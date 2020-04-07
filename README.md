@@ -23,7 +23,7 @@ On a cluster:
 
 
 ## Rulegraph
-<img src="https://github.com/reslp/smsi-comparative/blob/master/smsi_comparative_rulegraph.png" height="500">
+<img src="https://github.com/reslp/smsi-comparative/blob/master/rulegraph.png" height="500">
 
 ## Configuration
 
