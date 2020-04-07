@@ -1,0 +1,92 @@
+__default__:
+   time: "72:00:00"
+   N: default
+   shell: /bin/bash
+   mem: 48G
+   ntasks: 1
+   queue: all.q
+   output: $(pwd)/log/slurm-%j.out
+   error: $(pwd)/log/slurm-%j.err
+align_aa:
+   N: align_aa
+   hint: nomultithread
+ancestral_states_cazy:
+   N: anc_cazy
+   hint: nomultithread
+astral_species_tree:
+   N: astral
+   hint: nomultithread
+cazy_anc_summary:
+   N: cazyancsum
+   hint: nomultithread
+create_cafe_commands:
+   N: createcafe
+   hint: nomultithread
+create_cafe_style_tree:
+   N: cafestyletree
+   hint: nomultithread
+create_gene_family_table:
+   N: gefamtable
+   hint: nomultithread
+create_r8s_controlfile:
+   N: cr8scon
+   hint: nomultithread
+extract_functional_from_cafe:
+   N: extrfuncaf
+   hint: nomultithread
+extract_tree:
+   N: extrtree
+   hint: nomultithread
+filter_cafe_family_table:
+   N: filcafatab
+   hint: nomultithread
+infer_orthology:
+   N: infortho
+   hint: multithread
+   ntasks: 16
+iqtree_concat:
+   N: iqtconcat
+   hint: multithread
+   ntasks: 16
+iqtree_gene_concordance:
+   N: iqtgencon
+   hint: nomultithread
+iqtree_gene_trees:
+   N: iqtgenetr
+   hint: nomultithread
+orthology_statistics:
+   N: orthstats
+   hint: nomultithread
+parse_cafe_output:
+   N: parcafout
+   hint: nomultithread
+plot_phylogeny:
+   N: plotphylo
+   hint: nomultithread
+rename_ortholog_sequences:
+   N: renorthseq
+   hint: nomultithread
+reroot_tree:
+   N: reroottree
+   hint: nomultithread
+run_cafe:
+   N: runcafe
+   hint: multithread
+   ntasks: 16
+run_r8s:
+   N: runr8s
+   hint: nomultithread
+similarity_clustering:
+   N: simclus
+   hint: nomultithread
+trim:
+   N: trim
+   hint: nomultithread
+visualize_cafe_output:
+   N: viscafou
+   hint: nomultithread
+visualize_function_annotations_cafe:
+   N: visfacaf
+   hint: nomultithread
+get_upstream_inputfiles:
+   N: getupstream

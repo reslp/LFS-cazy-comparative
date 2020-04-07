@@ -1,0 +1,100 @@
+__default__:
+   time: "72:00:00"
+   ntasks: 1
+   N: 1
+   J: default
+   ntasks-per-node: 48 
+   hint: nomultithread
+   partition: mem_0096 
+   qos: mem_0096
+   output: $(pwd)/log/slurm-%j.out
+   error: $(pwd)/log/slurm-%j.err
+__default__:
+   time: "72:00:00"
+   ntasks: 1
+   N: 1
+   J: default
+   ntasks-per-node: 48
+   hint: nomultithread
+   partition: mem_0096
+   qos: mem_0096
+   output: $(pwd)/log/slurm-%j.out
+   error: $(pwd)/log/slurm-%j.err   
+align_aa:
+   J: align_aa
+   hint: nomultithread
+ancestral_states_cazy:
+   J: anc_cazy
+   hint: nomultithread
+astral_species_tree:
+   J: astral
+   hint: nomultithread
+cazy_anc_summary:
+   J: cazyancsum
+   hint: nomultithread
+create_cafe_commands:
+   J: createcafe
+   hint: nomultithread
+create_cafe_style_tree:
+   J: cafestyletree
+   hint: nomultithread
+create_gene_family_table:
+   J: gefamtable
+   hint: nomultithread
+create_r8s_controlfile:
+   J: cr8scon
+   hint: nomultithread
+extract_functional_from_cafe:
+   J: extrfuncaf
+   hint: nomultithread
+extract_tree:
+   J: extrtree
+   hint: nomultithread
+filter_cafe_family_table:
+   J: filcafatab
+   hint: nomultithread
+infer_orthology:
+   J: infortho
+   hint: multithread
+iqtree_concat:
+   J: iqtconcat
+   hint: multithread
+iqtree_gene_concordance:
+   J: iqtgencon
+   hint: nomultithread
+iqtree_gene_trees:
+   J: iqtgenetr
+   hint: nomultithread
+orthology_statistics:
+   J: orthstats
+   hint: nomultithread
+parse_cafe_output:
+   J: parcafout
+   hint: nomultithread
+plot_phylogeny:
+   J: plotphylo
+   hint: nomultithread
+rename_ortholog_sequences:
+   J: renorthseq
+   hint: nomultithread
+reroot_tree:
+   J: reroottree
+   hint: nomultithread
+run_cafe:
+   J: runcafe
+   hint: multithread
+run_r8s:
+   J: runr8s
+   hint: nomultithread
+similarity_clustering:
+   J: simclus
+   hint: nomultithread
+trim:
+   J: trim
+   hint: nomultithread
+visualize_cafe_output:
+   J: viscafou
+   hint: nomultithread
+visualize_function_annotations_cafe:
+   J: visfacaf
+   hint: nomultithread

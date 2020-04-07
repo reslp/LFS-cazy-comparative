@@ -1,0 +1,14 @@
+name: phylogenomics
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - libgcc-ng=9.2.0
+  - libgomp=9.2.0
+  - libstdcxx-ng=9.2.0
+  - mafft=7.455
+  - trimal=1.4.1
+
