@@ -4,7 +4,7 @@ __default__:
    shell: /bin/bash
    mem: 48G
    ntasks: 1
-   queue: all.q
+   queue: mpi
    output: $(pwd)/log/slurm-%j.out
    error: $(pwd)/log/slurm-%j.err
 align_aa:
