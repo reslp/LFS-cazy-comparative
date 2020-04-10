@@ -56,6 +56,7 @@ drwxr-xr-x 2 reslph domain_users   82  1. Apr 16:13 protein_files
 ```
 The folder `protein_files` contains protein files for each species included in the analysis.
 
+mafft creates tmp files in the folder `/usertmp`. This is a nonstandard binpoint in singularity. Therefore I pass the `tmp` directory as `/usertmp` to singularity as snakemake is called: `--singularity-args -B /tmp:/usertmp`.
 
 ## Run the pipeline:
 
