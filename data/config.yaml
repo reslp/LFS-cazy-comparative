@@ -5,7 +5,9 @@ set:
 orthofiles:
         Orthogroups_SpeciesOverlaps.tsv OrthologuesStats_many-to-many.tsv OrthologuesStats_one-to-many.tsv OrthologuesStats_many-to-one.tsv OrthologuesStats_one-to-one.tsv
 root:
-        Botrytis_cinerea,Erysiphe_necator,Epichloe_typhina,Sordaria_macrospora,Aureobasidium_pullulans,Phyllosticta_citricarpa,Arthonia_radiata
+        Erysiphe_necator,Epichloe_typhina,Sordaria_macrospora,Aureobasidium_pullulans,Phyllosticta_citricarpa,Arthonia_radiata
+cafe:
+        filter: no
 cafe_controlfile:
         data/cafe_commands_template.sh
 r8s_controlfile:
@@ -13,7 +15,7 @@ r8s_controlfile:
 pfam_descriptions:
         data/pfam_all_description.txt 
 iqtree:
-        threads: 48
+        threads: 16
 orthofinder:
-        threads: 48
+        threads: 32 
 

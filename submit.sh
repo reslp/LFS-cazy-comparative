@@ -34,6 +34,6 @@ CLUSTER=""
 command -v qsub >/dev/null 2>&1 && { echo >&2 "SGE detected, will use qsub to submit jobs."; CLUSTER="sge"; }
 command -v sbatch >/dev/null 2>&1 && { echo >&2 "SLURM detected, will use sbatch to submit jobs."; CLUSTER="slurm"; }
 
-#snakemake --use-singularity --jobs 1001 --cluster-config data/cluster_config-sauron.yaml --cluster "$(pwd)/bin/immediate_submit.py $(echo {dependencies} | sed 's#(##g' | sed 's#)##g' | sed 's#"##g') sge" --immediate-submit -pr --notemp --latency-wait 600 $1
-snakemake --use-singularity --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster "$(pwd)/bin/immediate_submit.py '{dependencies}' $CLUSTER" --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
+#snakemake --use-singularity --singularity-args "-B /tmp:/usertmp" --jobs 1001 --cluster-config data/cluster_config-sauron.yaml --cluster "$(pwd)/bin/immediate_submit.py $(echo {dependencies} | sed 's#(##g' | sed 's#)##g' | sed 's#"##g') sge" --immediate-submit -pr --notemp --latency-wait 600 $1
+snakemake --use-singularity --singularity-args "-B /tmp:/usertmp" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster "$(pwd)/bin/immediate_submit.py '{dependencies}' $CLUSTER" --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
 #snakemake --use-singularity --jobs 1001 --cluster-config data/cluster_config-sauron.yaml --immediate-submit -pr --notemp --latency-wait 600 $1

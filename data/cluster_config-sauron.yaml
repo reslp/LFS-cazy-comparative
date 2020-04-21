@@ -43,7 +43,7 @@ filter_cafe_family_table:
 infer_orthology:
    N: infortho
    hint: multithread
-   ntasks: 16
+   ntasks: 32
 iqtree_concat:
    N: iqtconcat
    hint: multithread
@@ -90,3 +90,15 @@ visualize_function_annotations_cafe:
    hint: nomultithread
 get_upstream_inputfiles:
    N: getupstream
+extract_gh5_genes:
+   N: gh5extract
+combine_gh5_genes_and_reference:
+   N: gh5combine
+align_gh5:
+   N: gh5align
+trimm_gh5:
+   N: gh5trimm
+iqtree_gh5:
+   N: gh5iqtree
+   ntasks: 16
+

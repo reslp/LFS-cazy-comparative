@@ -107,8 +107,7 @@ tree <- read.tree(treefile)
 mbt <- max(branching.times(tree))
 tree$edge.length <- tree$edge.length / mbt
 
-ptree <- ggtree(tree) + geom_tiplab(align=TRUE) + geom_treescale(x=0.1,y=50, width=0.2) + scale_x_continuous(expand=expand_scale(0.2)) + scale_y_tree() +xlim(NA, 1.65) #+geom_treescale(x=0,y=45, width=0.5)#+scale_x_continuous(expand=expand_scale(0.2))
-ptree
+ptree <- ggtree(tree, size=0.3) + geom_tiplab(align=TRUE, size=2.5) + geom_treescale(x=0.1,y=50, width=0.2, linesize=0.3) + scale_x_continuous(expand=expand_scale(0.2)) + scale_y_tree() +xlim(NA, 1.3) #+geom_treescale(x=0,y=45, width=0.5)#+scale_x_continuous(expand=expand_scale(0.2))
 
 d <- fortify(tree)
 d <- subset(d, isTip)
@@ -173,47 +172,44 @@ colnames(ancestral_states) <- colnames(cellulose_df)
 root_node <- findMRCA(tree, tree$tip.label)
 print(root_node)
 print("Ancestral internal nodes as follows (for manual check):")
-lecanoro_node <- findMRCA(tree, c("Peltigera_leucophlebia", "Xylographa_parallela"))
+lecanoro_node <- findMRCA(tree, c("Peltigera_leucophlebia", "Xylographa_parallela", "Umbilicaria_muehlenbergii"))
 print("Lecanoromycetes:")
 print(lecanoro_node)
 eurotio_node <- findMRCA(tree, c("Pseudophaeomoniella_oleicola", "Penicillium_chrysogenum"))
 print("Eurotiomycetes:")
 print(eurotio_node)
-ostropo_node <- findMRCA(tree, c("Schaereria_dolodes", "Xylographa_parallela"))
+ostropo_node <- findMRCA(tree, c("Loxospora_cismonica", "Xylographa_parallela"))
 print("Ostropomycetidae:")
 print(ostropo_node)
-lecanidae_node <- findMRCA(tree, c("Cladonia_metacorallifera", "Peltigera_leucophlebia"))
+lecanidae_node <- findMRCA(tree, c("Cladonia_metavorallifera", "Peltigera_leucophlebia"))
 print("Lecanoromycetidae:")
 print(lecanidae_node)
 xylo_node <- findMRCA(tree, c("Xylographa_parallela", "Xylographa_trunciseda"))
 print("Xylographa:")
 print(xylo_node)
-
+my_nodes <- c(root_node, lecanoro_node, eurotio_node, ostropo_node, lecanidae_node, xylo_node)
 
 for (i in 1:length(fit_cel)) {
-  ancestral_states["root", names[i]] <- round(fit_cel[[i]]$ace[toString(root_node)])
-  ancestral_states["ancestral_Lecanoromycete", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_node)])
-  ancestral_states["ancestral_Eurotiomycete", names[i]] <- round(fit_cel[[i]]$ace[toString(eurotio_node)])
+  ancestral_states["ancestral_Xylographa", names[i]] <- round(fit_cel[[i]]$ace[toString(xylo_node)])
   ancestral_states["ancestral_Ostropomycetidae", names[i]] <- round(fit_cel[[i]]$ace[toString(ostropo_node)])
   ancestral_states["ancestral_Lecanoromycetidae", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanidae_node)])
-  ancestral_states["ancestral_Xylographa", names[i]] <- round(fit_cel[[i]]$ace[toString(xylo_node)])
+  ancestral_states["ancestral_Lecanoromycete", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_node)])
+  ancestral_states["ancestral_Eurotiomycete", names[i]] <- round(fit_cel[[i]]$ace[toString(eurotio_node)])
+  ancestral_states["root", names[i]] <- round(fit_cel[[i]]$ace[toString(root_node)])
 }
-
 
 
 print("Plotting the all heatmap...")
 base_size <- 11
+#reorder names for plot
+ancestral_states <- ancestral_states[c("ancestral_Xylographa", "ancestral_Ostropomycetidae", "ancestral_Lecanoromycetidae", "ancestral_Lecanoromycete", "ancestral_Eurotiomycete", "root"),]
 rownames(ancestral_states)
 ancestral_states$name <- rownames(ancestral_states)
-plot_df1 <- melt(ancestral_states)
-psummary_anc <- ggplot(plot_df1, aes(variable, name)) + geom_tile(aes(fill = value), colour = "white") + scale_fill_gradient(low = "#EAF4F7",   high = "#F06449")+ geom_text(aes(fill = plot_df1$value),label = round(plot_df1$value, 1), size=2)
-psummary_anc <- psummary_anc  + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top") +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))
- 
-#filename = paste(prefix,"_",set,"_all_anc_heatmap.pdf",sep="")
-#pdf(file=filename, width=11.4, height=8.3)
-#psummary_anc 
-#dev.off()
 
+plot_df1 <- melt(ancestral_states)
+psummary_anc <- ggplot(plot_df1, aes(variable, name)) + geom_tile(aes(fill = value)) + scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449")+ theme_classic()+geom_text(aes(label = ifelse(round(plot_df1$value, 1)>0, round(plot_df1$value, 1), "")), size=2)
+psummary_anc <- psummary_anc + labs(x = "", y = "") + scale_x_discrete(position="top") +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))
+psummary_anc
 plot_df_sum <- melt(cellulose_df)
 
 colnames(plot_df_sum) <- c("label", "category", "value")
@@ -221,12 +217,9 @@ plot_df_sum <- as_tibble(plot_df_sum)
 plot_df_sum$label <- as.character(plot_df_sum$label)
 plot_df_sum$category <- as.character(plot_df_sum$category)
 
-#psummary <- ggplot(plot_df_sum, aes(Var2, Var1)) + geom_tile(aes(fill = value), colour = "white") + scale_fill_gradient(low = "#EAF4F7",   high = "#F06449")+ geom_text(aes(fill = plot_df_sum$value),label = round(plot_df_sum$value, 1), size=2)
-#psummary <- psummary+ theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top")+ theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))#+scale_y_discrete(expand = c(0, 0))
-#psummary <- psummary + scale_y_continuous(limits=limits, expand=c(0,0))
-#psummary <- ggplot(df2, aes(x=category, y=label),expand_limits=expand_scale(0,.6)) + geom_tile(aes(fill=value)) + scale_fill_gradient2()
-psummary <- ggtreeplot(ptree, plot_df_sum, aes(x=category)) + geom_tile(aes(fill=value)) +scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449") +no_y_axis() +no_x_axis()+theme(axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))
-psummary <- psummary + scale_y_continuous(expand=c(0,0)) +no_legend() +scale_x_discrete(position="top")+ geom_text(aes(fill = plot_df_sum$value),label = round(plot_df_sum$value, 1), size=2)
+psummary <- ggtreeplot(ptree, plot_df_sum, aes(x=category)) + geom_tile(aes(fill=value)) +scale_fill_gradient2(low = "#EAF4F7", high = "#F06449") +theme_classic()+no_y_axis() +no_x_axis()+theme(axis.text.x = element_text(size = base_size *0.8, angle=45, hjust = 0, colour = "grey50")) + no_legend() +scale_x_discrete(position="top")
+psummary <- psummary + scale_y_continuous(expand=c(0,0)) + geom_text(aes(label = ifelse(plot_df_sum$value >0, plot_df_sum$value, "")), colour="black", size=2)
+
 
 pdf(file=paste(prefix,"_",set,"_heatmap.pdf",sep=""), width=11.7, height=8.3)
 psummary
@@ -236,17 +229,55 @@ pdf(file=paste(prefix,"_",set,"_anc_heatmap.pdf",sep=""), width=11.7, height=8.3
 psummary_anc
 dev.off()
 
+
+# Prepare the combined plot:
+
+#Make some additional changes to the anc df before combining with the other plots:
+# To create the labels for the anc values while maintaining subplot alignment 
+# I had to create another empty plot with just the labels, but the extend into the plotting area:
+psummary_legend <- ggplot(plot_df1, aes(variable, name)) + scale_y_discrete(position = "right") + theme(axis.text.y.right = element_text(hjust = 1, size=base_size*0.6))
+psummary_legend <- psummary_legend + theme(legend.position = "none", axis.title.y.right=element_blank(), panel.background = element_blank()) +no_y_axis() +no_x_axis()
+psummary_legend <- psummary_legend + theme(axis.text.y.right = element_text(margin = margin(0,0.5,0,-4.5, unit = 'cm'), colour="black"))
+
+# make same changes to the plt margin
+psummary_anc <- psummary_anc + no_y_axis() + no_x_axis()+theme(plot.margin=margin(theme_grey()$plot.margin))
+
+#remove margins around plots
+#psummary_legend <- psummary_legend + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
+#psummary <- psummary + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
+#ptree <- ptree + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
+#psummary_anc <- psummary_anc + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
+
+
+#highlight nodes in tree for plotting:
+ptree <- ptree + geom_point2(aes(subset=(node %in% my_nodes)),color="black",size=2)
+
+#plot layout:
+layout <- "
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+AAABB
+CCCDD
+"
 print("combine output")
 pfiller <- ggplot() + geom_blank() + theme_minimal()
 pdf(file=paste(prefix,"_",set,"_combined.pdf",sep=""), width=11.7, height=8.3)
-ptree +  psummary
+ptree + psummary + psummary_legend + psummary_anc + plot_layout(design=layout)
 dev.off()
-#ggsave(paste(prefix,"_",set,"_combined.pdf",sep=""), width=11.4, height=8.3)
 
-#library(gridExtra)
-#pdf(file=paste(prefix,"_",set,"_all_out.pdf",sep=""), width=22.6, height=15.6)
-#grid.arrange(ptree, psummary,pfiller, psummary_anc, ncol=2)  
-#plot_grid(ptree, psummary,NULL, psummary_anc,ncol=2, labels=c("A", "B", "", "C"))
-#dev.off()
+#ptree + psummary + psummary_legend + psummary_anc + plot_layout(design=layout)
+#ggarrange(ptree,psummary, psummary_legend,psummary_anc)
 print("saving environment")
 save.image(file=paste(prefix,"_",set,"_anc_cazy_all.RData",sep=""))

@@ -112,7 +112,7 @@ def filter_print(mcl_dump, lines_to_keep_set, lines_to_separate_set, output_file
 
         # cleaning up in case size filtering was not done
         if len(lines_to_separate_set) == 0:
-            os.unlink("large_"+output_file_name)
+            os.unlink(output_file_name)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, prog="cafetutorial_clade_and_size_filter.py")

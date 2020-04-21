@@ -33,7 +33,12 @@ rule all:
 		expand("results/{pre}/checkpoints/visualize_cafe_output.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/extract_functional_from_cafe.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/extract_gh5_genes.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/combine_gh5_genes_and_reference.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -165,7 +170,7 @@ rule align_aa:
         dir = rules.rename_ortholog_sequences.output.dir,
         checkpoint = rules.rename_ortholog_sequences.output.checkpoint
     log:
-        "logs/align_aa.log"
+        "log/align_aa.log"
     output:
         checkpoint = expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
         dir = directory(expand("results/{pre}/aa_alignments/", pre=config["prefix"]))
@@ -223,7 +228,7 @@ rule iqtree_concat:
         cd results/{params.prefix}/phylogeny/concatenated
         mkdir algn
         cp {params.wd}/{input.trims}*trimmed algn
-        iqtree -p algn/ --prefix concat -bb 1000 -nt AUTO -m WAG -redo -T {threads}
+        iqtree -p algn/ --prefix concat -bb 1000 -nt AUTO -m WAG -redo -T {threads} --no-terrace
         rm -r algn
         cd {params.wd}
         touch {output.checkpoint}
@@ -277,7 +282,7 @@ rule iqtree_gene_concordance:
         cd results/{params.prefix}/phylogeny
         mkdir -p algn
         cp {params.wd}/{input.alignments}*trimmed algn
-        iqtree -t {params.wd}/{input.concat} --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
+        iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
         rm -r algn
         cd {params.wd}
         touch {output.checkpoint}
@@ -365,7 +370,7 @@ rule cazy_anc_summary:
     conda:
         "envs/rreroot.yml"
     log:
-        "logs/output_cazy_anc_summary.log"
+        "log/output_cazy_anc_summary.log"
     shell:
         """
         if [[ ! -d results/{params.prefix}/cazy_ancestral_states_summary ]]
@@ -448,12 +453,33 @@ rule orthology_statistics:
         touch {output.checkpoint}
         """
 
+rule astral_species_tree:
+        input:
+                trees = rules.iqtree_gene_trees.output.trees,
+                checkpoint = rules.iqtree_gene_trees.output.checkpoint
+        output:
+                species_tree = expand("results/{pre}/astral/species_tree.tre", pre=config["prefix"]),
+                checkpoint = expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"])
+        params:
+                wd = os.getcwd()
+        singularity:
+                "docker://reslp/astral:5.7.1"
+        log:
+                expand("results/{pre}/astral/astral.log", pre=config["prefix"])
+        shell:
+                """
+                java -jar /ASTRAL-5.7.1/Astral/astral.5.7.1.jar -i {input.trees} -o {output.species_tree} 2> {log}
+                touch {output.checkpoint}
+                """
+
 rule plot_phylogeny:
     input:
         tree = rules.iqtree_gene_concordance.output.treefile,
+	astral = rules.astral_species_tree.output.species_tree,
         checkpoint = rules.iqtree_gene_concordance.output.checkpoint
     output:
         phylogeny = expand("results/{pre}/phylogeny/{pre}_phylogeny.pdf", pre = config["prefix"]),
+	phylogeny2 = expand("results/{pre}/phylogeny/{pre}_phylogeny2.pdf", pre = config["prefix"]),
         checkpoint = expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"])
     params:
         wd = os.getcwd()
@@ -461,9 +487,87 @@ rule plot_phylogeny:
         "envs/rorthologystatistics.yml"
     shell:
         """
-        Rscript bin/visualize_tree.R {params.wd} {input.tree} {output.phylogeny}
+        Rscript bin/visualize_tree.R {params.wd} {input.tree} {input.astral} {output.phylogeny} {output.phylogeny2}
         touch {output.checkpoint}
         """
+
+rule extract_gh5_genes:
+	input:
+		gff_files = expand("data/{pre}/gff_files/", pre=config["prefix"]),
+		prot_files = expand("data/{pre}/protein_files/", pre=config["prefix"]),
+	output:
+		gh5_genes = expand("results/{pre}/gh5_tree/extracted_gh5_genes_{pre}.fas", pre = config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/extract_gh5_genes.done", pre=config["prefix"])
+	conda:
+		"envs/pyutils.yml"
+	shell:
+		"""
+		bin/select_genes_for_annotation.py -gff {input.gff_files} -fasta {input.prot_files} -item CAZy:GH5 > {output.gh5_genes}
+		touch {output.checkpoint}
+		"""
+
+rule combine_gh5_genes_and_reference:
+	input:
+		known_gh5_genes = "data/cazy_gh5_characterized_reference_seqs.fa",
+		extracted_gh5_genes = rules.extract_gh5_genes.output.gh5_genes,
+	output:
+		all_gh5_genes = expand("results/{pre}/gh5_tree/all_gh5_genes_{pre}.fas", pre = config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/combine_gh5_genes_and_reference.done", pre=config["prefix"])
+	shell:
+		"""
+		cat {input.known_gh5_genes} {input.extracted_gh5_genes} > {output.all_gh5_genes}
+		touch {output.checkpoint}
+		"""
+
+rule align_gh5:
+	input:
+		all_gh5_genes = rules.combine_gh5_genes_and_reference.output.all_gh5_genes
+	log:
+		"log/align_gh5.log"
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
+		gh5_alignment =  expand("results/{pre}/gh5_tree/all_gh5_genes_alignment_{pre}.fas", pre = config["prefix"]),
+	conda:
+		"envs/phylogenomics.yml"
+	shell:
+		"""
+		mafft --quiet --auto {input.all_gh5_genes}  > {output.gh5_alignment}
+		touch {output.checkpoint}
+		"""
+
+rule trim_gh5:
+	input:
+		rules.align_gh5.output.gh5_alignment
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
+		trimmed_alignment = expand("results/{pre}/gh5_tree/all_gh5_genes_alignment_trimmed_{pre}.fas", pre = config["prefix"])
+	conda:
+		"envs/phylogenomics.yml"
+	shell:
+		"""
+		trimal -gappyout -in {input} -out {output.trimmed_alignment}
+		touch {output.checkpoint}
+		"""
+
+rule iqtree_gh5:
+	input:
+		rules.trim_gh5.output.trimmed_alignment
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"]),
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"]
+	singularity:
+		"docker://reslp/iqtree:2.0rc2"
+	threads:
+		config["iqtree"]["threads"]
+	shell:
+		"""
+		cd results/{params.prefix}/gh5_tree
+		iqtree -s {params.wd}/{input} --prefix gh5_tree -bb 1000 -nt {threads} -m TEST -redo --no-terrace
+		cd {params.wd}
+		touch {output.checkpoint}
+		"""
 
 rule create_gene_family_table:
     input:
@@ -480,26 +584,40 @@ rule create_gene_family_table:
         touch {output.checkpoint}
         """
 
-rule filter_cafe_family_table:
-    input:
-        raw_file = rules.create_gene_family_table.output.raw_file,
-        checkpoint = rules.create_gene_family_table.output.checkpoint
-    output:
-        filtered_file = expand("results/{pre}/cafe/{pre}_filtered_cafe_input_file.tab", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"])
-    params:
-        wd = os.getcwd(),
-        prefix = config["prefix"]
-    conda:
-        "envs/pyutils.yml"
-    shell:
-        """
-        cd results/{params.prefix}/cafe/
-        name=$(basename "{params.wd}/{input.raw_file}")
-        python {params.wd}/bin/clade_and_size_filter.py -i "$name" -o {params.wd}/{output.filtered_file} -s
-        cd {params.wd}
-        touch {output.checkpoint}
-        """
+if config["cafe"]["filter"] == "yes":
+	rule filter_cafe_family_table:
+		input:
+			raw_file = rules.create_gene_family_table.output.raw_file,
+			checkpoint = rules.create_gene_family_table.output.checkpoint
+		output:
+        		filtered_file = expand("results/{pre}/cafe/{pre}_filtered_cafe_input_file.tab", pre=config["prefix"]),
+        		checkpoint = expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"])
+		params:
+			wd = os.getcwd(),
+			prefix = config["prefix"]
+		conda:
+			"envs/pyutils.yml"
+		shell:
+			"""
+			cd results/{params.prefix}/cafe/
+			name=$(basename "{params.wd}/{input.raw_file}")
+			python {params.wd}/bin/clade_and_size_filter.py -i "$name" -o {params.wd}/{output.filtered_file} -s
+			cd {params.wd}
+			touch {output.checkpoint}
+			"""
+else:
+	rule filter_cafe_family_table:
+		input:
+			raw_file = rules.create_gene_family_table.output.raw_file,
+                	checkpoint = rules.create_gene_family_table.output.checkpoint
+		output:
+        		filtered_file = expand("results/{pre}/cafe/{pre}_filtered_cafe_input_file.tab", pre=config["prefix"]),
+        		checkpoint = expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"])
+		shell:
+			"""
+			cp {input.raw_file} {output.filtered_file}
+			touch {output.checkpoint}
+			"""
 
 rule create_cafe_style_tree:
     input:
@@ -599,25 +717,6 @@ rule visualize_cafe_output:
         Rscript bin/visualize_cafe.R {params.wd}/results/{params.prefix}/cafe {input.tree} {input.table} {input.plottree} {params.prefix}
         touch {output.checkpoint}
         """
-
-rule astral_species_tree:
-	input:
-		trees = rules.iqtree_gene_trees.output.trees,
-		checkpoint = rules.iqtree_gene_trees.output.checkpoint
-	output:
-		species_tree = expand("results/{pre}/astral/species_tree.tre", pre=config["prefix"]),
-		checkpoint = expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"])
-	params:
-		wd = os.getcwd()
-	singularity:
-		"docker://reslp/astral:5.7.1"
-	log:
-		expand("results/{pre}/astral/astral.log", pre=config["prefix"])
-	shell:
-		"""
-		java -jar /ASTRAL-5.7.1/Astral/astral.5.7.1.jar -i {input.trees} -o {output.species_tree} 2> {log}
-		touch {output.checkpoint}
-		"""
 
 rule extract_functional_from_cafe:
 	input:
