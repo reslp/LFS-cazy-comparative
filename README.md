@@ -22,6 +22,12 @@ On a cluster:
 - SGE or SLURM job scheduling system
 
 
+## Known issues:
+
+### Conda and Singularity combined don't work on VSC4 (found workaround)
+
+On VSC4 originally, the pipeline failed. It looks like the conda environments could not be created successfully. I created an [issue](https://github.com/snakemake/snakemake/issues/304) about this on the snakemake Github page. The error only seems to occur when --use-conda and --use-singularity is combined. Also on sauron this does not happen. After lots of additional investigation I found a workaround. It works by creating an environment variable which points to a directory to store the downloaded conda packages. Othwerise the packages will be downloaded in the global /tmp directory which seems to result in symlinks being not correctly resolved in `.snakemake/conda`. This is currently only done on SLURM clusters and not on sauron. I don't understand exactly why this happens and I am also not 100% sure if this is a problem of snakemake, singularity or anaconda.
+
 ## Rulegraph
 <img src="https://github.com/reslp/smsi-comparative/blob/master/rulegraph.png" height="500">
 

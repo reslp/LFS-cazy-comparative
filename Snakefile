@@ -80,7 +80,7 @@ rule get_upstream_inputfiles:
 		idsfile = expand("data/{pre}/ids.txt", pre=config["prefix"]),
 		combined_gff = expand("data/{pre}/{pre}_combined.gff", pre=config["prefix"]),
 		combined_proteins = expand("data/{pre}/{pre}_proteins.fas", pre=config["prefix"]),
-		combined_transcripts = expand("data/{pre}/{pre}_transcripst.fas", pre=config["prefix"]),
+		combined_transcripts = expand("data/{pre}/{pre}_transcripts.fas", pre=config["prefix"]),
 		cazyme_results = expand("data/{pre}/CAZyme.all.results.csv", pre=config["prefix"]),
 		cazyme_summary_results = expand("data/{pre}/CAZyme.summary.results.csv", pre=config["prefix"]),
 		interproscan_results = expand("data/{pre}/interproscan.results.csv", pre=config["prefix"]),
@@ -122,7 +122,6 @@ rule infer_orthology:
 	output:
 		dir = directory(expand("results/{pre}/orthofinder/", pre=config["prefix"])),
 		checkpoint = expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"])
-	singularity: "docker://continuumio/miniconda3:4.7.10"
 	conda: "envs/orthofinder.yml"
 	threads: config["orthofinder"]["threads"]
 	shell:
