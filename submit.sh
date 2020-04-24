@@ -10,7 +10,7 @@ usage() {
 	echo "Options:"
 	echo "	-c <cluster_config_file> Path to cluster config file in YAML format (mandatory). "
 	echo "	-s \"<snakemake_args>\" Additional arguments passed on to the snakemake command (optional). snakemake is run with --immediate-submit -pr --notemp --latency-wait 600 --use-singularity --jobs 1001 by default." 
-	echo "	-i \"<singularity_args>\" Additional arguments passed on to singularity (optional). Singularity is run with -V /tmp:/usertmp by default."
+	echo "	-i \"<singularity_args>\" Additional arguments passed on to singularity (optional). Singularity is run with -B /tmp:/usertmp by default."
 	1>&2; exit 1; }
 	
 version() {

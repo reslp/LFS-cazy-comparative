@@ -1,5 +1,5 @@
-prefix: "80_genomes"
-ngenomes: 80
+prefix: "82_genomes"
+ngenomes: 82
 set:
         cellulose hemicellulose
 orthofiles:
@@ -15,7 +15,7 @@ r8s_controlfile:
 pfam_descriptions:
         data/pfam_all_description.txt 
 iqtree:
-        threads: 16
+        threads: 32
 orthofinder:
-        threads: 32 
+        threads: 48 
 

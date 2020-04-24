@@ -1,8 +1,10 @@
 .snakemake/
 data/80_genomes/
+data/82_genomes/
 results/
 .conda/
 .bash_history
 .conda_pkg_tmp/
 .condarc
 .python_history
+log/
