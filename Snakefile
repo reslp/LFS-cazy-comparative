@@ -115,6 +115,25 @@ rule statistics:
 		touch {output.checkpoint}
 		"""
 
+rule plot_genome_overview:
+	input:
+		cogs_file = expand("data/{pre}/COGS.all.results.csv", pre=config["prefix"]),
+		cazy_file = expand("data/{pre}/CAZyme.summary.results.csv", pre=config["prefix"]),
+		secmet_file = expand("data/{pre}/SM.summary.results.csv", pre=config["prefix"]),
+		stats_file = expand("data/{pre}/genome.stats.summary.csv", pre=config["prefix"])
+	output:
+		genomes_overview = expand("results/{pre}/statistics/genomes_overview.pdf", pre=config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
+	conda:
+		"envs/genome_overview.yml"
+	params:
+		wd = os.getcwd()
+	shell:
+		"""
+		Rscript bin/plot_overview.R {params.wd} {input.cogs_file} {input.cazy_file} {input.secmet_file} {input.stats_file} {output.genomes_overview}
+		touch {output.checkpoint}
+		"""	
+
 rule infer_orthology:
 	input:
 		prot_files = expand("data/{pre}/protein_files", pre=config["prefix"]),

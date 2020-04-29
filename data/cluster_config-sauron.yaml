@@ -101,4 +101,5 @@ trimm_gh5:
 iqtree_gh5:
    N: gh5iqtree
    ntasks: 16
-
+plot_genome_overview:
+   N: genooverview

@@ -87,3 +87,6 @@ visualize_cafe_output:
 visualize_function_annotations_cafe:
    J: visfacaf
    hint: nomultithread
+plot_genome_overview:
+   J: genooverview
+   hint: nomultithread
