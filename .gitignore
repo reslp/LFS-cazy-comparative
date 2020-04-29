@@ -8,3 +8,5 @@ results/
 .condarc
 .python_history
 log/
+Rplots.pdf
+bin/__pycache__/
