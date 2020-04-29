@@ -29,6 +29,7 @@ On a cluster:
 On VSC4 originally, the pipeline failed. It looks like the conda environments could not be created successfully. I created an [issue](https://github.com/snakemake/snakemake/issues/304) about this on the snakemake Github page. The error only seems to occur when --use-conda and --use-singularity is combined. Also on sauron this does not happen. After lots of additional investigation I found a workaround. It works by creating an environment variable which points to a directory to store the downloaded conda packages. Othwerise the packages will be downloaded in the global /tmp directory which seems to result in symlinks being not correctly resolved in `.snakemake/conda`. This is currently only done on SLURM clusters and not on sauron. I don't understand exactly why this happens and I am also not 100% sure if this is a problem of snakemake, singularity or anaconda.
 
 ## Rulegraph
+*Note:* The PDF of the rulegraph is more up-to-date than this png:
 <img src="https://github.com/reslp/smsi-comparative/blob/master/rulegraph.png" height="500">
 
 ## Configuration
@@ -42,23 +43,26 @@ For example if `config.yaml`has a specified prefix 80_genomes. The data folder s
 
 ```
 $ ls -lah
-insgesamt 2,6G
-drwxr-xr-x 3 reslph domain_users   16  6. Apr 19:54 .
-drwxr-xr-x 4 reslph domain_users    9  7. Apr 09:20 ..
--rw-r--r-- 1 reslph domain_users 664M  1. Apr 16:10 80_genomes_combined.gff
--rw-r--r-- 1 reslph domain_users 395M  1. Apr 16:10 80_genomes_proetins.fas
--rw-r--r-- 1 reslph domain_users 395M  6. Apr 19:43 80_genomes_proteins.fas
--rw-r--r-- 1 reslph domain_users 1,2G  1. Apr 16:10 80_genomes_transcripst.fas
--rwxr-xr-x 1 reslph domain_users 1,4K 30. Mär 08:55 cafe_commands_template.sh
--rw-r--r-- 1 reslph domain_users 109K  1. Apr 16:10 CAZyme.all.results.csv
--rw-r--r-- 1 reslph domain_users 4,0K  1. Apr 16:10 CAZyme.summary.results.csv
--rw------- 1 reslph domain_users 1,9M 30. Mär 17:30 entry.list
--rw-r--r-- 1 reslph domain_users 2,3K  1. Apr 16:10 ids.txt
--rw-r--r-- 1 reslph domain_users 1,8M  1. Apr 16:10 interproscan.results.csv
--rw-r--r-- 1 reslph domain_users 703K 30. Mär 08:55 pfam_all_description.txt
--rw-r--r-- 1 reslph domain_users 999K  1. Apr 16:10 pfam.results.csv
-drwxr-xr-x 2 reslph domain_users   82  1. Apr 16:13 protein_files
--rw-r--r-- 1 reslph domain_users  274 30. Mär 08:55 r8s_template.nex
+insgesamt 2,2G
+drwxr-xr-x 4 reslp p71312    17 29. Apr 10:53 .
+drwxr-xr-x 4 reslp p71312     6 29. Apr 09:48 ..
+-rw-r--r-- 1 reslp p71312  679M 24. Apr 17:46 82_genomes_combined.gff
+-rw-r--r-- 1 reslp p71312  404M 24. Apr 17:46 82_genomes_proteins.fas
+-rw-r--r-- 1 reslp p71312  1,2G 24. Apr 17:46 82_genomes_transcripts.fas
+-rwxr-xr-x 1 reslp p71312  1,4K 24. Apr 17:47 cafe_commands_template.sh
+-rw-r--r-- 1 reslp p71312  111K 24. Apr 17:46 CAZyme.all.results.csv
+-rw-r--r-- 1 reslp p71312  4,1K 24. Apr 17:46 CAZyme.summary.results.csv
+-rw-r--r-- 1 reslp p71312  9,9K 29. Apr 10:49 COGS.all.results.csv
+-rw------- 1 reslp p71312  1,9M 24. Apr 17:47 entry.list
+-rw-r--r-- 1 reslp p71312   12K 29. Apr 09:31 genome.stats.summary.csv
+drwxr-xr-x 2 reslp p71312    83 24. Apr 17:46 gff_files
+-rw-r--r-- 1 reslp p71312  2,3K 28. Apr 17:19 ids.txt
+-rw-r--r-- 1 reslp p71312  1,8M 24. Apr 17:46 interproscan.results.csv
+-rw-r--r-- 1 reslp p71312  703K 24. Apr 17:47 pfam_all_description.txt
+-rw-r--r-- 1 reslp p71312 1019K 24. Apr 17:46 pfam.results.csv
+drwxr-xr-x 2 reslp p71312    83 24. Apr 17:46 protein_files
+-rw-r--r-- 1 reslp p71312   274 24. Apr 17:47 r8s_template.nex
+-rw-r--r-- 1 reslp p71312  2,5K 29. Apr 09:31 SM.summary.results.csv
 ```
 The folder `protein_files` contains protein files for each species included in the analysis.
 

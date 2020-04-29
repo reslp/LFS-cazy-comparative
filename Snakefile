@@ -38,7 +38,8 @@ rule all:
 		expand("results/{pre}/checkpoints/combine_gh5_genes_and_reference.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
