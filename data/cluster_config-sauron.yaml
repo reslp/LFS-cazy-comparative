@@ -13,6 +13,9 @@ align_aa:
 ancestral_states_cazy:
    N: anc_cazy
    hint: nomultithread
+ancestral_states_all_cazy:
+   N: anc_acazy
+   hint: nomultithread
 astral_species_tree:
    N: astral
    hint: nomultithread

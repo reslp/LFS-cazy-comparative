@@ -6,12 +6,14 @@ cazy_file <- args[2]
 treefile <- args[3]
 prefix <- args[4]
 set <- args[5]
+outdir <- args[6]
 
 print(wd)
 print(cazy_file)
 print(treefile)
 print(prefix)
 print(set)
+print(outdir)
 
 #if (!"patchwork" %in% installed.packages())
 #{
@@ -126,8 +128,8 @@ all_cazy <- all_cazy [nrow(all_cazy ):1,]
 
 #change working directory for output
 print("Change WD for output...")
-print(paste(wd,"/results/",prefix,"/cazy_ancestral_states_genesets/",sep=""))
-setwd(paste(wd,"/results/",prefix,"/cazy_ancestral_states_genesets/",sep=""))
+print(paste(wd,"/results/",prefix,"/",outdir,"/",sep=""))
+setwd(paste(wd,"/results/",prefix,"/",outdir,"/",sep=""))
 
 print("plotting tree...")
 tree_out <- paste(prefix, "_tree.pdf", sep="")

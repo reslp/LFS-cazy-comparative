@@ -7,7 +7,7 @@ configfile: "data/config.yaml"
 rule all:
 	input:
 		expand("results/{pre}/checkpoints/get_upstream_inputfiles.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
@@ -39,6 +39,7 @@ rule all:
 		expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
@@ -97,7 +98,7 @@ rule get_upstream_inputfiles:
 
 rule statistics:
 	input:
-		expand("data/{pre}/overview_stats.csv", pre=config["prefix"])
+		expand("data/{pre}/stats_genomes.csv", pre=config["prefix"])
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"]),
 		dir = directory(expand("results/{pre}/statistics/", pre=config["prefix"]))
@@ -123,7 +124,7 @@ rule plot_genome_overview:
 		secmet_file = expand("data/{pre}/SM.summary.results.csv", pre=config["prefix"]),
 		stats_file = expand("data/{pre}/genome.stats.summary.csv", pre=config["prefix"])
 	output:
-		genomes_overview = expand("results/{pre}/statistics/genomes_overview.pdf", pre=config["prefix"]),
+		genomes_overview = expand("results/{pre}/genome_overviews/genomes_overview.pdf", pre=config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
 	conda:
 		"envs/genome_overview.yml"
@@ -412,7 +413,8 @@ rule ancestral_states_cazy:
     params:
         wd = os.getcwd(),
         prefix = config["prefix"],
-        set = config["set"]
+        set = config["set"],
+	outprefix = "cazy_ancestral_states_genesets"
     conda:
         "envs/rreroot.yml"
     shell:
@@ -420,11 +422,29 @@ rule ancestral_states_cazy:
         for i in {params.set}
         do
             echo $i
-            Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} $i
+            Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} $i {params.outprefix}
         done
         touch {output.checkpoint}
         """
 
+rule ancestral_states_all_cazy:
+    input:
+        csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
+        tree = rules.extract_tree.output.ultra_tree
+    output:
+        dir = directory(expand("results/{pre}/cazy_ancestral_states_all_cazy/", pre = config["prefix"])),
+        checkpoint = expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"])
+    params:
+        wd = os.getcwd(),
+        prefix = config["prefix"],
+	outprefix = "cazy_ancestral_states_all_cazy"
+    conda:
+        "envs/rreroot.yml"
+    shell:
+        """
+        Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} all {params.outprefix}
+        touch {output.checkpoint}
+        """
 rule similarity_clustering:
     input:
         cazy_data = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
