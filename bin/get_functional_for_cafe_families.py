@@ -22,19 +22,19 @@ args=pars.parse_args()
 
 whichnodes = ""
 if args.type == "all":
-	print("Extracting data from all nodes:")
+	print("Extracting data from all nodes:", file=sys.stderr)
 	whichnodes = "all"
 elif args.type == "internal":
-	print("Extracting data from internal nodes:")
+	print("Extracting data from internal nodes:", file=sys.stderr)
 	whichnodes = "internal"
 else:
-	print("Extracting data for nodes", args.type)
+	print("Extracting data for nodes", args.type, file=sys.stderr)
 	whichnodes = args.type.split(",")
 	
 if args.which == "+":
-	print("Extracting expanded families")
+	print("Extracting expanded families", file=sys.stderr)
 if args.which == "-":
-	print("Extracting contracted families")
+	print("Extracting contracted families", file=sys.stderr)
 	
 fam_file = open(args.fam, "r")
 #skip first two lines:
@@ -81,7 +81,7 @@ if type(whichnodes) == str:
 		if whichnodes == "internal" and not cafe_node_dict[node].isdigit():
 			continue
 		key = cafe_node_dict[node]
-		print("Extracting data for node", key)
+		print("Extracting data for node", key, file=sys.stderr)
 		decendent_species = tree_node_dict[key]
 		seqnames = []
 		for orthogroup in expanded_orthogroup_dict[node]:
@@ -95,7 +95,7 @@ if type(whichnodes) == str:
 			
 elif type(whichnodes) == list:
 	for node in whichnodes:
-		print("Extracting data for node", node)
+		print("Extracting data for node", node, file=sys.stderr)
 		key = ref_cafe_node_dict[node]
 		decendent_species = tree_node_dict[node]
 		seqnames = []
@@ -185,7 +185,7 @@ class node_functional:
 gff_file = open(args.gff, "r")
 total_node_list = []
 for key in seq_names_dict.keys():
-	print("Parsing annotations for node:", key)
+	print("Parsing annotations for node:", key, file=sys.stderr)
 	this_node = node_functional(key)
 	seqnames = seq_names_dict[key]
 	seqnamelist = seqnames.split(", ")
@@ -239,7 +239,7 @@ for key in seq_names_dict.keys():
 		gff_file.seek(0)
 	total_node_list.append(this_node)
 
-print("Writing output files:")
+print("Writing output files:", file=sys.stderr)
 if args.which =="+":
 	args.pre += "_expanded"
 if args.which == "-":
