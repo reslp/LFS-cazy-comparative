@@ -16,8 +16,10 @@ library(ggpubr)
 
 print("creating plots...")
 colors <- wes_palette("FantasticFox1", length(unique(data$class)), type="continuous")
+colors <- c("#66c2a5", "#e78ac3", "#8da0cb", "#fc8d62", "#a6d854", "#ffd92f")
+print(colors)
 ggplot(data = data, aes(x = Assembly.Size, y=Percent.GC, color=class)) + geom_point()
-textsize <- 8
+textsize <- 9 
 
 print("genome size")
 pSize <- ggplot(data=data, aes(x = isolate, y= Assembly.Size, fill=class))  +
@@ -87,7 +89,13 @@ pGC <- ggplot(data=data, aes(x = isolate, y= Percent.GC, fill=class))  +
 
 print("Creating first file")
 pdf(file=paste(output, "genome_stats1.pdf", sep=""), width=11.8, height=8.3, onefile=FALSE)
-p1 <- ggarrange(pSize, pN50, pLargest, pAverage, pNumScaf, pGC, nrow=2, ncol=3, common.legend = T, legend="bottom", labels="AUTO")
+p1 <- ggarrange(pSize, pN50, pLargest, nrow=1, ncol=3, common.legend = T, legend="bottom", labels=c("A","B","C"))
+annotate_figure(p1, top = text_grob("Basic statistics of the studied genomes", color = "black", face = "bold", size = 14))
+dev.off()
+
+print("Creating second file")
+pdf(file=paste(output, "genome_stats2.pdf", sep=""), width=11.8, height=8.3, onefile=FALSE)
+p1 <- ggarrange(pAverage, pNumScaf, pGC, nrow=1, ncol=3, common.legend = T, legend="bottom", labels=c("D","E","F"))
 annotate_figure(p1, top = text_grob("Basic statistics of the studied genomes", color = "black", face = "bold", size = 14))
 dev.off()
 
@@ -146,9 +154,15 @@ pProtOrth <- ggplot(data=data, aes(x = isolate, y= Prots.atleast.1.ortholog, fil
   ylab("No. of Proteins with at least one Ortholog")+
   coord_flip()
 
-print("create second file")
-pdf(file=paste(output, "genome_stats2.pdf", sep=""), width=11.8, height=8.3, onefile=FALSE)
-p2 <- ggarrange(pGenes, pProteins, ptRNA, pUnique, pProtOrth, nrow=2, ncol=3, common.legend = T, legend="bottom", labels="AUTO")
+print("create third file")
+pdf(file=paste(output, "genome_stats3.pdf", sep=""), width=11.8, height=8.3, onefile=FALSE)
+p2 <- ggarrange(pGenes, pProteins, ptRNA, nrow=1, ncol=3, common.legend = T, legend="bottom", labels=c("A","B","C"))
+annotate_figure(p2, top = text_grob("Statistics related to the gene content of the studied genomes", color = "black", face = "bold", size = 14))
+dev.off()
+
+print("create fourth file")
+pdf(file=paste(output, "genome_stats4.pdf", sep=""), width=11.8, height=8.3, onefile=FALSE)
+p2 <- ggarrange(pUnique, pProtOrth, nrow=1, ncol=3, common.legend = T, legend="bottom", labels=c("D","E"))
 annotate_figure(p2, top = text_grob("Statistics related to the gene content of the studied genomes", color = "black", face = "bold", size = 14))
 dev.off()
 
