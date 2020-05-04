@@ -46,7 +46,7 @@ for handle in gff3_files:
 				n_cazy_internal += 1
 		if "TransMembrane" in line:
 			n_transmembrane += 1
-		if "SECRETED" and "CAZy" in line:
+		if "SECRETED" in line and "CAZy" in line:
 			n_secreted_cazy += 1
 		if "TransMembrane" and "CAZy" in line:
 			n_transmem_cazy += 1
