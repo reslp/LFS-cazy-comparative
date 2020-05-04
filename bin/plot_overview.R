@@ -15,7 +15,8 @@ cogs_file <- args[2]
 cazy_file <- args[3]
 secmet_file <- args[4]
 stats_file <- args[5]
-outfile <- args[6]
+seccazy_file <- args[6]
+outfile <- args[7]
 
 #setwd("/Users/sinnafoch/Dropbox/Philipp/xylographa_comparative_genomics/tmp/new_overview")
 setwd(wd)
@@ -32,13 +33,25 @@ secmet <- read.csv(secmet_file)
 secmet <- melt(secmet)
 #stats <- read.table("genome.stats.summary.csv", sep=",", header=T)
 stats <- read.table(stats_file, sep=",", header=T)
+sec_cazy <- read.table(seccazy_file, sep="\t", header=T)
+rownames(sec_cazy) <- sec_cazy$species
+sec_cazy$species <- NULL
+#print(head(sec_cazy))
+sec_cazy <- as.data.frame(t(sec_cazy))
+sec_cazy$category <- c("total\ncazy", "total\nsecreted", "total\ntrans-\nmembrane", "cazy\nsecreted", " cazy\ntrans-\nmembrane", "cazy\nendo")
+#print(head(sec_cazy))
+sec_cazy <- melt(sec_cazy)
 
+# get axis limits for bar plots:
+sec_cazy_max_y <- max(sec_cazy$value)
+cazy_max_y <- max(cazy$value)
 
 #get species names and set current species.
 # this will have to be a for loop later
 rownames(stats) <- stats$X
 stats$X <- NULL
 species_names <- colnames(stats)
+species_names <- sort(species_names)
 
 all_plots <- list()
 i <- 1
@@ -84,17 +97,24 @@ for (species in species_names){
   current_sp_cazy <- cazy[cazy$variable==species,]
   cazy_plot <-ggplot(current_sp_cazy, aes(x=X, y=value, fill=as.factor(X))) + 
     geom_bar(stat = "identity") +theme_classic()+theme(axis.ticks=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank()) +
-    scale_fill_manual(values=cazy_palette) +theme(legend.position = "none") + ggtitle("CAZymes")
+    scale_fill_manual(values=cazy_palette) + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25, size = 2) + theme(legend.position = "none") + ylim(c(0,cazy_max_y)) +ggtitle("CAZymes")
   
-  print("Extract SECMET")
+  #print("Extract SECMET")
   # create plot for secondary metabolite genes
-  secmet_palette <- colorRampPalette(wes_palette("Cavalcanti1"))(length(unique(secmet$X)))
+  #secmet_palette <- colorRampPalette(wes_palette("Cavalcanti1"))(length(unique(secmet$X)))
   
-  current_sp_secmet <- secmet[secmet$variable==species,]
-  secmet_plot <- ggplot(current_sp_secmet, aes(x=X, y=value, fill=as.factor(X))) + 
+  #current_sp_secmet <- secmet[secmet$variable==species,]
+  #secmet_plot <- ggplot(current_sp_secmet, aes(x=X, y=value, fill=as.factor(X))) + 
+  #  geom_bar(stat = "identity") +theme_classic()+theme(axis.ticks=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank()) +
+  #  scale_fill_manual(values=secmet_palette) + theme(legend.position = "none") + ggtitle("Seconday Metabolite genes")
+  
+  print("Extract Cazy and Secreted Information")
+  seccazy_palette <- colorRampPalette(wes_palette("Cavalcanti1"))(length(unique(sec_cazy$category)))
+  current_sp_seccazy <- sec_cazy[sec_cazy$variable==species,]
+  seccazy_plot <- ggplot(current_sp_seccazy, aes(x=category, y=value, fill=as.factor(category))) +
     geom_bar(stat = "identity") +theme_classic()+theme(axis.ticks=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank()) +
-    scale_fill_manual(values=secmet_palette) +theme(legend.position = "none") + ggtitle("Seconday Metabolite genes")
-  
+    scale_fill_manual(values=seccazy_palette) + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25, size = 2) + theme(legend.position = "none") + ylim(c(0,sec_cazy_max_y)) + ggtitle("CAZyme and Secreted genes")
+
   # create overview table:
   print("Overview table")
   all_rownames <- rownames(stats_sp)
@@ -109,7 +129,7 @@ for (species in species_names){
                             theme = ttheme("blank", padding=unit(c(1,1),"mm"), base_size = 7, tbody.style = tbody.style))
   # create the assembly of plots:
   print("Plot assembly")
-  sp_plot_assembly <- cog_plot + cazy_plot + secmet_plot + stats_plot + plot_layout(ncol=4) + plot_annotation(title = sp_title)
+  sp_plot_assembly <- cog_plot + cazy_plot + seccazy_plot + stats_plot + plot_layout(ncol=4) + plot_annotation(title = sp_title)
   sp_plot_assembly <- sp_plot_assembly & theme(text=element_text(size=6)) 
   all_plots[[i]] <- sp_plot_assembly
   i <- i + 1

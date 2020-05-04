@@ -135,7 +135,8 @@ rule plot_genome_overview:
 		cogs_file = expand("data/{pre}/COGS.all.results.csv", pre=config["prefix"]),
 		cazy_file = expand("data/{pre}/CAZyme.summary.results.csv", pre=config["prefix"]),
 		secmet_file = expand("data/{pre}/SM.summary.results.csv", pre=config["prefix"]),
-		stats_file = expand("data/{pre}/genome.stats.summary.csv", pre=config["prefix"])
+		stats_file = expand("data/{pre}/genome.stats.summary.csv", pre=config["prefix"]),
+		seccazy_file = rules.summarize_secreted_and_cazy.output.sec_cazy_summary
 	output:
 		genomes_overview = expand("results/{pre}/genome_overviews/genomes_overview.pdf", pre=config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
@@ -145,7 +146,7 @@ rule plot_genome_overview:
 		wd = os.getcwd()
 	shell:
 		"""
-		Rscript bin/plot_overview.R {params.wd} {input.cogs_file} {input.cazy_file} {input.secmet_file} {input.stats_file} {output.genomes_overview}
+		Rscript bin/plot_overview.R {params.wd} {input.cogs_file} {input.cazy_file} {input.secmet_file} {input.stats_file} {input.seccazy_file} {output.genomes_overview}
 		touch {output.checkpoint}
 		"""	
 
