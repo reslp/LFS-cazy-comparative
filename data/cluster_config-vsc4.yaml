@@ -93,3 +93,6 @@ visualize_function_annotations_cafe:
 plot_genome_overview:
    J: genooverview
    hint: nomultithread
+summarize_secreted_and_cazy:
+   J: sumseccaz
+   hint: nomultithread

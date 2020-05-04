@@ -106,3 +106,5 @@ iqtree_gh5:
    ntasks: 16
 plot_genome_overview:
    N: genooverview
+summarize_secreted_and_cazy:
+   N: sumseccaz

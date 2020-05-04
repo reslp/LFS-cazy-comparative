@@ -40,7 +40,8 @@ rule all:
 		expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -77,6 +78,8 @@ def remove_donefile(files):
 # mkdir -p {output.protein_files}
 # cp -r {input.protein_files}/* {output.protein_files}
 #touch {output.checkpoint}
+
+# currently this rules does not check for the gff and protein file directories!
 rule get_upstream_inputfiles:
 	input:
 		idsfile = expand("data/{pre}/ids.txt", pre=config["prefix"]),
@@ -93,8 +96,6 @@ rule get_upstream_inputfiles:
 		"""
 		touch {output.checkpoint}	
 		"""
-
-
 
 rule statistics:
 	input:
@@ -114,6 +115,18 @@ rule statistics:
 			mkdir results/{params.prefix}/statistics
 		fi
 		Rscript bin/stats.R {input} {params.wd}/{output.dir}
+		touch {output.checkpoint}
+		"""
+
+rule summarize_secreted_and_cazy:
+	input: 
+		gff_dir = expand("data/{pre}/gff_files/", pre=config["prefix"])
+	output:
+		sec_cazy_summary = expand("results/{pre}/secreted_and_cazy/sec_cazy_sum.tsv", pre=config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
+	shell:
+		"""
+		python bin/summarize_secreted_and_cazy_genes.py -gff {input.gff_dir} > {output.sec_cazy_summary}
 		touch {output.checkpoint}
 		"""
 

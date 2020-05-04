@@ -10,3 +10,5 @@ results/
 log/
 Rplots.pdf
 bin/__pycache__/
+.Snakefile.swp
+data/new/
