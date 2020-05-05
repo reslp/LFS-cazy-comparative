@@ -42,7 +42,8 @@ rule all:
 		expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -389,6 +390,29 @@ rule extract_tree:
         python bin/extract_tree_from_r8s.py -r {input.r8s} > {output.ultra_tree}
         touch {output.checkpoint}
         """
+
+rule character_correlation:
+	input:
+		ultra_tree = rules.extract_tree.output.ultra_tree,
+		cazy_data = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
+		discrete_data = expand("data/{pre}/character_information.csv",pre = config["prefix"]),
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"]),
+		outdir = directory(expand("results/{pre}/character_correlation", pre=config["prefix"]))
+	params:
+		wd = os.getcwd()
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+		if [[ ! -d {output.outdir} ]]
+        	then
+            		mkdir {output.outdir}
+        	fi
+		Rscript bin/character_correlation.R {params.wd} {input.ultra_tree} {input.discrete_data} {input.cazy_data} {output.outdir}
+		touch {output.checkpoint}
+		"""
+
 
 rule cazy_anc_summary:
     input:

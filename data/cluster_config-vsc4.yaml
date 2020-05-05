@@ -99,3 +99,6 @@ summarize_secreted_and_cazy:
 plot_ancestral_states_cazy_all:
    J: plancaal
    hint: nomultithread
+character_correlation:
+   J: charcorr
+   hint: nomultithread

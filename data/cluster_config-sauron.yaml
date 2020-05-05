@@ -110,3 +110,5 @@ summarize_secreted_and_cazy:
    N: sumseccaz
 plot_ancestral_states_cazy_all:
    N: plancaal
+character_correlation:
+   N: charcorr
