@@ -42,6 +42,7 @@ rule all:
 		expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -459,6 +460,23 @@ rule ancestral_states_all_cazy:
         Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} all {params.outprefix}
         touch {output.checkpoint}
         """
+rule plot_ancestral_states_cazy_all:
+	input:
+		rdata = expand("results/{pre}/cazy_ancestral_states_all_cazy/{pre}_all_anc_cazy_all.RData", pre = config["prefix"]),
+		checkpoint = rules.ancestral_states_all_cazy.output.checkpoint
+	output:
+		plot = expand("results/{pre}/plot_ancestral_states_all_cazy/{pre}_all_cazymes.pdf", pre = config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"])
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"]
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
+		touch {output.checkpoint}
+		""" 
 rule similarity_clustering:
     input:
         cazy_data = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),

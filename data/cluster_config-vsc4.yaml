@@ -96,3 +96,6 @@ plot_genome_overview:
 summarize_secreted_and_cazy:
    J: sumseccaz
    hint: nomultithread
+plot_ancestral_states_cazy_all:
+   J: plancaal
+   hint: nomultithread

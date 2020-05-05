@@ -108,3 +108,5 @@ plot_genome_overview:
    N: genooverview
 summarize_secreted_and_cazy:
    N: sumseccaz
+plot_ancestral_states_cazy_all:
+   N: plancaal
