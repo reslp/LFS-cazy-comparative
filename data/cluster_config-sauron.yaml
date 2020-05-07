@@ -112,3 +112,4 @@ plot_ancestral_states_cazy_all:
    N: plancaal
 character_correlation:
    N: charcorr
+   ntasks: 16

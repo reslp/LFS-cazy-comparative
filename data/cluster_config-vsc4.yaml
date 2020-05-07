@@ -101,4 +101,6 @@ plot_ancestral_states_cazy_all:
    hint: nomultithread
 character_correlation:
    J: charcorr
-   hint: nomultithread
+   hint: multithread
+   ntasks: 24
+   ntasks-per-node: 96

@@ -403,13 +403,14 @@ rule character_correlation:
 		wd = os.getcwd()
 	conda:
 		"envs/rreroot.yml"
+	threads: 8
 	shell:
 		"""
 		if [[ ! -d {output.outdir} ]]
         	then
             		mkdir {output.outdir}
         	fi
-		Rscript bin/character_correlation.R {params.wd} {input.ultra_tree} {input.discrete_data} {input.cazy_data} {output.outdir}
+		Rscript bin/character_correlation.R {params.wd} {input.ultra_tree} {input.discrete_data} {input.cazy_data} {output.outdir} {threads}
 		touch {output.checkpoint}
 		"""
 

@@ -1,7 +1,7 @@
 library(phytools)
 #library(tidyverse)
 #library(ggplot2)
-
+library(parallel)
 args <- commandArgs(trailingOnly=TRUE)
 
 wd <- args[1]
@@ -9,7 +9,7 @@ treefile <- args[2]
 discrete_chars <- args[3]
 cazyme_chars <- args[4]
 outdir <- args[5]
-
+threads <- args[6]
 
 
 
@@ -37,20 +37,58 @@ all_cazy_groups <- colnames(data2)
 
 combination <- list()
 mcmcs <- list()
-pdf(file=paste(outdir,"/r_values_overview.pdf", sep=""))
-for (i in 1:length(all_cazy_groups)) {
-  cat(format(Sys.time(), "%a %b %d %X %Y"))
-  cat(paste(" - ", toString(i)," - ",all_cazy_groups[i],"\n", sep=""))
+ngen <- 1000000 # number of generations
+burnin <- 0.2 * ngen # 20% burn-in
+sample <- 200 # sample all n generations
+quiet <- T
+run_mcmc <- function(i) {
   subsampled_data <- data[,c("lichen", all_cazy_groups[i])]
   subsampled_data$lichen <- as.character(subsampled_data$lichen)
-  combination[[i]] <- c("lichen", all_cazy_groups[i])
-  mcmcs[[i]] <- threshBayes(tree, subsampled_data, types=c("discrete", "continuous"), control=list(sample=500, quiet=T),ngen=1000000)
-  plot(mcmcs[[i]], bw=0.1)
-  lines(rep(0.7,2),c(0,par()$usr[4]),lwd=2,lty="dashed",col="red")
-  text(x=0.7,y=0.9*par()$usr[4],"simulated r",pos=4,cex=0.7)
-  tt <- paste(combination[[i]], sep = " and ", collapse=" and ")
-  title(tt)
+  combination <- c("lichen", all_cazy_groups[i])
+  cat(format(Sys.time(), "%a %b %d %X %Y"))
+  cat(paste(" - ", toString(i)," - ",all_cazy_groups[i],"\n", sep=""))
+  cat ("          Chain1\n")
+  mcmc1 <- threshBayes(tree, subsampled_data, types=c("discrete", "continuous"), control=list(sample=sample, quiet=quiet),ngen=ngen)
+  cat ("          Chain2\n")
+  mcmc2 <- threshBayes(tree, subsampled_data, types=c("discrete", "continuous"), control=list(sample=sample, quiet=quiet),ngen=ngen)
+  cat ("          Chain3\n")
+  mcmc3 <- threshBayes(tree, subsampled_data, types=c("discrete", "continuous"), control=list(sample=sample, quiet=quiet),ngen=ngen)
+  cat ("          Chain4\n")
+  mcmc4 <- threshBayes(tree, subsampled_data, types=c("discrete", "continuous"), control=list(sample=sample, quiet=quiet),ngen=ngen)
+  mcmc <- list()
+  mcmc$par <- rbind(mcmc1$par, mcmc2$par, mcmc3$par, mcmc4$par)
+  mcmc$liab <- rbind(mcmc1$liab, mcmc2$liab, mcmc3$liab, mcmc4$liab)
+  mcmc$burnin <- mcmc1$burnin
+  mcmc$levels <- mcmc1$levels
+  mcmc$types <- mcmc1$types
+  class(mcmc) <- "threshBayes"
+  mcmc$combination <- combination
+  return(mcmc)
 }
-dev.off()
+
+num_cazy <- seq(1, length(all_cazy_groups))
+print(detectCores())
+print(detectCores(logical = FALSE))
+#mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=threads)
+#mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=4)
+mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=12)
+#mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=1)
+#pdf(file=paste(outdir,"/r_values_overview.pdf", sep=""))
+#for (i in 1:length(all_cazy_groups)) {
+#  cat(format(Sys.time(), "%a %b %d %X %Y"))
+#  cat(paste(" - ", toString(i)," - ",all_cazy_groups[i],"\n", sep=""))
+#  subsampled_data <- data[,c("lichen", all_cazy_groups[i])]
+#  subsampled_data$lichen <- as.character(subsampled_data$lichen)
+#  combination[[i]] <- c("lichen", all_cazy_groups[i])
+#  mcmcs[[i]] <- threshBayes(tree, subsampled_data, types=c("discrete", "continuous"), control=list(sample=500, quiet=T),ngen=1000000)
+#  plot(mcmcs[[i]], bw=0.1)
+#  lines(rep(0.7,2),c(0,par()$usr[4]),lwd=2,lty="dashed",col="red")
+#  text(x=0.7,y=0.9*par()$usr[4],"simulated r",pos=4,cex=0.7)
+#  tt <- paste(combination[[i]], sep = " and ", collapse=" and ")
+#  title(tt)
+#}
+#dev.off()
+
+
 save.image(paste(outdir, "/data.RData", sep=""))
 
