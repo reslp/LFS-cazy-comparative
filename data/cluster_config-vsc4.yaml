@@ -104,3 +104,11 @@ character_correlation:
    hint: multithread
    ntasks: 24
    ntasks-per-node: 96
+prepare_saccharis:
+   J: presacch
+   hint: nomultithread
+saccharis:
+   J: saccharis
+   hint: multithread
+   ntasks: 24
+   ntasks-per-node: 96

@@ -12,3 +12,5 @@ Rplots.pdf
 bin/__pycache__/
 .Snakefile.swp
 data/new/
+.parallel/
+bin/cazy_extract.pl
