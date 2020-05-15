@@ -453,7 +453,8 @@ rule prepare_scrape_cazy:
 		"docker://reslp/scrape_cazy:1"
 	params:
 		prefix = config["prefix"],
-		wd = os.getcwd()
+		wd = os.getcwd(),
+		search_terms = config["scrape_cazy"]["terms"]
 	shell:
 		"""
 		if [[ ! -d results/{params.prefix}/cazy_information ]]
@@ -463,6 +464,13 @@ rule prepare_scrape_cazy:
 		cd results/{params.prefix}/cazy_information
 		scrape_cazy.py -f $(cat {params.wd}/{input.cazy} | awk -F "," 'NR > 1 {{print $1;}}' | awk -F "_" '{{print $1}}' | uniq | tr "\\n" "," | sed '$s/,$//')
 		cat *_characterized.txt > all_cazy_data.csv
+		# strangely this only works if the terms specified in the config file exist. It works outside of snakemake. Maybe it some problem with the different shell 
+		# invoked by snakemake...
+		names="{params.search_terms}"
+		for name in $names; do
+			touch "$name"_families.txt
+			cat all_cazy_data.csv | grep "$name" | awk '{{print $1}}' | uniq > "$name"_families.txt
+		done	
 		cd {params.wd}
 		touch {output.checkpoint}
 		"""

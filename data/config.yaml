@@ -18,4 +18,5 @@ iqtree:
         threads: 32
 orthofinder:
         threads: 48 
-
+scrape_cazy:
+        terms: xylanase β-mannanase cellulase PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
