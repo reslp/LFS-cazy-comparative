@@ -39,7 +39,7 @@ echo $SI_ARGS
 if [ $CLUSTER = "slurm" ]; then
 	export CONDA_PKGS_DIRS="$(pwd)/.conda_pkg_tmp"
 	mkdir -p .conda_pkg_tmp
-	snakemake --use-singularity --singularity-args "-B /tmp:/usrtmp $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster '$(pwd)/bin/immediate_submit.py {dependencies} slurm' --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
+	snakemake --use-singularity --singularity-args "-B /tmp:/usrtmp -B $(pwd):/data -B $(pwd)/bin:/usr/local/external $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster '$(pwd)/bin/immediate_submit.py {dependencies} slurm' --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
 	unset CONDA_PKGS_DIRS
 elif [ $CLUSTER = "sge" ]; then
 	snakemake --use-singularity --singularity-args "-B /tmp:/usertmp $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster '$(pwd)/bin/immediate_submit.py {dependencies} sge' --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
