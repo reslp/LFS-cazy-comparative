@@ -481,21 +481,20 @@ rule prepare_saccharis:
 		cazy = expand("data/{pre}/CAZyme.all.results.csv", pre=config["prefix"])	
 	output:
 		renamed_sequences = expand("results/{pre}/saccharis/renamed_proteins.fas", pre=config["prefix"]),
-		cazy = expand("results/{pre}/saccharis/cazy_list.txt", pre=config["prefix"]), 
 		checkpoint = expand("results/{pre}/checkpoints/prepare_saccharis.done", pre=config["prefix"])
 	singularity:
 		"docker://reslp/saccharis:1"
 	shell:
 		"""
 		perl -pe 's/\>/$& . U . sprintf("%08d", ++$n) . " "/ge' {input.combined_proteins} > {output.renamed_sequences}
-		awk -F "," 'NR > 1 {print $1;}' {input.cazy} > {output.cazy}
+		#awk -F "," 'NR > 1 {print $1;}' {input.cazy} > {output.cazy}
 		touch {output.checkpoint}
 		"""	
 		
 rule saccharis:
 	input:
 		seqs = rules.prepare_saccharis.output.renamed_sequences,
-		cazy = rules.prepare_saccharis.output.cazy
+		cazy = rules.prepare_scrape_cazy.output.checkpoint
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"])
 	singularity:
@@ -507,7 +506,7 @@ rule saccharis:
 		prefix = config["prefix"]
 	shell:
 		"""
-		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/82_genomes/saccharis/cazy_list.txt | tr '\n' ' ')
+		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/*families.txt | tr '\n' ' ' | uniq)
 		touch {output.checkpoint}
 		"""
 
