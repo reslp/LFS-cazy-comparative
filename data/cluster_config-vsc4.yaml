@@ -104,6 +104,9 @@ character_correlation:
    hint: multithread
    ntasks: 24
    ntasks-per-node: 96
+prepare_scrape_cazy:
+   J: presrcaz
+   hint: nomultithread
 prepare_saccharis:
    J: presacch
    hint: nomultithread
@@ -112,3 +115,5 @@ saccharis:
    hint: multithread
    ntasks: 24
    ntasks-per-node: 96
+   partition: mem_0384
+   qos: mem_0384

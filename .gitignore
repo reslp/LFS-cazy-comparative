@@ -14,3 +14,5 @@ bin/__pycache__/
 data/new/
 .parallel/
 bin/cazy_extract.pl
+tmp/
+saccharis_backup/

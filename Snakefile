@@ -43,7 +43,8 @@ rule all:
 		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -442,6 +443,30 @@ rule cazy_anc_summary:
         touch {output.checkpoint}
         """
 
+rule prepare_scrape_cazy:
+	input:
+		cazy = expand("data/{pre}/CAZyme.all.results.csv", pre=config["prefix"]),
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/prepare_scrape_cazy.done", pre=config["prefix"]),	
+		all_cazy_info = expand("results/{pre}/cazy_information/all_cazy_data.csv", pre=config["prefix"])
+	singularity:
+		"docker://reslp/scrape_cazy:1"
+	params:
+		prefix = config["prefix"],
+		wd = os.getcwd()
+	shell:
+		"""
+		if [[ ! -d results/{params.prefix}/cazy_information ]]
+		then
+			mkdir results/{params.prefix}/cazy_information
+		fi
+		cd results/{params.prefix}/cazy_information
+		scrape_cazy.py -f $(cat {params.wd}/{input.cazy} | awk -F "," 'NR > 1 {{print $1;}}' | awk -F "_" '{{print $1}}' | uniq | tr "\\n" "," | sed '$s/,$//')
+		cat *_characterized.txt > all_cazy_data.csv
+		cd {params.wd}
+		touch {output.checkpoint}
+		"""
+
 rule prepare_saccharis:
 	input:
 		combined_proteins = expand("data/{pre}/{pre}_proteins.fas", pre=config["prefix"]),
@@ -467,10 +492,10 @@ rule saccharis:
 		checkpoint = expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"])
 	singularity:
 		"docker://reslp/saccharis:1"
-	threads: 96
+	threads: 192
 	params:
-		saccharis_threads = 8,
-		parallel_jobs = 12,
+		saccharis_threads = 80,
+		parallel_jobs = 8,
 		prefix = config["prefix"]
 	shell:
 		"""
