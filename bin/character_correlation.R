@@ -41,10 +41,11 @@ ngen <- 1000000 # number of generations
 burnin <- 0.2 * ngen # 20% burn-in
 sample <- 200 # sample all n generations
 quiet <- T
-run_mcmc <- function(i) {
-  subsampled_data <- data[,c("lichen", all_cazy_groups[i])]
-  subsampled_data$lichen <- as.character(subsampled_data$lichen)
-  combination <- c("lichen", all_cazy_groups[i])
+run_mcmc <- function(i, char) {
+  subsampled_data <- data[,c(char, all_cazy_groups[i])]
+  colnames(subsampled_data)[1] <- "my_char"
+  subsampled_data$my_char <- as.character(subsampled_data$my_char)
+  combination <- c(char, all_cazy_groups[i])
   cat(format(Sys.time(), "%a %b %d %X %Y"))
   cat(paste(" - ", toString(i)," - ",all_cazy_groups[i],"\n", sep=""))
   cat ("          Chain1\n")
@@ -71,7 +72,13 @@ print(detectCores())
 print(detectCores(logical = FALSE))
 #mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=threads)
 #mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=4)
-mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=12)
+mcmcs <- list()
+x <- 1
+for (char in colnames(data1)) {
+	cat(paste("Running analysis for ", char, "\n", sep=""))
+	mcmcs[[x]] <- mclapply(num_cazy,run_mcmc,char, mc.cores=12)
+	x <- x + 1
+}
 #mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=1)
 #pdf(file=paste(outdir,"/r_values_overview.pdf", sep=""))
 #for (i in 1:length(all_cazy_groups)) {
