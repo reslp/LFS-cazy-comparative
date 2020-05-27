@@ -37,7 +37,7 @@ all_cazy_groups <- colnames(data2)
 
 combination <- list()
 mcmcs <- list()
-ngen <- 1000000 # number of generations
+ngen <- 2000000 # number of generations
 burnin <- 0.2 * ngen # 20% burn-in
 sample <- 200 # sample all n generations
 quiet <- T
