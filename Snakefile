@@ -463,7 +463,7 @@ rule prepare_scrape_cazy:
 		fi
 		cd results/{params.prefix}/cazy_information
 		scrape_cazy.py -f $(cat {params.wd}/{input.cazy} | awk -F "," 'NR > 1 {{print $1;}}' | awk -F "_" '{{print $1}}' | uniq | tr "\\n" "," | sed '$s/,$//')
-		cat *_characterized.txt > all_cazy_data.csv
+		tail -n +2 *_characterized.txt > all_cazy_data.csv
 		# strangely this only works if the terms specified in the config file exist. It works outside of snakemake. Maybe it some problem with the different shell 
 		# invoked by snakemake...
 		names="{params.search_terms}"
