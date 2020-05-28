@@ -506,7 +506,7 @@ rule saccharis:
 		prefix = config["prefix"]
 	shell:
 		"""
-		parallel -j {params.parallel_jobs} Saccharis.pl --RAXML -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/*families.txt | tr '\n' ' ' | uniq)
+		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/*families.txt | tr '\n' ' ' | uniq)
 		touch {output.checkpoint}
 		"""
 
