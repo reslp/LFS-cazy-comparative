@@ -471,6 +471,7 @@ rule prepare_scrape_cazy:
 			touch "$name"_families.txt
 			cat all_cazy_data.csv | grep "$name" | awk '{{print $1}}' | uniq > "$name"_families.txt
 		done	
+		cat *_families.txt > all_interesting_cazy_families.txt
 		cd {params.wd}
 		touch {output.checkpoint}
 		"""
@@ -506,7 +507,7 @@ rule saccharis:
 		prefix = config["prefix"]
 	shell:
 		"""
-		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/*families.txt | tr '\n' ' ' | uniq)
+		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
 		touch {output.checkpoint}
 		"""
 
