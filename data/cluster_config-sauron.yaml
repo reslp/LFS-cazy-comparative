@@ -120,3 +120,7 @@ prepare_saccharis:
 saccharis:
    N: saccharis
    ntasks: 16
+get_saccharis_mapping_data:
+   N: gsacchmap
+plot_saccharis_trees:
+   N: plsacctree

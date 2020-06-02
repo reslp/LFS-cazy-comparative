@@ -117,3 +117,10 @@ saccharis:
    ntasks-per-node: 96
    partition: mem_0384
    qos: mem_0384
+get_saccharis_mapping_data:
+   J: gsacchmap
+   hint: nomultithread
+plot_saccharis_trees:
+   J: plsacctree
+   hint: nomultithread
+
