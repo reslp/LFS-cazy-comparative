@@ -511,6 +511,22 @@ rule saccharis:
 		touch {output.checkpoint}
 		"""
 
+rule get_saccharis_mapping_data:
+	input:
+		seqs = rules.prepare_saccharis.output.renamed_sequences,
+		genome_info = expand("data/{pre}/stats_genomes.csv", pre=config["prefix"]),
+		discrete_data = expand("data/{pre}/character_information.csv",pre = config["prefix"])
+	output:
+		saccharis_mapping_data = expand("results/{pre}/saccharis_plotting/saccharis_mapping_information.tsv",pre = config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/get_saccharis_mapping_data.done", pre=config["prefix"])
+	conda:
+		"envs/pyutils.yml"
+	shell:
+		"""
+		bin/get_saccharis_mapping_data.py -fasta {input.seqs} -info {input.genome_info} -map {input.discrete_data} > {output.saccharis_mapping_data}
+		touch {output.checkpoint}
+		"""
+
 rule ancestral_states_cazy:
     input:
         csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
