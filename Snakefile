@@ -44,7 +44,8 @@ rule all:
 		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
