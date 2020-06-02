@@ -230,7 +230,7 @@ cazy_data$EC. <- ec_names
 
 #subsample data to plot
 
-if ("Subf." %in% colnames(cazy_data)) {
+if ("Subf" %in% colnames(cazy_data)) {
 	plot_data <- cazy_data %>% select("EC.", "Subf", "Domain")
 } else {
 	plot_data <- cazy_data %>% select("EC.", "Domain")
@@ -248,7 +248,7 @@ taxonomy_plotting$taxonomy
 
 
 #create number of distinct colors according to the plot data
-if ("Subf." %in% colnames(cazy_data)) {
+if ("Subf" %in% colnames(cazy_data)) {
 
 	n <- length(unique(plot_data$Subf))
 
@@ -272,7 +272,7 @@ tax_colors <- sample(colors, n)
 tax_colors <- brewer.pal(n, "Spectral")
 length(tax_colors)
 
-if ("Subf." %in% colnames(cazy_data)) {
+if ("Subf" %in% colnames(cazy_data)) {
 	all_colors <- c(subf_colors, ec_colors, tax_colors)
 	names(all_colors) <- c(unique(plot_data$Subf), unique(plot_data$EC.), as.vector(unique(taxonomy_plotting$taxonomy))) 
 } else { all_colors <- c(ec_colors, tax_colors)
@@ -284,7 +284,7 @@ ggt <- ggtree(tree, layout="fan")
 ggt <- ggt + xlim(-5, NA)
 #ggt +ggtitle("bla")+theme(plot.title = element_text(hjust = 0.5, vjust=-55))
 
-if ("Subf." %in% colnames(cazy_data)) {
+if ("Subf" %in% colnames(cazy_data)) {
 
 	subfp <- gheatmap(ggt, plot_data[,"Subf",drop=F], offset = 0.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
 	subfp  <- subfp  + scale_fill_manual("Subfamily", values=subf_colors) 
