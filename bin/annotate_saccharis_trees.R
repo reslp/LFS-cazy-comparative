@@ -217,7 +217,9 @@ for (i in 1:length(ncbi_names)){ # keep only first number if there are more than
   ncbi_names[i] <- strsplit(ncbi_names[i]," ")[[1]][1]
   ec_names[i] <- strsplit(ec_names[i]," ")[[1]][1] 
 }
-cazy_data <- as.data.frame(sapply(cazy_data, as.character))
+if (length(rownames(cazy_data))>1) {
+	cazy_data <- as.data.frame(sapply(cazy_data, as.character))
+}
 
 ncbi_names<-make.unique(ncbi_names,sep="_") # make accessions unique, this is not yet compatible with the tip labels (which contain letters)
 cazy_data$GenBank <- ncbi_names
