@@ -462,6 +462,7 @@ rule prepare_scrape_cazy:
 			mkdir results/{params.prefix}/cazy_information
 		fi
 		cd results/{params.prefix}/cazy_information
+		rm all_interesting_cazy_families.txt
 		scrape_cazy.py -f $(cat {params.wd}/{input.cazy} | awk -F "," 'NR > 1 {{print $1;}}' | awk -F "_" '{{print $1}}' | uniq | tr "\\n" "," | sed '$s/,$//')
 		tail -n +2 -q *_characterized.txt > all_cazy_data.csv
 		# strangely this only works if the terms specified in the config file exist. It works outside of snakemake. Maybe it some problem with the different shell 
@@ -527,6 +528,31 @@ rule get_saccharis_mapping_data:
 		touch {output.checkpoint}
 		"""
 
+rule plot_saccharis_trees:
+	input:
+		saccharis_mapping_data = rules.get_saccharis_mapping_data.output.saccharis_mapping_data,
+		checkpoint = rules.prepare_scrape_cazy.output.checkpoint
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"]
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+		for treename in $(ls results/{params.prefix}/saccharis/*/characterized/*.tree); do	
+			echo $treename
+			#IFS="_"
+			#read -ar fields <<< $(basename $treename)
+			famname=$(basename $treename _characterized.tree)
+			#famname="${{fields[0]}}"
+			echo $famname 
+		        Rscript bin/annotate_saccharis_trees.R {params.wd} $treename results/{params.prefix}/cazy_information/"$famname"_characterized.txt {input.saccharis_mapping_data} "results/{params.prefix}/saccharis_plotting" $famname
+		done
+		touch {output.checkpoint}
+			#RScript bin/annotate_saccharis_trees.R {params.wd} "results/{params.prefix}/saccharis/"$treename 
+		"""
 rule ancestral_states_cazy:
     input:
         csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
@@ -569,6 +595,7 @@ rule ancestral_states_all_cazy:
         Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} all {params.outprefix}
         touch {output.checkpoint}
         """
+
 rule plot_ancestral_states_cazy_all:
 	input:
 		rdata = expand("results/{pre}/cazy_ancestral_states_all_cazy/{pre}_all_anc_cazy_all.RData", pre = config["prefix"]),
