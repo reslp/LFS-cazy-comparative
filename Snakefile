@@ -574,7 +574,7 @@ rule deeploc:
 			echo $seqfile
 			outname=$(basename "$seqfile" .fasta)
 			echo $outname
-			deeploc -f $seqfile -o outname 
+			deeploc -f $seqfile -o $outname 
 		done;
 		cd /data
 		touch {output.checkpoint}
