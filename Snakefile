@@ -477,7 +477,7 @@ rule prepare_scrape_cazy:
 		cd {params.wd}
 		touch {output.checkpoint}
 		"""
-
+# all rules using the saccharis container need the following bindpoints: "-B $(pwd):/data -B $(pwd)/bin:/usr/local/external"
 rule prepare_saccharis:
 	input:
 		combined_proteins = expand("data/{pre}/{pre}_proteins.fas", pre=config["prefix"]),
