@@ -2,6 +2,8 @@
 data/80_genomes/
 data/82_genomes/
 results/
+.theano/
+external/
 .conda/
 .bash_history
 .conda_pkg_tmp/

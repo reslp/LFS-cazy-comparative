@@ -123,4 +123,9 @@ get_saccharis_mapping_data:
 plot_saccharis_trees:
    J: plsacctree
    hint: nomultithread
+deeploc:
+   J: deeploc
+   hint: multithread
+   ntasks: 24
+   ntasks-per-node: 96
 

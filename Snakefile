@@ -554,6 +554,32 @@ rule plot_saccharis_trees:
 		touch {output.checkpoint}
 			#RScript bin/annotate_saccharis_trees.R {params.wd} "results/{params.prefix}/saccharis/"$treename 
 		"""
+# deeploc needs the following bindpoints: "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B $(pwd):/data"
+#
+rule deeploc:
+	input:	
+		checkpoint = rules.saccharis.output.checkpoint
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/deeploc.done", pre=config["prefix"]),
+		outdir = directory(expand("results/{pre}/deeploc/", pre=config["prefix"]))
+	params:
+		prefix = config["prefix"],
+		wd = os.getcwd()
+	singularity:
+		"docker://reslp/deeploc:1.0"
+	shell:
+		"""
+		cd /data/{output.outdir}
+		for seqfile in $(ls /data/results/{params.prefix}/saccharis/*/characterized/dbcan/*extracted.fasta); do
+			echo $seqfile
+			outname=$(basename "$seqfile" .fasta)
+			echo $outname
+			deeploc -f $seqfile -o outname 
+		done;
+		cd /data
+		touch {output.checkpoint}
+		"""
+
 rule ancestral_states_cazy:
     input:
         csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),

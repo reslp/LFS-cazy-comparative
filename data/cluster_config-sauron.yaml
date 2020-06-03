@@ -124,3 +124,6 @@ get_saccharis_mapping_data:
    N: gsacchmap
 plot_saccharis_trees:
    N: plsacctree
+deeploc:
+   N: deeploc
+   ntasks: 32
