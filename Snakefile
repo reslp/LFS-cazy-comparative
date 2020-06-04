@@ -570,7 +570,7 @@ rule deeploc:
 	shell:
 		"""
 		cd /data/{output.outdir}
-		for seqfile in $(ls /data/results/{params.prefix}/saccharis/*/characterized/dbcan/*extracted.fasta); do
+		for seqfile in $(find /data/results/{params.prefix}/saccharis/*/characterized/dbcan/*extracted.fasta -not -empty); do
 			echo $seqfile
 			outname=$(basename "$seqfile" .fasta)
 			echo $outname
