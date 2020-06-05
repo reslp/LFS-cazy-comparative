@@ -529,31 +529,6 @@ rule get_saccharis_mapping_data:
 		touch {output.checkpoint}
 		"""
 
-rule plot_saccharis_trees:
-	input:
-		saccharis_mapping_data = rules.get_saccharis_mapping_data.output.saccharis_mapping_data,
-		checkpoint = rules.prepare_scrape_cazy.output.checkpoint
-	output:
-		checkpoint = expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
-	params:
-		wd = os.getcwd(),
-		prefix = config["prefix"]
-	conda:
-		"envs/rreroot.yml"
-	shell:
-		"""
-		for treename in $(ls results/{params.prefix}/saccharis/*/characterized/*.tree); do	
-			echo $treename
-			#IFS="_"
-			#read -ar fields <<< $(basename $treename)
-			famname=$(basename $treename _characterized.tree)
-			#famname="${{fields[0]}}"
-			echo $famname 
-		        Rscript bin/annotate_saccharis_trees.R {params.wd} $treename results/{params.prefix}/cazy_information/"$famname"_characterized.txt {input.saccharis_mapping_data} "results/{params.prefix}/saccharis_plotting" $famname
-		done
-		touch {output.checkpoint}
-			#RScript bin/annotate_saccharis_trees.R {params.wd} "results/{params.prefix}/saccharis/"$treename 
-		"""
 # deeploc needs the following bindpoints: "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B $(pwd):/data"
 #
 rule deeploc:
@@ -578,6 +553,34 @@ rule deeploc:
 		done;
 		cd /data
 		touch {output.checkpoint}
+		"""
+
+
+rule plot_saccharis_trees:
+	input:
+		saccharis_mapping_data = rules.get_saccharis_mapping_data.output.saccharis_mapping_data,
+		checkpoint = rules.prepare_scrape_cazy.output.checkpoint,
+		checkpoint2 = rules.deeploc.output.checkpoint
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"]
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+		for treename in $(ls results/{params.prefix}/saccharis/*/characterized/*.tree); do	
+			echo $treename
+			#IFS="_"
+			#read -ar fields <<< $(basename $treename)
+			famname=$(basename $treename _characterized.tree)
+			#famname="${{fields[0]}}"
+			echo $famname 
+		        Rscript bin/annotate_saccharis_trees.R {params.wd} $treename results/{params.prefix}/cazy_information/"$famname"_characterized.txt {input.saccharis_mapping_data} "results/{params.prefix}/saccharis_plotting" $famname results/{params.prefix}/deeploc/"$famname".extracted.txt
+		done
+		touch {output.checkpoint}
+			#RScript bin/annotate_saccharis_trees.R {params.wd} "results/{params.prefix}/saccharis/"$treename 
 		"""
 
 rule ancestral_states_cazy:

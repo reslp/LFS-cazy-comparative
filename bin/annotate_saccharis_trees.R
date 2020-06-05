@@ -12,6 +12,9 @@ fam_data <- args[3]
 additional_data <- args[4]
 out_prefix <- args[5]
 family <- args[6]
+deeploc_file <- args[7]
+
+prob <- 0.7
 #setwd("/home/reslp/Dropbox/Philipp/xylographa_comparative_genomics/tmp/saccharis_trees")
 #setwd("/Users/sinnafoch/Dropbox/Philipp/xylographa_comparative_genomics/tmp/saccharis_trees")
 
@@ -198,10 +201,78 @@ print("Load cazy data")
 cazy_data <- read.csv(fam_data, sep="\t", header=T, stringsAsFactors = F)
 print("load additional mapping data")
 additional_mapping <- read.csv(additional_data, header=T, stringsAsFactors = F, sep="\t")
+deeploc <- read.csv(deeploc_file, header=T, sep="\t", stringsAsFactors = F)
+
+#reformat deeploc data:
+ids <- deeploc$ID
+#strsplit(strsplit(ids[[147]], " ")[[1]][2]), "_(?=[^_]+$)", perl=TRUE))[[1]][1]
+for (i in 1:length(deeploc$ID)){ # keep only first number if there are more than one, only the first number is downloaded
+  if (startsWith(strsplit(ids[i]," ")[[1]][1], "00")) { # account for different naming in deeploc output resulting from different name in saccharis alignment
+    ids[i] <- strsplit(strsplit(ids[[i]], " ")[[1]][2],"_(?=[^_]+$)", perl=T)[[1]][1] # split string at last occurence of _ (some NCBI names have _ in there names)
+  }else {
+    ids[i] <- strsplit(ids[i]," ")[[1]][1]
+  }
+  
+}
+
+rownames(deeploc) <- ids
+
+## this is to make sure tip labels and dataframe rows match
+## it is necessary because saccharis extracts only cazy motifs from unkown sequences and there could be more than 
+## on such motive in a single sequence
+## eg. U00647651 (a sequence from AA2) is represented twice in the tree as: U00647651a U00647651b
+## most of the annotation is however sequence specific and not motif specific so it will be duplicated
+## information about the function about the fragment can be derived from the pyhlogenetic context and sister sequences
+## therefore the dataframe is extended with new rows using information from the gene based annotations:
+
+#remove <- vector()
+print("Duplicating correct dataframe rows containing deeploc location information")
+for (i in 1:length(rownames(deeploc))) {
+  for (j in 1:length(tree$tip.label)){
+    if (grepl(rownames(deeploc)[i], tree$tip.label[j], fixed=T) && (rownames(deeploc)[i] != tree$tip.label[j])){
+      print(tree$tip.label[j])
+      deeploc <- rbind(deeploc,deeploc[i,])
+      rownames(deeploc)[length(rownames(deeploc))] <- tree$tip.label[j]
+      #remove <- c(remove, rownames(deeploc)[i])
+    }
+  }
+}
+
+#deeploc
+rownames(deeploc) %in% tree$tip.label
+# this should be empty:
+tree$tip.label[!tree$tip.label %in% rownames(deeploc)]
+
+
+## this is to subsample only ids above a certain probability. Some assignment probabilities are very low
+best_value <- vector()
+for (i in 1:length(rownames(deeploc))) {
+  column <- gsub("/", ".",deeploc$Location[i]) # account for different labeling of columns introduced by r
+  
+  best_value <- c(best_value, deeploc[,column][i])
+}
+deeploc <- deeploc[deeploc$best_value >= prob,] # only keep labels with prob > 70%
+
+
 
 #format mapping data
 rownames(additional_mapping) <- additional_mapping$saccharis_name
 
+## similar to what is done above for the deeploc data, taxonomy information needs to be transfered for duplicated 
+## sequences as well. This is done here. The dataframe is huge in this case and this chunk can run for some time...
+
+print("Duplicating correct dataframe rows containing additional mapping (eg. taxonomy)")
+for (i in 1:length(rownames(additional_mapping))) {
+  for (j in 1:length(tree$tip.label)){
+    if (grepl(rownames(additional_mapping)[i], tree$tip.label[j], fixed=T) && (rownames(additional_mapping)[i] != tree$tip.label[j])){
+      print(tree$tip.label[j])
+      additional_mapping <- rbind(additional_mapping,additional_mapping[i,])
+      rownames(additional_mapping)[length(rownames(additional_mapping))] <- tree$tip.label[j]
+    }
+  }
+}
+
+print("Some reformating of cazy data for easier handling later on")
 # do some reformatting to cazy data to make it easier to handle later on
 cl <- colnames(cazy_data)
 cazy_data$sub
@@ -247,41 +318,48 @@ colnames(taxonomy_plotting) <- "taxonomy"
 taxonomy_plotting$taxonomy
 
 
+
+
 #create number of distinct colors according to the plot data
+
+
+# subfamily and EC code colors need to be created dynamically because the numers will always be different
 if ("Subf" %in% colnames(cazy_data)) {
-
 	n <- length(unique(plot_data$Subf))
-
-	colors <- grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
-	subf_colors <- sample(colors, n)
 	subf_colors <- colorRampPalette(brewer.pal(8, "BrBG"))(n)
 	length(subf_colors)
 } 
 
 n <- length(unique(plot_data$EC.))
-
-colors <- grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
-ec_colors <- sample(colors, n)
 ec_colors <- colorRampPalette(brewer.pal(11, "Spectral"))(n)
 length(ec_colors)
 
-n <- length(unique(taxonomy_plotting$taxonomy))
+# colors for taxonomy and location will be hardcoded so that they are the same accross multiple plots
+num_cat_tax <- c("Archaea", "Bacteria", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
+tax_colors <- c("#d9d9d9", "#969696")
+tax_colors <- c(tax_colors, brewer.pal(length(num_cat_tax)-3, "Spectral"))
+tax_colors <- c(tax_colors, "#ffffff")
+names(tax_colors) <- num_cat_tax
 
-colors <- grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
-tax_colors <- sample(colors, n)
-tax_colors <- brewer.pal(n, "Spectral")
-length(tax_colors)
 
-if ("Subf" %in% colnames(cazy_data)) {
-	all_colors <- c(subf_colors, ec_colors, tax_colors)
-	names(all_colors) <- c(unique(plot_data$Subf), unique(plot_data$EC.), as.vector(unique(taxonomy_plotting$taxonomy))) 
-} else { all_colors <- c(ec_colors, tax_colors)
-	names(all_colors) <- c(unique(plot_data$EC.), as.vector(unique(taxonomy_plotting$taxonomy)))
-}
+num_cat_deeploc <- c("Membrane", "Nucleus", "Cytoplasm", "Extracellular", "Mitochondrion", "Cell_membrane", "Endoplasmic_reticulum", "Plastid", "Golgi_apparatus", "Lysosome/Vacuole", "Peroxisome")
+deeploc_colors <- brewer.pal(length(num_cat_deeploc), "Paired")
+names(deeploc_colors)<- num_cat_deeploc
+
+
+#if ("Subf" %in% colnames(cazy_data)) {
+#	all_colors <- c(subf_colors, ec_colors, tax_colors)
+#	names(all_colors) <- c(unique(plot_data$Subf), unique(plot_data$EC.), as.vector(unique(taxonomy_plotting$taxonomy))) 
+#} else { all_colors <- c(ec_colors, tax_colors)
+#	names(all_colors) <- c(unique(plot_data$EC.), as.vector(unique(taxonomy_plotting$taxonomy)))
+#}
 
 # plot tree
-ggt <- ggtree(tree, layout="fan")
-ggt <- ggt + xlim(-5, NA)
+ggt <- ggtree(tree, layout="circular")
+ggt <- ggt + xlim(-2, NA)
+#ggt <- ggt + xlim(-2, NA)
+ggt <- open_tree(ggt, 10)
+ggt <- rotate_tree(ggt, 10)
 #ggt +ggtitle("bla")+theme(plot.title = element_text(hjust = 0.5, vjust=-55))
 
 if ("Subf" %in% colnames(cazy_data)) {
@@ -297,9 +375,15 @@ if ("Subf" %in% colnames(cazy_data)) {
         ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors)
 	}
 
-domainp <- ecp + new_scale_fill()
-domainp <- gheatmap(domainp, taxonomy_plotting[,"taxonomy", drop=F], offset = 2.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
+deeplocp <- ecp + new_scale_fill()
+deeplocp <- gheatmap(deeplocp, deeploc[,"Location",drop=F], offset = 2.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
+deeplocp <- deeplocp + scale_fill_manual("Location", values=deeploc_colors)
+
+
+domainp <- deeplocp + new_scale_fill()
+domainp <- gheatmap(domainp, taxonomy_plotting[,"taxonomy", drop=F], offset = 3.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
 domainp <- domainp + scale_fill_manual("taxonomy", values=tax_colors) + ggtitle(family) + theme(plot.title = element_text(hjust = 0.5, vjust=-55))
+
 
 # function to reduce size of legend
 addSmallLegend <- function(myPlot, pointSize = 1, textSize = 7, spaceLegend = 0.5) {
@@ -332,7 +416,6 @@ dd <- addSmallLegend(domainp)
 #domainp <- domainp + theme(legend.position="none")
 #p <- plot_grid(domainp, leg_subfp, leg_ecp, leg_domainp2, ncol=4, rel_widths=c(.7, .1, .1, .1))
 p <- dd + theme(plot.margin = margin(-2, 0, -2, -2, "cm"))
-
 
 outfile <- paste(out_prefix, "/", family, "_tree.pdf", sep="")
 pdf(file=outfile, width=11.8, height=7.3)
