@@ -307,7 +307,7 @@ if ("Subf" %in% colnames(cazy_data)) {
 } else {
 	plot_data <- cazy_data %>% select("EC.", "Domain")
 	}
-plot_data$Domain
+#plot_data$Domain
 
 names <- c(rownames(plot_data),rownames(additional_mapping)) 
 
@@ -316,7 +316,7 @@ names(taxonomy) <- names
 taxonomy_plotting <- taxonomy[names(taxonomy) %in% tree$tip.label]
 taxonomy_plotting <-data.frame(t(data.frame(as.list(taxonomy_plotting))))
 colnames(taxonomy_plotting) <- "taxonomy"
-taxonomy_plotting$taxonomy
+#taxonomy_plotting$taxonomy
 
 
 
@@ -356,7 +356,7 @@ names(deeploc_colors)<- num_cat_deeploc
 #}
 
 # plot tree
-ggt <- ggtree(tree, layout="circular")
+ggt <- ggtree(tree, layout="circular", size=0.2)
 ggt <- ggt + xlim(-2, NA)
 #ggt <- ggt + xlim(-2, NA)
 ggt <- open_tree(ggt, 10)
@@ -418,8 +418,13 @@ dd <- addSmallLegend(domainp)
 #p <- plot_grid(domainp, leg_subfp, leg_ecp, leg_domainp2, ncol=4, rel_widths=c(.7, .1, .1, .1))
 p <- dd + theme(plot.margin = margin(-2, 0, -2, -2, "cm"))
 
+print("Writing plots to file")
 outfile <- paste(out_prefix, "/", family, "_tree.pdf", sep="")
 pdf(file=outfile, width=11.8, height=7.3)
 p
 dev.off()
+
+print("Saving R env for potential later use")
+rfile <- paste(out_prefix,"/",family,".rData", sep="")
+save.image(file=rfile)
 
