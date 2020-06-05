@@ -251,6 +251,7 @@ for (i in 1:length(rownames(deeploc))) {
   
   best_value <- c(best_value, deeploc[,column][i])
 }
+deeploc$best_value <- best_value
 deeploc <- deeploc[deeploc$best_value >= prob,] # only keep labels with prob > 70%
 
 
