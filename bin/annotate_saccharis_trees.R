@@ -23,6 +23,12 @@ prob <- 0.7
 # The code here was downloaded directly from github: https://github.com/eliocamp/ggnewscale
 # Download was on June 2nd, 2020. The downloaded commit is: 16f0331
 
+#first check if rData file already exists, in which case plotting will be skipped:
+if (file.exists(paste(out_prefix,"/",family,".rData", sep="")) == TRUE) {
+	print(paste("File for ", family, " already exists. Plot will be skipped"))
+	quit()
+}
+
 
 new_scale <- function(new_aes) {
   structure(standardise_aes_names(new_aes), class = "new_aes")
@@ -336,9 +342,9 @@ ec_colors <- colorRampPalette(brewer.pal(11, "Spectral"))(n)
 length(ec_colors)
 
 # colors for taxonomy and location will be hardcoded so that they are the same accross multiple plots
-num_cat_tax <- c("Archaea", "Bacteria", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
-tax_colors <- c("#d9d9d9", "#969696")
-tax_colors <- c(tax_colors, brewer.pal(length(num_cat_tax)-3, "Spectral"))
+num_cat_tax <- c("Archaea", "Bacteria","Viruses", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
+tax_colors <- c("#d9d9d9", "#969696", "#f0f0f0")
+tax_colors <- c(tax_colors, brewer.pal(length(num_cat_tax)-4, "Spectral"))
 tax_colors <- c(tax_colors, "#ffffff")
 names(tax_colors) <- num_cat_tax
 
