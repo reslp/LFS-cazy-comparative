@@ -372,24 +372,24 @@ ggt <- rotate_tree(ggt, 10)
 if ("Subf" %in% colnames(cazy_data)) {
 
 	subfp <- gheatmap(ggt, plot_data[,"Subf",drop=F], offset = 0.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
-	subfp  <- subfp  + scale_fill_manual("Subfamily", values=subf_colors) 
+	subfp  <- subfp  + scale_fill_manual("Subfamily", values=subf_colors, na.translate = FALSE) 
 
 	ecp <- subfp + new_scale_fill()
 	ecp <- gheatmap(ecp, plot_data[,"EC.",drop=F], offset = 1.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
-	ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors)
+	ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors, na.translate = FALSE)
 } else {
 	ecp <- gheatmap(ggt, plot_data[,"EC.",drop=F], offset = 1.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
-        ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors)
+        ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors, na.translate = FALSE)
 	}
 
 deeplocp <- ecp + new_scale_fill()
 deeplocp <- gheatmap(deeplocp, deeploc[,"Location",drop=F], offset = 2.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
-deeplocp <- deeplocp + scale_fill_manual("Location", values=deeploc_colors)
+deeplocp <- deeplocp + scale_fill_manual("Location", values=deeploc_colors, na.translate = FALSE)
 
 
 domainp <- deeplocp + new_scale_fill()
 domainp <- gheatmap(domainp, taxonomy_plotting[,"taxonomy", drop=F], offset = 3.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
-domainp <- domainp + scale_fill_manual("taxonomy", values=tax_colors) + ggtitle(family) + theme(plot.title = element_text(hjust = 0.5, vjust=-55))
+domainp <- domainp + scale_fill_manual("taxonomy", values=tax_colors, na.translate = FALSE) + ggtitle(family) + theme(plot.title = element_text(hjust = 0.5, vjust=-55))
 
 
 # function to reduce size of legend
