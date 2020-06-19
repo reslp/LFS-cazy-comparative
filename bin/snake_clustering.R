@@ -43,47 +43,47 @@ dev.off()
 
 
 ######## PFAM
-print("calculating PFAM similarity..." )
+#print("calculating PFAM similarity..." )
 #print(rownames(all_pfam))
 #rownames(all_pfam) <- all_pfam$X
-all_pfam$X <- NULL
-all_pfam$description <- NULL
-all_pfam <- all_pfam[,-ncol(all_pfam)]
-all_pfam <- t(all_pfam)
+#all_pfam$X <- NULL
+#all_pfam$description <- NULL
+#all_pfam <- all_pfam[,-ncol(all_pfam)]
+#all_pfam <- t(all_pfam)
 
 #as.numeric(all_pfam)
 
 
 #remove columns with zero variance, as they will not help with the clustering and pvclust does not like them
-variances<-apply(t(all_pfam), 1, var)
-low_var_names <- names(variances[which(variances<=variance)])
-all_pfam_subset <- all_pfam[, !colnames(all_pfam) %in% low_var_names]
+#variances<-apply(t(all_pfam), 1, var)
+#low_var_names <- names(variances[which(variances<=variance)])
+#all_pfam_subset <- all_pfam[, !colnames(all_pfam) %in% low_var_names]
 
 #as.numeric(all_pfam_subset)
 
-pfam.pv <- pvclust(t(all_pfam_subset),method.hclust=method,method.dist="correlation", nboot=boots,parallel=T)
-pdf("pfam_clustering_all.pdf", width=widthp, height=heightp)
-plot(pfam.pv, cex=1, cex.pv=0.8, main=paste("PFAM profile similarity clustering. method: ", method,sep=""))
-dev.off()
+#pfam.pv <- pvclust(t(all_pfam_subset),method.hclust=method,method.dist="correlation", nboot=boots,parallel=T)
+#pdf("pfam_clustering_all.pdf", width=widthp, height=heightp)
+#plot(pfam.pv, cex=1, cex.pv=0.8, main=paste("PFAM profile similarity clustering. method: ", method,sep=""))
+#dev.off()
 
 ######## interpro
-print("calculating Interpro similarity..." )
+#print("calculating Interpro similarity..." )
 #rownames(all_interpro) <- all_interpro$X
-all_interpro$X <- NULL
-all_interpro$description <- NULL
-all_interpro <- all_interpro[,-ncol(all_interpro)]
-all_interpro <- t(all_interpro)
-rownames(all_interpro)
+#all_interpro$X <- NULL
+#all_interpro$description <- NULL
+#all_interpro <- all_interpro[,-ncol(all_interpro)]
+#all_interpro <- t(all_interpro)
+#rownames(all_interpro)
 
 
 #remove columns with zero variance, as they will not help with the clustering and pvclust does not like them
-variances<-apply(t(all_interpro), 1, var)
-low_var_names <- names(variances[which(variances<=variance)])
-all_interpro_subset <- all_interpro[, !colnames(all_interpro) %in% low_var_names]
+#variances<-apply(t(all_interpro), 1, var)
+#low_var_names <- names(variances[which(variances<=variance)])
+#all_interpro_subset <- all_interpro[, !colnames(all_interpro) %in% low_var_names]
 
-interpro.pv <- pvclust(t(all_interpro_subset),method.hclust=method,method.dist="correlation", nboot=boots, parallel=T)
-interpro.pv <- pfam.pv
-pdf("interpro_clustering_all.pdf", width=widthp, height=heightp)
-plot(interpro.pv, cex=1, cex.pv=0.8, main=paste("InterPro profile similarity clustering. method: ", method,sep=""))
-dev.off()
+#interpro.pv <- pvclust(t(all_interpro_subset),method.hclust=method,method.dist="correlation", nboot=boots, parallel=T)
+#interpro.pv <- pfam.pv
+#pdf("interpro_clustering_all.pdf", width=widthp, height=heightp)
+#plot(interpro.pv, cex=1, cex.pv=0.8, main=paste("InterPro profile similarity clustering. method: ", method,sep=""))
+#dev.off()
 

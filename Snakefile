@@ -21,7 +21,7 @@ rule all:
 		expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/cazy_anc_summary.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/ancestral_states_cazy.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/similarity_clustering.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/similarity_clustering.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/orthology_statistics.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"]),
@@ -650,8 +650,6 @@ rule similarity_clustering:
         pfam_data = expand("data/{pre}/pfam.results.csv",pre = config["prefix"])
     output:
         cazy_clustering = expand("results/{pre}/similarity_clustering/cazy_clustering_all.pdf", pre=config["prefix"]),
-        pfam_clustering = expand("results/{pre}/similarity_clustering/pfam_clustering_all.pdf", pre=config["prefix"]),
-        iprscan_clustering = expand("results/{pre}/similarity_clustering/interpro_clustering_all.pdf", pre=config["prefix"]),
         checkpoint = expand("results/{pre}/checkpoints/similarity_clustering.done", pre=config["prefix"])
     params:
         wd = os.getcwd(),
