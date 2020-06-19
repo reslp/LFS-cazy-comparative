@@ -72,12 +72,14 @@ print(detectCores())
 print(detectCores(logical = FALSE))
 #mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=threads)
 #mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=4)
-mcmcs <- list()
+#mcmcs <- list()
 x <- 1
 for (char in colnames(data1)) {
 	cat(paste("Running analysis for ", char, "\n", sep=""))
-	mcmcs[[x]] <- mclapply(num_cazy,run_mcmc,char, mc.cores=12)
-	x <- x + 1
+	mcmcs <- mclapply(num_cazy,run_mcmc,char, mc.cores=12)
+	cat("Saving environment\n")
+	save.image(paste(outdir, "/data_",char ,".RData", sep=""))
+	#x <- x + 1
 }
 #mcmcs <- mclapply(num_cazy,run_mcmc, mc.cores=1)
 #pdf(file=paste(outdir,"/r_values_overview.pdf", sep=""))
@@ -97,5 +99,5 @@ for (char in colnames(data1)) {
 #dev.off()
 
 
-save.image(paste(outdir, "/data.RData", sep=""))
+#save.image(paste(outdir, "/data.RData", sep=""))
 
