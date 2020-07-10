@@ -14,11 +14,11 @@ all_cazy <- read.csv(file=file_cazy)
 all_pfam <- read.csv(file=file_pfam)
 all_interpro <- read.csv(file=file_interpro)
 
-boots = 1000
-variance = 2
+boots = 5000
+variance = 0.1
 widthp=15
 heightp=10
-method="single"
+method="mcquitty"
 
 print("Set WD to output")
 
@@ -31,14 +31,19 @@ rownames(all_cazy)
 
 #remove columns with zero variance, as they will not help with the clustering and pvclust does not like them
 print("calculating Cazyme similarity..." )
+all_cazy <- all_cazy + 1
+all_cazy <- log(all_cazy)
+
 variances<-apply(t(all_cazy), 1, var)
+print(variances)
 low_var_names <- names(variances[which(variances<=variance)])
 all_cazy_subset <- all_cazy[, !colnames(all_cazy) %in% low_var_names]
-
+length(colnames(all_cazy))
+length(colnames(all_cazy_subset))
 
 cazy.pv <- pvclust(t(all_cazy_subset),method.hclust=method,method.dist="correlation", nboot=boots,parallel=T)
 pdf("cazy_clustering_all.pdf", width=widthp, height=heightp)
-plot(cazy.pv, cex=1, cex.pv=0.9, main=paste("CAZY profile similarity clustering. method: ", method,sep=""))
+plot(cazy.pv, cex=1, cex.pv=0.9, main=paste("CAZY profile similarity clustering. method: ", method," variance: ", variance, sep=""))
 dev.off()
 
 
