@@ -129,7 +129,8 @@ for (species in species_names){
                             theme = ttheme("blank", padding=unit(c(1,1),"mm"), base_size = 7, tbody.style = tbody.style))
   # create the assembly of plots:
   print("Plot assembly")
-  sp_plot_assembly <- cog_plot + cazy_plot + seccazy_plot + stats_plot + plot_layout(ncol=4) + plot_annotation(title = sp_title)
+  sp_plot_assembly <- stats_plot + cazy_plot + seccazy_plot + plot_spacer() + plot_layout(ncol=4) + plot_annotation(title = sp_title)
+  #sp_plot_assembly <- cog_plot + cazy_plot + seccazy_plot + stats_plot + plot_layout(ncol=4) + plot_annotation(title = sp_title)
   sp_plot_assembly <- sp_plot_assembly & theme(text=element_text(size=6)) 
   all_plots[[i]] <- sp_plot_assembly
   i <- i + 1

@@ -104,6 +104,9 @@ character_correlation:
    hint: multithread
    ntasks: 24
    ntasks-per-node: 96
+extract_cazy_proteins:
+   J: excapro
+   hint: nomultithread
 prepare_scrape_cazy:
    J: presrcaz
    hint: nomultithread

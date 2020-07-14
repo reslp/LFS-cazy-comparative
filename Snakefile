@@ -44,6 +44,7 @@ rule all:
 		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/extract_cazy_proteins.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
@@ -477,10 +478,26 @@ rule prepare_scrape_cazy:
 		cd {params.wd}
 		touch {output.checkpoint}
 		"""
+
+rule extract_cazy_proteins:
+	input:
+		combined_proteins = expand("data/{pre}/protein_files", pre=config["prefix"]),
+		combined_gff = expand("data/{pre}/gff_files", pre=config["prefix"]),
+	output:
+		cazy_proteins = expand("results/{pre}/saccharis/all_cazy_proteins.fas", pre=config["prefix"]),
+		checkpoint = expand("results/{pre}/checkpoints/extract_cazy_proteins.done", pre=config["prefix"])
+	singularity:
+		"docker://reslp/biopython_plus:1.77"
+	shell:
+		"""
+		bin/select_cazy_from_gff.py -gff {input.combined_gff} -fasta {input.combined_proteins} -item CAZy >> {output.cazy_proteins}
+		touch {output.checkpoint}
+		"""
+
 # all rules using the saccharis container need the following bindpoints: "-B $(pwd):/data -B $(pwd)/bin:/usr/local/external"
 rule prepare_saccharis:
 	input:
-		combined_proteins = expand("data/{pre}/{pre}_proteins.fas", pre=config["prefix"]),
+		combined_proteins = rules.extract_cazy_proteins.output.cazy_proteins,
 		cazy = expand("data/{pre}/CAZyme.all.results.csv", pre=config["prefix"])	
 	output:
 		renamed_sequences = expand("results/{pre}/saccharis/renamed_proteins.fas", pre=config["prefix"]),
@@ -490,7 +507,6 @@ rule prepare_saccharis:
 	shell:
 		"""
 		perl -pe 's/\>/$& . U . sprintf("%08d", ++$n) . " "/ge' {input.combined_proteins} > {output.renamed_sequences}
-		#awk -F "," 'NR > 1 {print $1;}' {input.cazy} > {output.cazy}
 		touch {output.checkpoint}
 		"""	
 		
