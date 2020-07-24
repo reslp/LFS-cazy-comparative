@@ -14,10 +14,11 @@ subs = sys.argv[-2]
 
 print(sys.argv, file=sys.stderr)
 # all other command-line arguments are the dependencies
+dependencies = ""
 if subs == "slurm":
 	dependencies = set(sys.argv[1:-2])
 elif subs == "sge":
-	dependencies = str(sys.argv[1:-2])
+	dependencies = dependencies.join(sys.argv[1:-2])
 else:
 	print("Cannot get dependencies for submission system")
 	sys.exit(1)
@@ -64,7 +65,7 @@ elif subs == "sge":
 	cmdline.append(sge_args)
 
 	#now work on dependencies
-	if dependencies != "":
+	if dependencies:
 		cmdline.append("-hold_jid")
 		# only keep numbers (which are the jobids) in dependencies list. this is necessary because sge on sauron returns more than the jobid. For other schedulers this could be different!
 		dependencies = [x for x in dependencies.split(" ") if x.isdigit()]
