@@ -21,7 +21,7 @@ file = open(args.fasta, "r")
 sequences = {}
 for line in file:
 	if line.startswith(">"):
-		saccharis_name, transcript_name, gene_name = line.strip().split(" ")
+		saccharis_name, transcript_name = line.strip().split(" ")
 		sequences[transcript_name] = saccharis_name.split(">")[1]
 file.close()
 

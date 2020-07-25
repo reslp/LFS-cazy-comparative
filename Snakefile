@@ -522,10 +522,12 @@ rule saccharis:
 	params:
 		saccharis_threads = 80,
 		parallel_jobs = 8,
-		prefix = config["prefix"]
+		prefix = config["prefix"],
+		wd = os.getcwd()
 	shell:
 		"""
-		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
+		export TMPDIR={params.wd}/tmp
+		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
 		touch {output.checkpoint}
 		"""
 
