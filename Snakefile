@@ -520,14 +520,14 @@ rule saccharis:
 		"docker://reslp/saccharis:1"
 	threads: 192
 	params:
-		saccharis_threads = 80,
-		parallel_jobs = 8,
+		saccharis_threads = config["saccharis"]["threads"],
+		parallel_jobs = config["saccharis"]["parallel_jobs"],
 		prefix = config["prefix"],
 		wd = os.getcwd()
 	shell:
 		"""
 		export TMPDIR={params.wd}/tmp
-		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
+		parallel --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
 		touch {output.checkpoint}
 		"""
 
