@@ -19,3 +19,4 @@ bin/cazy_extract.pl
 tmp/
 saccharis_backup/
 TODO.md
+data/82_genomes_v2/
