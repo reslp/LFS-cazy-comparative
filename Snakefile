@@ -160,7 +160,6 @@ rule infer_orthology:
 		prot_files = expand("data/{pre}/protein_files", pre=config["prefix"]),
 		check = rules.get_upstream_inputfiles.output.checkpoint 
 	output:
-		dir = directory(expand("results/{pre}/orthofinder/", pre=config["prefix"])),
 		checkpoint = expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"])
 	conda: "envs/orthofinder.yml"
 	threads: config["orthofinder"]["threads"]
@@ -176,7 +175,7 @@ rule infer_orthology:
 rule rename_ortholog_sequences:
     input:
         checkpoint = rules.infer_orthology.output.checkpoint,
-        dir = rules.infer_orthology.output.dir,
+        dir = expand("results/{pre}/orthofinder", pre=config["prefix"]),
         ids_file = expand("data/{pre}/ids.txt", pre=config["prefix"])
     output:
         checkpoint = expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
@@ -190,13 +189,14 @@ rule rename_ortholog_sequences:
         mkdir {output.dir}/aa
         mkdir {output.dir}/nu
         echo "Renaming aa sequences..."
-        for file in $(find {input.dir}orthofinder/Results_ortho/Single_Copy_Orthologue_Sequences/ -type f -name "*.fa");
+        for file in $(find {input.dir}/orthofinder/Results_ortho/Single_Copy_Orthologue_Sequences/ -type f -name "*.fa");
         do
+	    echo $file
             outname=$(basename $file)
             python {params.wd}/bin/rename_sequences.py {input.ids_file} $file > {output.dir}/aa/$outname"_renamed"
         done
         echo "Renaming nu sequences..."
-        for file in $(find {input.dir}orthofinder/Results_ortho/Single_Copy_Orthologue_Sequences/ -type f -name "*.fa");
+        for file in $(find {input.dir}/orthofinder/Results_ortho/Single_Copy_Orthologue_Sequences/ -type f -name "*.fa");
         do
         	outname=$(basename $file)
         	python {params.wd}/bin/rename_sequences.py {input.ids_file} $file > {output.dir}/nu/$outname"_renamed"
@@ -520,14 +520,14 @@ rule saccharis:
 		"docker://reslp/saccharis:1"
 	threads: 192
 	params:
-		saccharis_threads = 80,
-		parallel_jobs = 8,
+		saccharis_threads = config["saccharis"]["threads"],
+		parallel_jobs = config["saccharis"]["parallel_jobs"],
 		prefix = config["prefix"],
 		wd = os.getcwd()
 	shell:
 		"""
 		export TMPDIR={params.wd}/tmp
-		parallel -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
+		parallel --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
 		touch {output.checkpoint}
 		"""
 
@@ -684,7 +684,7 @@ rule similarity_clustering:
 
 rule orthology_statistics:
     input:
-        directory = rules.infer_orthology.output.dir,
+        directory = expand("results/{pre}/orthofinder", pre=config["prefix"]),
         tree = rules.extract_tree.output.ultra_tree,
         checkpoint1 = rules.infer_orthology.output.checkpoint,
         checkpoint2 = rules.extract_tree.output.checkpoint
@@ -701,7 +701,7 @@ rule orthology_statistics:
         for i in {params.orthofiles}
         do
             echo $i
-            Rscript bin/ortholog_heatmap.R {output.directory}/{params.prefix}_$i.RData {input.tree} {input.directory}orthofinder/Results_ortho/Comparative_Genomics_Statistics/$i {output.directory}/{params.prefix} $i
+            Rscript bin/ortholog_heatmap.R {output.directory}/{params.prefix}_$i.RData {input.tree} {input.directory}/orthofinder/Results_ortho/Comparative_Genomics_Statistics/$i {output.directory}/{params.prefix} $i
         done
         touch {output.checkpoint}
         """
@@ -824,7 +824,7 @@ rule iqtree_gh5:
 
 rule create_gene_family_table:
     input:
-        orthodir = rules.infer_orthology.output.dir,
+        orthodir = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
         checkpoint = rules.infer_orthology.output.checkpoint
     output:
         raw_file = expand("results/{pre}/cafe/{pre}_raw_cafe_input_file.tab", pre=config["prefix"]),
@@ -977,7 +977,7 @@ rule extract_functional_from_cafe:
 		checkpoint1 = rules.parse_cafe_output.output.checkpoint,
 		mapping_file = rules.visualize_cafe_output.output.mapping_file,
 		checkpoint2 = rules.visualize_cafe_output.output.checkpoint,
-		orthgroups = rules.infer_orthology.output.dir,
+		orthgroups = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
 		checkpoint3 = rules.infer_orthology.output.checkpoint,
 		gff = expand("data/{pre}/{pre}_combined.gff", pre=config["prefix"])
 	output:
@@ -1035,7 +1035,7 @@ rule create_codon_alignments:
 		nucl_file = expand("data/{pre}/{pre}_transcripts.fas", pre=config["prefix"]),
 		aa_alignments = rules.align_aa.output.dir,
 		checkpoint = rules.align_aa.output.checkpoint,
-		orth_dir = rules.infer_orthology.output.dir,
+		orth_dir = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
 		checkpoint2 = rules.infer_orthology.output.checkpoint,
 		id = expand("data/{pre}/ids.txt", pre=config["prefix"])
 	output:
