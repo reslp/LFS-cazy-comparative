@@ -180,7 +180,7 @@ rule rename_ortholog_sequences:
         ids_file = expand("data/{pre}/ids.txt", pre=config["prefix"])
     output:
         checkpoint = expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
-        dir = directory(expand("results/{pre}/renamed_sc_seq_files/", pre=config["prefix"]))
+        dir = directory(expand("results/{pre}/renamed_sc_seq_files", pre=config["prefix"]))
     conda:
         "envs/pyutils.yml"
     params:
@@ -213,16 +213,20 @@ rule align_aa:
         "log/align_aa.log"
     output:
         checkpoint = expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
-        dir = directory(expand("results/{pre}/aa_alignments/", pre=config["prefix"]))
+        dir = directory(expand("results/{pre}/aa_alignments", pre=config["prefix"]))
     conda:
         "envs/phylogenomics.yml"
     shell:
         """
+	export TMPDIR="$(pwd)/tmp"
+	if [[ ! -d {output.dir} ]]; then
+		mkdir {output.dir}
+	fi
         for file in $(find {input.dir}/aa -type f -name "*_renamed");
         do
             outname=$(basename $file)
             echo "Aligning sequences: "$outname
-            mafft --quiet --auto {input.dir}/aa/$outname  > {output.dir}/$outname"_aligned"
+            mafft --quiet --auto {input.dir}/aa/$outname > {output.dir}/$outname"_aligned"
         done
         touch {output.checkpoint}
         """
@@ -233,16 +237,21 @@ rule trim:
         checkpoint = rules.align_aa.output.checkpoint
     output:
         checkpoint = expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
-        dir = directory(expand("results/{pre}/aa_trimmed/", pre=config["prefix"]))
+        dir = directory(expand("results/{pre}/aa_trimmed", pre=config["prefix"]))
     conda:
         "envs/phylogenomics.yml"
     shell:
         """
-        for file in $(find {input.dir} -type f -name "*_aligned");
+	export TMPDIR="$(pwd)/tmp"
+        if [[ ! -d {output.dir} ]]; then
+                mkdir {output.dir}
+        fi
+        
+	for file in $(find {input.dir}/ -type f -name "*_aligned");
         do
             echo "Trimming file: "$file
             outname=$(basename $file)
-            trimal -gappyout -in $file -out {output.dir}$outname"_trimmed"
+            trimal -gappyout -in $file -out {output.dir}/$outname"_trimmed"
         done
         touch {output.checkpoint}
         """
@@ -267,7 +276,7 @@ rule iqtree_concat:
         rm -rf results/{params.prefix}/phylogeny/concatenated/algn
         cd results/{params.prefix}/phylogeny/concatenated
         mkdir algn
-        cp {params.wd}/{input.trims}*trimmed algn
+        cp {params.wd}/{input.trims}/*trimmed algn
         iqtree -p algn/ --prefix concat -bb 1000 -nt AUTO -m WAG -redo -T {threads} --no-terrace
         rm -r algn
         cd {params.wd}
@@ -294,7 +303,7 @@ rule iqtree_gene_trees:
         rm -rf results/{params.prefix}/phylogeny/trees/algn
         mkdir results/{params.prefix}/phylogeny/trees/algn
         cd results/{params.prefix}/phylogeny/trees
-        cp {params.wd}/{input.trims}*trimmed algn
+        cp {params.wd}/{input.trims}/*trimmed algn
         iqtree -S algn --prefix loci -nt AUTO -m WAG -redo -T {threads}
         cd {params.wd}
         touch {output.checkpoint}
@@ -321,7 +330,7 @@ rule iqtree_gene_concordance:
         """
         cd results/{params.prefix}/phylogeny
         mkdir -p algn
-        cp {params.wd}/{input.alignments}*trimmed algn
+        cp {params.wd}/{input.alignments}/*trimmed algn
         iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
         rm -r algn
         cd {params.wd}
@@ -677,10 +686,11 @@ rule plot_ancestral_states_cazy_all:
 		"envs/rreroot.yml"
 	shell:
 		"""
-		rdata=results/{params.prefix}/cazy_ancestral_states_all_cazy/{params.prefix}_all_anc_cazy_all.RData
-		Rscript bin/plot_all_cazy_anc.R {params.wd} rdata {params.prefix}
+		rdata={params.wd}/results/{params.prefix}/cazy_ancestral_states_all_cazy/{params.prefix}_all_anc_cazy_all.RData
+		Rscript bin/plot_all_cazy_anc.R {params.wd} $rdata {params.prefix}
 		touch {output.checkpoint}
 		""" 
+
 rule similarity_clustering:
     input:
         cazy_data = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
