@@ -140,16 +140,25 @@ add.scale.bar()
 ptree
 dev.off()
 
-#Ancestral State reconstruction with Cellulose degrading set of genes according to Floudas 2012
-if (set == "cellulose") {
-  cellulose_df <- all_cazy[,colnames(all_cazy) %in% c("GH3","GH5","GH6","GH7","GH10","GH11", "GH12", "GH28","GH43","GH45","GH61","GH74", "CBM1", "AA9", "CE1", "CE16", "CE5", "CE8", "CE12", "CE15")]
-  print("Will analyze the cellulose set")
-} else if (set == "hemicellulose") {
-  cellulose_df <- all_cazy[,colnames(all_cazy) %in% c("GH10", "GH11", "CE1", "CE12", "CE3", "CE2", "CE5", "CE7", "GH43_29", "GH43_34", "GH51", "GH45", "GH62")]
-  print("Will analyze the hemicellulose set")
+#Ancestral State reconstruction with phylosig or cellulose degrading set of genes according to Floudas 2012
+if (grepl("phylosig", set, fixed=T)) {
+	cazies <- read.table(paste(wd,"/",set,sep=""), header=T, sep=",")
+	print(cazies$cazyme)
+	cellulose_df <- all_cazy[,colnames(all_cazy) %in% cazies$cazyme]
+	print("Will analyze phylosig cazy")
+	print(colnames(cellulose_df))
+	set <- "phylosig"
 } else {
-  cellulose_df <- all_cazy
-  print("Will analyze all cazymes")
+	if (set == "cellulose") {
+		cellulose_df <- all_cazy[,colnames(all_cazy) %in% c("GH3","GH5","GH6","GH7","GH10","GH11", "GH12", "GH28","GH43","GH45","GH61","GH74", "CBM1", "AA9", "CE1", "CE16", "CE5", "CE8", "CE12", "CE15")]
+		print("Will analyze the cellulose set")
+	} else if (set == "hemicellulose") {
+		cellulose_df <- all_cazy[,colnames(all_cazy) %in% c("GH10", "GH11", "CE1", "CE12", "CE3", "CE2", "CE5", "CE7", "GH43_29", "GH43_34", "GH51", "GH45", "GH62")]
+		print("Will analyze the hemicellulose set")
+	} else {
+		cellulose_df <- all_cazy
+		print("Will analyze all cazymes")
+	}
 }
 
 print("Reconstructing ancestral states...")
