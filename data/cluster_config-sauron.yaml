@@ -120,10 +120,11 @@ prepare_saccharis:
 saccharis:
    N: saccharis
    ntasks: 16
+   mem: 164G
 get_saccharis_mapping_data:
    N: gsacchmap
 plot_saccharis_trees:
    N: plsacctree
 deeploc:
    N: deeploc
-   ntasks: 32
+   ntasks: 16

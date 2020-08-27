@@ -528,7 +528,6 @@ rule saccharis:
 		checkpoint = expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"])
 	singularity:
 		"docker://reslp/saccharis:1"
-	threads: 192
 	params:
 		saccharis_threads = config["saccharis"]["threads"],
 		parallel_jobs = config["saccharis"]["parallel_jobs"],
@@ -537,7 +536,7 @@ rule saccharis:
 	shell:
 		"""
 		export TMPDIR={params.wd}/tmp
-		parallel --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\n' ' ')
+		parallel --joblog {params.wd}/results/{params.prefix}/saccharis/parallel_logfile --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} "&>" {params.wd}/results/{params.prefix}/saccharis/{{}}.log ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\\n' ' ')
 		touch {output.checkpoint}
 		"""
 
