@@ -48,7 +48,8 @@ rule all:
 		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/phylosig.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/ancestral_states_cazy_phylosig.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/ancestral_states_cazy_phylosig.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/pca.done", pre = config["prefix"]),
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -693,6 +694,28 @@ rule ancestral_states_all_cazy:
         touch {output.checkpoint}
         """
 
+rule pca:
+	input:
+		cazy_data = expand("results/{pre}/cazy_ancestral_states_all_cazy/{pre}_all_anc_cazy_all.RData", pre=config["prefix"]),
+		check1 = rules.ancestral_states_all_cazy.output.checkpoint,
+		phylosig_cazy = rules.phylosig.output.phylosig_families,
+		genome_stats = expand("data/{pre}/stats_genomes.csv",pre = config["prefix"])
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/pca.done", pre = config["prefix"]),
+		dir = directory(expand("results/{pre}/pca/", pre = config["prefix"]))
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"]
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+		Rscript bin/phyl_pca.R {input.cazy_data} {input.phylosig_cazy} {input.genome_stats} {output.dir}
+		touch {output.checkpoint}
+		"""
+
+
+
 rule plot_ancestral_states_cazy_all:
 	input:
 		checkpoint = rules.ancestral_states_all_cazy.output.checkpoint
@@ -793,6 +816,8 @@ rule plot_phylogeny:
         Rscript bin/visualize_tree.R {params.wd} {input.tree} {input.astral} {output.phylogeny} {output.phylogeny2}
         touch {output.checkpoint}
         """
+
+
 
 rule extract_gh5_genes:
 	input:
