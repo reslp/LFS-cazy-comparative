@@ -47,7 +47,8 @@ rule all:
 		expand("results/{pre}/checkpoints/extract_cazy_proteins.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/phylosig.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/phylosig.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/ancestral_states_cazy_phylosig.done", pre=config["prefix"])
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
@@ -627,6 +628,26 @@ rule phylosig:
 		"""
 		Rscript bin/phylosig.R {input.tree} {input.cazy_data} {params.wd}/results/{params.prefix}/phylosig/ &> {log}
 		touch {output.checkpoint}
+		"""
+
+rule ancestral_states_cazy_phylosig:
+	input:
+		csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
+		tree = rules.extract_tree.output.ultra_tree,
+		phylosig_families = rules.phylosig.output.phylosig_families
+	output:
+		dir = directory(expand("results/{pre}/cazy_ancestral_states_phylosig/", pre = config["prefix"])),
+		checkpoint = expand("results/{pre}/checkpoints/ancestral_states_cazy_phylosig.done", pre=config["prefix"])
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"],
+		outprefix = "cazy_ancestral_states_phylosig"
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+			Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} {input.phylosig_families} {params.outprefix}
+			touch {output.checkpoint}
 		"""
 
 rule ancestral_states_cazy:
