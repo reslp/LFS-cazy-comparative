@@ -538,7 +538,25 @@ rule saccharis:
 	shell:
 		"""
 		export TMPDIR={params.wd}/tmp
-		parallel --joblog {params.wd}/results/{params.prefix}/saccharis/parallel_logfile --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} "&>" {params.wd}/results/{params.prefix}/saccharis/{{}}.log ::: $(cat /data/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\\n' ' ')
+		# Saccharis sometimes does not finsish (reasons unkown, maybe memory), but it still returns a valid exit code 0, like it finished normally.
+		# Therefore parallel does not catch the failed jobs. 
+		# The only way around this seems to rerun the saccharis rule
+		# However it is only necessary to run it for the failed familes.
+		# The for loop will check for which families saccharis finished correctly and then rerun the failed ones.
+		# It will run for all cazymes if nothing has been run before.
+		rm -f {params.wd}/results/{params.prefix}/saccharis/interesting_cazy_families.txt
+		for cazy in $(cat {params.wd}/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\\n' ' '); 
+		do 
+			if ! grep -Fxq "Cazy Pipeline Finished" {params.wd}/results/{params.prefix}/saccharis/$cazy.log;
+			then 
+				echo $cazy >> {params.wd}/results/{params.prefix}/saccharis/interesting_cazy_families.txt
+				rm -rf {params.wd}/results/{params.prefix}/saccharis/$cazy
+			else
+				continue
+			fi
+		done
+		echo $(cat /data/results/{params.prefix}/saccharis/interesting_cazy_families.txt | tr '\\n' ' ')
+		parallel --joblog {params.wd}/results/{params.prefix}/saccharis/parallel_logfile --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} "&>" {params.wd}/results/{params.prefix}/saccharis/{{}}.log ::: $(cat /data/results/{params.prefix}/saccharis/interesting_cazy_families.txt | tr '\\n' ' ')
 		touch {output.checkpoint}
 		"""
 
