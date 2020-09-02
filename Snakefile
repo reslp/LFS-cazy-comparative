@@ -698,8 +698,9 @@ rule ancestral_states_all_cazy:
         csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
         tree = rules.extract_tree.output.ultra_tree
     output:
-        dir = directory(expand("results/{pre}/cazy_ancestral_states_all_cazy/", pre = config["prefix"])),
-        checkpoint = expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"])
+        #dir = directory(expand("results/{pre}/cazy_ancestral_states_all_cazy/", pre = config["prefix"])),
+        checkpoint = expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
+	rdata = expand("results/{pre}/cazy_ancestral_states_all_cazy/{pre}_anc_cazy_all.RData", pre=config["prefix"])
     params:
         wd = os.getcwd(),
         prefix = config["prefix"],
@@ -708,13 +709,30 @@ rule ancestral_states_all_cazy:
         "envs/rreroot.yml"
     shell:
         """
-        Rscript bin/snake_anc_cazy_xylo_all.R {params.wd} {input.csv} {input.tree} {params.prefix} all {params.outprefix}
+        Rscript bin/ancestral_state_reconstruction.R {params.wd} {input.csv} {input.tree} {params.prefix} {params.outprefix}
         touch {output.checkpoint}
         """
 
+rule plot_ancestral_states:
+	input:
+		rdata = rules.ancestral_states_all_cazy.output.rdata
+	output:
+		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states.done", pre=config["prefix"]),
+		rdata = expand("results/{pre}/plots_ancestral_states/ancestral_states.rData", pre=config["prefix"]),
+	params:
+		wd = os.getcwd(),
+		prefix = config["prefix"],
+	conda:
+		"envs/rreroot.yml"
+	shell:
+		"""
+		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/{params.prefix}/plots_ancestral_states/ {input.rdata}
+		touch {output.checkpoint}		
+		"""
+
 rule pca:
 	input:
-		cazy_data = expand("results/{pre}/cazy_ancestral_states_all_cazy/{pre}_all_anc_cazy_all.RData", pre=config["prefix"]),
+		cazy_data = rules.ancestral_states_all_cazy.output.rdata,
 		check1 = rules.ancestral_states_all_cazy.output.checkpoint,
 		phylosig_cazy = rules.phylosig.output.phylosig_families,
 		genome_stats = expand("data/{pre}/stats_genomes.csv",pre = config["prefix"])
@@ -736,7 +754,8 @@ rule pca:
 
 rule plot_ancestral_states_cazy_all:
 	input:
-		checkpoint = rules.ancestral_states_all_cazy.output.checkpoint
+		checkpoint = rules.ancestral_states_all_cazy.output.checkpoint,
+		rdata = rules.ancestral_states_all_cazy.output.rdata
 	output:
 		plot = expand("results/{pre}/plot_ancestral_states_all_cazy/{pre}_all_cazymes.pdf", pre = config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"])
@@ -747,8 +766,8 @@ rule plot_ancestral_states_cazy_all:
 		"envs/rreroot.yml"
 	shell:
 		"""
-		rdata={params.wd}/results/{params.prefix}/cazy_ancestral_states_all_cazy/{params.prefix}_all_anc_cazy_all.RData
-		Rscript bin/plot_all_cazy_anc.R {params.wd} $rdata {params.prefix}
+		#rdata={params.wd}/results/{params.prefix}/cazy_ancestral_states_all_cazy/{params.prefix}_all_anc_cazy_all.RData
+		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
 		touch {output.checkpoint}
 		""" 
 
