@@ -121,6 +121,18 @@ for (foo in 1:length(sets)) {
   ancestral_states_plot$name <- rownames(ancestral_states_plot)
 
   plot_df1 <- melt(ancestral_states_plot)
+  plot_df1$name <- factor(plot_df1$name, levels=rows_in_order)
+  levels(plot_df1$name)[levels(plot_df1$name)=="root"] ="root (R)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="Eurotio_Lecanoro_split"] ="Eurotiomycetes/Lecanoromycetes split (ELS)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Eurotiomycetes"] ="ancestral Eurotiomycetes (AE)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Lecanoromycetes_slat"] ="ancestral Lecanoromycetes s.lat. (ALSL)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Lecanoromycetes_sstr"] ="ancestral Lecanoromycetes s.str. (ALSS)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="Lecanoro_Ostropo_split"] ="Lecanoromycetidae/Ostropomycetidae split (OLS)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Lecanoromycetidae"] ="ancestral Lecanoromycetidae (AL)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Ostropomycetidae"] ="ancestral Ostropomycetidae (AO)"
+  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Xylographa"] ="ancestral Xylographa (AX)"
+
+
   psummary_anc <- ggplot(plot_df1, aes(variable, name)) + geom_tile(aes(fill = value)) + scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449")+ theme_classic()+geom_text(aes(label = ifelse(round(plot_df1$value, 1)>0, round(plot_df1$value, 1), "")), size=2)
   psummary_anc <- psummary_anc + labs(x = "", y = "") + scale_x_discrete(position="top") +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))
   psummary_anc
@@ -160,13 +172,18 @@ for (foo in 1:length(sets)) {
   #psummary <- psummary + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
   #ptree <- ptree + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
   #psummary_anc <- psummary_anc + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
-
-
+  
+  
   #highlight nodes in tree for plotting:
-  ptree <- ptree + geom_point2(aes(subset=(node %in% my_nodes)),color="black",size=2)
+  bla <- c("R", "ELS", "ALSL", "ALSS", "OLS", "AO", "AX", "AL", "AE")
+  print(bla)
+  print(my_nodes)
+  ptree <- ptree + geom_point2(aes(subset=(node %in% my_nodes)),color="black",size=2) + geom_text2(label=bla, aes(subset=(node %in% my_nodes)), nudge_x=-0.03,nudge_y=0.7, size=2)
 
   #plot layout:
   layout <- "
+  AAABB
+  AAABB
   AAABB
   AAABB
   AAABB
