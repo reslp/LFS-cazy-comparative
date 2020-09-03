@@ -85,6 +85,12 @@ scale_y_tree <- function(expand=expand_scale(0, 0.6), ...){
   scale_y_continuous(expand=expand, ...)
 }
 
+## recreate tree plot with corrected tip labels:
+tree$tip.label <- gsub("_", " ", tree$tip.label)
+ptree <- ggtree(tree, size=0.3) + geom_tiplab(align=TRUE, size=2.5) + geom_treescale(x=0.1,y=50, width=0.2, linesize=0.3) + scale_x_continuous(expand=expand_scale(0.2)) + scale_y_tree() +xlim(NA, 1.3)
+rownames(all_cazy) <- gsub("_", " ", rownames(all_cazy))
+tree$tip.label
+
 ## Run plotting routine for each interesting gene set:
 
 sets <- c("cellulose", "hemicellulose", "phylosig")
