@@ -58,8 +58,8 @@ plot_data$name <- str_replace(rownames(plot_data), "_", " ")
 print("creating plots")
 colors <- c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33")
 p1 <- ggplot(plot_data, aes(PC1, PC2, colour=class)) + geom_point() +scale_color_manual(values=colors) +ggtitle("") + theme(legend.position = "none") + theme(plot.title = element_text(size = 10)) +xlab(paste("PC1 (", as.character(percent.var.phylo[1]),"%)", sep=""))+ylab(paste("PC2 (", as.character(percent.var.phylo[2]),"%)", sep=""))
-p2 <- ggplot(plot_data, aes(PC1, PC2, label=rownames(plot_data))) + geom_point(color = ifelse(plot_data$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 > -1, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(percent.var.phylo[1]),"%)", sep=""))+ylab(paste("PC2 (", as.character(percent.var.phylo[2]),"%)", sep=""))
-p3 <- ggplot(plot_data, aes(PC1, PC2, label=rownames(plot_data))) + geom_point(color = ifelse(plot_data$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 <= -1, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(percent.var.phylo[1]),"%)", sep=""))+ylab(paste("PC2 (", as.character(percent.var.phylo[2]),"%)", sep=""))
+p2 <- ggplot(plot_data, aes(PC1, PC2, label=rownames(plot_data))) + geom_point(color = ifelse(plot_data$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 > 1, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(percent.var.phylo[1]),"%)", sep=""))+ylab(paste("PC2 (", as.character(percent.var.phylo[2]),"%)", sep=""))
+p3 <- ggplot(plot_data, aes(PC1, PC2, label=rownames(plot_data))) + geom_point(color = ifelse(plot_data$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 <= 1, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(percent.var.phylo[1]),"%)", sep=""))+ylab(paste("PC2 (", as.character(percent.var.phylo[2]),"%)", sep=""))
 
 pp <- ggarrange(p1,p2,p3, ncol=3,nrow=1,common.legend = T, legend="bottom", labels="AUTO")
 print("saving phylo.pca plots")
@@ -89,7 +89,7 @@ print("prepare for plotting")
 plot_data2 <- pca$x
 plot_data2 <- as.data.frame(plot_data2)
 cazy_with_info$class
-plot_data2$class <- c(as.character(cazy_with_info$class), "ancestral", "ancestral", "ancestral", "ancestral", "ancestral", "ancestral")
+plot_data2$class <- c(as.character(cazy_with_info$class), "ancestral", "ancestral", "ancestral", "ancestral", "ancestral", "ancestral", "ancestral", "ancestral", "ancestral")
 
 plot_data2$class
 plot_data2$name <- str_replace(rownames(plot_data2), "_", " ")
@@ -97,8 +97,8 @@ plot_data2$name <- str_replace(rownames(plot_data2), "_", " ")
 print("Creating plots")
 colors2 <- c("#000000","#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33")
 p1 <- ggplot(plot_data2, aes(PC1, PC2, colour=class)) + geom_point() +scale_color_manual(values=colors2) +ggtitle("") + theme(legend.position = "none") + theme(plot.title = element_text(size = 10)) +xlab(paste("PC1 (", as.character(PC1),"%)", sep=""))+ylab(paste("PC2 (", as.character(PC2),"%)", sep=""))+ geom_text_repel(data = . %>% mutate(label = ifelse(class == "ancestral", name, "")), aes(label = label),segment.size=0.1, size=1.8)
-p2 <- ggplot(plot_data2, aes(PC1, PC2, label=rownames(plot_data2))) + geom_point(color = ifelse(plot_data2$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 > 0.6, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(PC1),"%)", sep=""))+ylab(paste("PC2 (", as.character(PC2),"%)", sep=""))
-p3 <- ggplot(plot_data2, aes(PC1, PC2, label=rownames(plot_data2))) + geom_point(color = ifelse(plot_data2$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 <= 0.6, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(PC1),"%)", sep=""))+ylab(paste("PC2 (", as.character(PC2),"%)", sep=""))
+p2 <- ggplot(plot_data2, aes(PC1, PC2, label=rownames(plot_data2))) + geom_point(color = ifelse(plot_data2$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 > 0.5, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(PC1),"%)", sep=""))+ylab(paste("PC2 (", as.character(PC2),"%)", sep=""))
+p3 <- ggplot(plot_data2, aes(PC1, PC2, label=rownames(plot_data2))) + geom_point(color = ifelse(plot_data2$class != "Lecanoromycetes", "grey50", "#984ea3")) + geom_text_repel(data = . %>% mutate(label = ifelse(class == "Lecanoromycetes" & PC2 <= 0.5, name, "")), aes(label = label),segment.size=0.1, size=1.8) +ggtitle("")+ theme(plot.title = element_text(size = 10))+xlab(paste("PC1 (", as.character(PC1),"%)", sep=""))+ylab(paste("PC2 (", as.character(PC2),"%)", sep=""))
 
 pp <- ggarrange(p1,p2,p3, ncol=3,nrow=1,common.legend = T, legend="bottom", labels="AUTO")
 
