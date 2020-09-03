@@ -68,14 +68,12 @@ dev.off()
 print("Reconstructing ancestral states...")
 fit_cel <- list()
 obj_cel <- list()
-# need to uncomment the things here to change to more comprehensive reconstruction. This is merely for speed now to test all pipeline elements
-# ALSO SEE END OF SCRIPT for additional things to uncomment.
 for (i in 1:length(colnames(cellulose_df))){
   print(i)
   trait <- as.matrix(cellulose_df)[,i]
-  #fit_cel[[i]] <- anc.ML(tree, trait, model="OU")
-  fit_cel[[i]] <- fastAnc(tree, trait)
-  #cat("convergence for ",i,"=",fit_cel[[i]]$convergence,"\n")
+  fit_cel[[i]] <- anc.ML(tree, trait, model="OU")
+  #fit_cel[[i]] <- fastAnc(tree, trait) # this is only for faster prototyping
+  cat("convergence for ",i,"=",fit_cel[[i]]$convergence,"\n")
   obj_cel[[i]]<-contMap(tree,trait,plot=FALSE)
   obj_cel[[i]]<-setMap(obj_cel[[i]],colors=c("#f7fcf5","#74c476","#00441b"), space="Lab")
 }
@@ -131,29 +129,29 @@ colnames(ancestral_states) <- colnames(cellulose_df)
 
 my_nodes <- c(root_node, eurotio_lecanoro_split_node, eurotio_node, lecanoro_slat_node, lecanoro_node,lecanoro_ostropo_split_node, ostropo_node, lecanidae_node, xylo_node)
 
-#for (i in 1:length(fit_cel)) {
-#  ancestral_states["ancestral_Xylographa", names[i]] <- round(fit_cel[[i]]$ace[toString(xylo_node)])
-#  ancestral_states["ancestral_Ostropomycetidae", names[i]] <- round(fit_cel[[i]]$ace[toString(ostropo_node)])
-#  ancestral_states["ancestral_Lecanoromycetidae", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanidae_node)])
-#  ancestral_states["ancestral_Lecanoromycetes_sstr", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_node)])
-#  ancestral_states["Lecanoro_Ostropo_split", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_ostropo_split_node)])
-#  ancestral_states["ancestral_Eurotiomycetes", names[i]] <- round(fit_cel[[i]]$ace[toString(eurotio_node)])
-#  ancestral_states["Eurotio_Lecanoro_split", names[i]] <- round(fit_cel[[i]]$ace[toString(eurotio_lecanoro_split_node)])
-#  ancestral_states["ancestral_Lecanoromycetes_slat", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_slat_node)])
-#  ancestral_states["root", names[i]] <- round(fit_cel[[i]]$ace[toString(root_node)])
-#}
-
 for (i in 1:length(fit_cel)) {
-  ancestral_states["ancestral_Xylographa", names[i]] <- round(fit_cel[[i]][toString(xylo_node)])
-  ancestral_states["ancestral_Ostropomycetidae", names[i]] <- round(fit_cel[[i]][toString(ostropo_node)])
-  ancestral_states["ancestral_Lecanoromycetidae", names[i]] <- round(fit_cel[[i]][toString(lecanidae_node)])
-  ancestral_states["ancestral_Lecanoromycetes_sstr", names[i]] <- round(fit_cel[[i]][toString(lecanoro_node)])
-  ancestral_states["Lecanoro_Ostropo_split", names[i]] <- round(fit_cel[[i]][toString(lecanoro_ostropo_split_node)])
-  ancestral_states["ancestral_Eurotiomycetes", names[i]] <- round(fit_cel[[i]][toString(eurotio_node)])
-  ancestral_states["Eurotio_Lecanoro_split", names[i]] <- round(fit_cel[[i]][toString(eurotio_lecanoro_split_node)])
-  ancestral_states["ancestral_Lecanoromycetes_slat", names[i]] <- round(fit_cel[[i]][toString(lecanoro_slat_node)])
-  ancestral_states["root", names[i]] <- round(fit_cel[[i]][toString(root_node)])
+  ancestral_states["ancestral_Xylographa", names[i]] <- round(fit_cel[[i]]$ace[toString(xylo_node)])
+  ancestral_states["ancestral_Ostropomycetidae", names[i]] <- round(fit_cel[[i]]$ace[toString(ostropo_node)])
+  ancestral_states["ancestral_Lecanoromycetidae", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanidae_node)])
+  ancestral_states["ancestral_Lecanoromycetes_sstr", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_node)])
+  ancestral_states["Lecanoro_Ostropo_split", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_ostropo_split_node)])
+  ancestral_states["ancestral_Eurotiomycetes", names[i]] <- round(fit_cel[[i]]$ace[toString(eurotio_node)])
+  ancestral_states["Eurotio_Lecanoro_split", names[i]] <- round(fit_cel[[i]]$ace[toString(eurotio_lecanoro_split_node)])
+  ancestral_states["ancestral_Lecanoromycetes_slat", names[i]] <- round(fit_cel[[i]]$ace[toString(lecanoro_slat_node)])
+  ancestral_states["root", names[i]] <- round(fit_cel[[i]]$ace[toString(root_node)])
 }
+# uncomment this for fast prototyping with fastANC
+#for (i in 1:length(fit_cel)) {
+#  ancestral_states["ancestral_Xylographa", names[i]] <- round(fit_cel[[i]][toString(xylo_node)])
+#  ancestral_states["ancestral_Ostropomycetidae", names[i]] <- round(fit_cel[[i]][toString(ostropo_node)])
+#  ancestral_states["ancestral_Lecanoromycetidae", names[i]] <- round(fit_cel[[i]][toString(lecanidae_node)])
+#  ancestral_states["ancestral_Lecanoromycetes_sstr", names[i]] <- round(fit_cel[[i]][toString(lecanoro_node)])
+#  ancestral_states["Lecanoro_Ostropo_split", names[i]] <- round(fit_cel[[i]][toString(lecanoro_ostropo_split_node)])
+#  ancestral_states["ancestral_Eurotiomycetes", names[i]] <- round(fit_cel[[i]][toString(eurotio_node)])
+#  ancestral_states["Eurotio_Lecanoro_split", names[i]] <- round(fit_cel[[i]][toString(eurotio_lecanoro_split_node)])
+#  ancestral_states["ancestral_Lecanoromycetes_slat", names[i]] <- round(fit_cel[[i]][toString(lecanoro_slat_node)])
+#  ancestral_states["root", names[i]] <- round(fit_cel[[i]][toString(root_node)])
+#}
 
 print(ancestral_states)
 
