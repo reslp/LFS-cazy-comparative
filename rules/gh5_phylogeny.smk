@@ -7,7 +7,7 @@ rule extract_gh5_genes:
 		gh5_genes = expand("results/{pre}/gh5_tree/extracted_gh5_genes_{pre}.fas", pre = config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/extract_gh5_genes.done", pre=config["prefix"])
 	conda:
-		"envs/pyutils.yml"
+		"../envs/pyutils.yml"
 	shell:
 		"""
 		bin/select_genes_for_annotation.py -gff {input.gff_files} -fasta {input.prot_files} -item CAZy:GH5 > {output.gh5_genes}
@@ -36,7 +36,7 @@ rule align_gh5:
 		checkpoint = expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
 		gh5_alignment =  expand("results/{pre}/gh5_tree/all_gh5_genes_alignment_{pre}.fas", pre = config["prefix"]),
 	conda:
-		"envs/phylogenomics.yml"
+		"../envs/phylogenomics.yml"
 	shell:
 		"""
 		mafft --quiet --auto {input.all_gh5_genes}  > {output.gh5_alignment}
@@ -50,7 +50,7 @@ rule trim_gh5:
 		checkpoint = expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
 		trimmed_alignment = expand("results/{pre}/gh5_tree/all_gh5_genes_alignment_trimmed_{pre}.fas", pre = config["prefix"])
 	conda:
-		"envs/phylogenomics.yml"
+		"../envs/phylogenomics.yml"
 	shell:
 		"""
 		trimal -gappyout -in {input} -out {output.trimmed_alignment}

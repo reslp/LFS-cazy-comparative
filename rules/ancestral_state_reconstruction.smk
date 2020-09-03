@@ -11,7 +11,7 @@ rule cazy_anc_summary:
         wd = os.getcwd(),
         prefix = config["prefix"]
     conda:
-        "envs/rreroot.yml"
+        "../envs/rreroot.yml"
     log:
         "log/output_cazy_anc_summary.log"
     shell:
@@ -39,7 +39,7 @@ rule phylosig:
 	log:
 		"log/phylosig.log"
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	shell:
 		"""
 		Rscript bin/phylosig.R {input.tree} {input.cazy_data} {params.wd}/results/{params.prefix}/phylosig/ &> {log}
@@ -60,7 +60,7 @@ rule ancestral_states_all_cazy:
         prefix = config["prefix"],
 	outprefix = "cazy_ancestral_states_all_cazy"
     conda:
-        "envs/rreroot.yml"
+        "../envs/rreroot.yml"
     shell:
         """
         Rscript bin/ancestral_state_reconstruction.R {params.wd} {input.csv} {input.tree} {params.prefix} {params.outprefix}
@@ -77,7 +77,7 @@ rule plot_ancestral_states:
 		wd = os.getcwd(),
 		prefix = config["prefix"],
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	shell:
 		"""
 		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/{params.prefix}/plots_ancestral_states/ {input.rdata}
@@ -96,7 +96,7 @@ rule pca:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	shell:
 		"""
 		Rscript bin/phyl_pca.R {input.cazy_data} {input.phylosig_cazy} {input.genome_stats} {output.dir}
@@ -115,7 +115,7 @@ rule plot_ancestral_states_cazy_all:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	shell:
 		"""
 		#rdata={params.wd}/results/{params.prefix}/cazy_ancestral_states_all_cazy/{params.prefix}_all_anc_cazy_all.RData

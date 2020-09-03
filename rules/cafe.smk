@@ -7,7 +7,7 @@ rule create_gene_family_table:
         raw_file = expand("results/{pre}/cafe/{pre}_raw_cafe_input_file.tab", pre=config["prefix"]),
         checkpoint = expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"])
     conda:
-        "envs/pyutils.yml"
+        "../envs/pyutils.yml"
     shell:
         """
         python bin/orthofinder_to_cafe.py -i {input.orthodir}/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv -o {output.raw_file}
@@ -26,7 +26,7 @@ if config["cafe"]["filter"] == "yes":
 			wd = os.getcwd(),
 			prefix = config["prefix"]
 		conda:
-			"envs/pyutils.yml"
+			"../envs/pyutils.yml"
 		shell:
 			"""
 			cd results/{params.prefix}/cafe/
@@ -60,7 +60,7 @@ rule create_cafe_style_tree:
     params:
         wd = os.getcwd()
     conda:
-        "envs/rreroot.yml"
+        "../envs/rreroot.yml"
     shell:
         """
         Rscript bin/get_cafe_tree.R {params.wd} {input.tree} {output.tree} {output.cafe_tree}
@@ -79,7 +79,7 @@ rule create_cafe_commands:
     params:
         prefix = config["prefix"]
     conda:
-        "envs/pyutils.yml"
+        "../envs/pyutils.yml"
     shell:
         """
         python bin/create_cafe.py -t {input.tree} -ct {input.cafe_tree} -template {input.template} -data {input.data} -pre results/{params.prefix}/cafe/{params.prefix} > {output.cafe_commands}
@@ -117,7 +117,7 @@ rule parse_cafe_output:
         prefix = config["prefix"],
         wd = os.getcwd()
     conda:
-        "envs/pyutils.yml"
+        "../envs/pyutils.yml"
     shell:
         """
         cd results/{params.prefix}/cafe
@@ -141,7 +141,7 @@ rule visualize_cafe_output:
         prefix = config["prefix"],
         wd = os.getcwd()
     conda:
-        "envs/rreroot.yml"
+        "../envs/rreroot.yml"
     shell:
         """
         Rscript bin/visualize_cafe.R {params.wd}/results/{params.prefix}/cafe {input.tree} {input.table} {input.plottree} {params.prefix}
@@ -176,7 +176,7 @@ rule extract_functional_from_cafe:
 	params:
 		prefix = config["prefix"]
 	conda:
-		"envs/pyutils.yml"
+		"../envs/pyutils.yml"
 	shell:
 		"""
 		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho {input.orthgroups}/orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which + -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
@@ -198,7 +198,7 @@ rule visualize_function_annotations_cafe:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	shell:
 		"""
 		for file in {input.files}

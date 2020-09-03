@@ -8,7 +8,7 @@ rule statistics:
 		prefix=config["prefix"],
 		wd = os.getcwd()
 	conda:
-		"envs/rplotting.yml"
+		"../envs/rplotting.yml"
 	shell:
 		"""
 		if [[ ! -d results/{params.prefix}/statistics ]]
@@ -42,7 +42,7 @@ rule plot_genome_overview:
 		genomes_overview = expand("results/{pre}/genome_overviews/genomes_overview.pdf", pre=config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"])
 	conda:
-		"envs/genome_overview.yml"
+		"../envs/genome_overview.yml"
 	params:
 		wd = os.getcwd()
 	shell:
@@ -64,7 +64,7 @@ rule orthology_statistics:
         prefix = config["prefix"],
         orthofiles = config["orthofiles"]
     conda:
-        "envs/rorthologystatistics.yml"
+        "../envs/rorthologystatistics.yml"
     shell:
         """
         for i in {params.orthofiles}

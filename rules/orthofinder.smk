@@ -48,7 +48,7 @@ rule infer_orthology:
 		check = rules.get_upstream_inputfiles.output.checkpoint 
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"])
-	conda: "envs/orthofinder.yml"
+	conda: "../envs/orthofinder.yml"
 	threads: config["orthofinder"]["threads"]
 	shell:
 		"""
@@ -67,7 +67,7 @@ rule rename_ortholog_sequences:
         checkpoint = expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
         dir = directory(expand("results/{pre}/renamed_sc_seq_files", pre=config["prefix"]))
     conda:
-        "envs/pyutils.yml"
+        "../envs/pyutils.yml"
     params:
         wd = os.getcwd()
     shell:

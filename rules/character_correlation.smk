@@ -10,7 +10,7 @@ rule character_correlation:
 	params:
 		wd = os.getcwd()
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	threads: 8
 	shell:
 		"""

@@ -8,7 +8,7 @@ rule align_aa:
         checkpoint = expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
         dir = directory(expand("results/{pre}/aa_alignments", pre=config["prefix"]))
     conda:
-        "envs/phylogenomics.yml"
+        "../envs/phylogenomics.yml"
     shell:
         """
 	export TMPDIR="$(pwd)/tmp"
@@ -32,7 +32,7 @@ rule trim:
         checkpoint = expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
         dir = directory(expand("results/{pre}/aa_trimmed", pre=config["prefix"]))
     conda:
-        "envs/phylogenomics.yml"
+        "../envs/phylogenomics.yml"
     shell:
         """
 	export TMPDIR="$(pwd)/tmp"
@@ -138,7 +138,7 @@ rule reroot_tree:
         treefile = expand("results/{pre}/phylogeny/{pre}_concat_rerooted.tre", pre=config["prefix"]),
         checkpoint = expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"])
     conda:
-        "envs/rreroot.yml"
+        "../envs/rreroot.yml"
     params:
         wd = os.getcwd(),
         root = config["root"]
@@ -159,7 +159,7 @@ rule create_r8s_controlfile:
     params:
         prefix = config["prefix"]
     conda:
-        "envs/phylogenomics.yml"
+        "../envs/phylogenomics.yml"
     shell:
         """
         python bin/create_r8s.py -t {input.template} -tr {input.tree} -l results/{params.prefix}/phylogeny/concatenated/concat.log > {output.r8s_controlfile}
@@ -228,7 +228,7 @@ rule plot_phylogeny:
     params:
         wd = os.getcwd()
     conda:
-        "envs/rorthologystatistics.yml"
+        "../envs/rorthologystatistics.yml"
     shell:
         """
         Rscript bin/visualize_tree.R {params.wd} {input.tree} {input.astral} {output.phylogeny} {output.phylogeny2}

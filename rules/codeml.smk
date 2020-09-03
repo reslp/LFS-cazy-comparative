@@ -11,7 +11,7 @@ rule create_codon_alignments:
 		dir = directory(expand("results/{pre}/codon_alignments/", pre=config["prefix"])),
 		checkpoint = expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"])
 	conda:
-		"envs/pyutils.yml"
+		"../envs/pyutils.yml"
 	shell:
 		"""
 		for file in $(find {input.aa_alignments} -type f -name "*.fa_renamed_aligned");

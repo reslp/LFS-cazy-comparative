@@ -110,7 +110,7 @@ rule get_saccharis_mapping_data:
 		saccharis_mapping_data = expand("results/{pre}/saccharis_plotting/saccharis_mapping_information.tsv",pre = config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/get_saccharis_mapping_data.done", pre=config["prefix"])
 	conda:
-		"envs/pyutils.yml"
+		"../envs/pyutils.yml"
 	shell:
 		"""
 		bin/get_saccharis_mapping_data.py -fasta {input.seqs} -info {input.genome_info} -map {input.discrete_data} > {output.saccharis_mapping_data}
@@ -155,7 +155,7 @@ rule plot_saccharis_trees:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
 	conda:
-		"envs/rreroot.yml"
+		"../envs/rreroot.yml"
 	shell:
 		"""
 		for treename in $(ls results/{params.prefix}/saccharis/*/characterized/*.tree); do	
