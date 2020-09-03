@@ -73,6 +73,7 @@ rule plot_ancestral_states:
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states.done", pre=config["prefix"]),
 		rdata = expand("results/{pre}/plots_ancestral_states/ancestral_states.rData", pre=config["prefix"]),
+		rdata2 = expand("results/{pre}/plots_ancestral_states/ancestral_states_all.rData", pre=config["prefix"])
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"],
@@ -80,7 +81,10 @@ rule plot_ancestral_states:
 		"../envs/rreroot.yml"
 	shell:
 		"""
+		# plot the heatmaps and tree for different genesets:
 		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/{params.prefix}/plots_ancestral_states/ {input.rdata}
+		# plot heatmap for all cazymes:
+		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
 		touch {output.checkpoint}		
 		"""
 rule pca:

@@ -42,7 +42,7 @@ rule all:
 		expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
+		#expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/extract_cazy_proteins.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"]),

@@ -22,7 +22,7 @@ library(tidyverse)
 
 # load the Rdata file from the reconstruction
 load(rfile)
-
+base_size <- 7
 
 #make sure the dataframe is divisable by 40 so that all pages look the same:
 npages <- length(colnames(cellulose_df)) / 40
@@ -62,7 +62,7 @@ omitt_fake_labels <- function(colnms) { # function to get rid of fake column lab
 start <- 0
 end <- 40
 
-filename <- paste("results/",prefix,"/plot_ancestral_states_all_cazy/",prefix,"_all_cazymes.pdf", sep="")
+filename <- paste("results/",prefix,"/plots_ancestral_states/",prefix,"_all_cazymes.pdf", sep="")
 
 pdf(filename, width=11.7, height=9.3)
 
@@ -89,3 +89,4 @@ for (i in 1:npages) {
   print(" ")
 }
 dev.off()
+save.image(file=paste("results/",prefix,"/plots_ancestral_states/ancestral_states_all.rData", sep=""))
