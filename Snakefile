@@ -65,4 +65,4 @@ include: "rules/phylogeny.smk"
 include: "rules/statistics.smk"
 include: "rules/ancestral_state_reconstruction.smk"
 include: "rules/saccharis.smk"
-
+include: "rules/character_correlation.smk"

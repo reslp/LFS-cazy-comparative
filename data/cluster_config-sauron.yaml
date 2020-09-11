@@ -113,6 +113,7 @@ plot_ancestral_states_cazy_all:
 character_correlation:
    N: charcorr
    ntasks: 16
+   mem: 164G
 prepare_scrape_cazy:
    J: prescrcaz
 prepare_saccharis:
