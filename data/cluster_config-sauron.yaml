@@ -2,11 +2,12 @@ __default__:
    time: "72:00:00"
    N: default
    shell: /bin/bash
-   mem: 48G
+   mem: 4G
    ntasks: 1
    queue: mpi
    output: $(pwd)/log/slurm-%j.out
    error: $(pwd)/log/slurm-%j.err
+   pe: mpi1node
 align_aa:
    N: align_aa
    hint: nomultithread
@@ -46,10 +47,12 @@ filter_cafe_family_table:
 infer_orthology:
    N: infortho
    hint: multithread
+   mem: 8G
    ntasks: 32
 iqtree_concat:
    N: iqtconcat
    hint: multithread
+   mem: 8G
    ntasks: 16
 iqtree_gene_concordance:
    N: iqtgencon
@@ -75,6 +78,7 @@ reroot_tree:
 run_cafe:
    N: runcafe
    hint: multithread
+   mem: 8G
    ntasks: 16
 run_r8s:
    N: runr8s
@@ -104,6 +108,7 @@ trimm_gh5:
 iqtree_gh5:
    N: gh5iqtree
    ntasks: 16
+   mem: 8G
 plot_genome_overview:
    N: genooverview
 summarize_secreted_and_cazy:
@@ -113,7 +118,7 @@ plot_ancestral_states_cazy_all:
 character_correlation:
    N: charcorr
    ntasks: 16
-   mem: 164G
+   mem: 10G
 prepare_scrape_cazy:
    J: prescrcaz
 prepare_saccharis:
@@ -121,7 +126,7 @@ prepare_saccharis:
 saccharis:
    N: saccharis
    ntasks: 16
-   mem: 164G
+   mem: 10G
 get_saccharis_mapping_data:
    N: gsacchmap
 plot_saccharis_trees:
@@ -129,3 +134,4 @@ plot_saccharis_trees:
 deeploc:
    N: deeploc
    ntasks: 16
+   mem: 8G
