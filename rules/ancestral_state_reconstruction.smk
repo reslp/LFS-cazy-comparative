@@ -92,6 +92,7 @@ rule pca:
 		cazy_data = rules.ancestral_states_all_cazy.output.rdata,
 		check1 = rules.ancestral_states_all_cazy.output.checkpoint,
 		phylosig_cazy = rules.phylosig.output.phylosig_families,
+		apriori_sets = expand("data/{pre}/apriori_cazyme_sets.txt", pre=config["prefix"]),
 		genome_stats = expand("data/{pre}/stats_genomes.csv",pre = config["prefix"])
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/pca.done", pre = config["prefix"]),
@@ -103,7 +104,7 @@ rule pca:
 		"../envs/rreroot.yml"
 	shell:
 		"""
-		Rscript bin/phyl_pca.R {input.cazy_data} {input.phylosig_cazy} {input.genome_stats} {output.dir}
+		Rscript bin/phyl_pca.R {input.cazy_data} {input.phylosig_cazy} {input.apriori_sets} {input.genome_stats} {output.dir} 
 		touch {output.checkpoint}
 		"""
 
