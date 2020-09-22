@@ -66,7 +66,8 @@ rule prepare_saccharis:
 rule saccharis:
 	input:
 		seqs = rules.prepare_saccharis.output.renamed_sequences,
-		cazy = rules.prepare_scrape_cazy.output.checkpoint
+		cazy = rules.prepare_scrape_cazy.output.checkpoint,
+		apriori_sets = expand("data/{pre}/apriori_cazyme_sets.txt", pre=config["prefix"])
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"])
 	singularity:
@@ -86,7 +87,7 @@ rule saccharis:
 		# The for loop will check for which families saccharis finished correctly and then rerun the failed ones.
 		# It will run for all cazymes if nothing has been run before.
 		rm -f {params.wd}/results/{params.prefix}/saccharis/interesting_cazy_families.txt
-		for cazy in $(cat {params.wd}/results/{params.prefix}/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\\n' ' '); 
+		for cazy in $(echo $(cat {input.apriori_sets} | tail -n +2 | awk -F "," '{{print $1}}' | awk -F "_" '{{print $1}}') $(cat results/82_genomes/cazy_information/all_interesting_cazy_families.txt | sort | uniq | tr '\\n' ' ') | sort | uniq); 
 		do 
 			if ! grep -Fxq "Cazy Pipeline Finished" {params.wd}/results/{params.prefix}/saccharis/$cazy.log;
 			then 
