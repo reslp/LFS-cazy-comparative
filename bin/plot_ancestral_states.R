@@ -23,7 +23,7 @@ library(tidyverse)
 load(rdata)
 setwd(wd)
 
-
+sessionInfo()
 # function definitions. These functions have been modified from:
 # https://thackl.github.io/ggtree-composite-plots
 
@@ -76,7 +76,7 @@ ggtreeplot <- function(ggtree, data = NULL, mapping = aes(), flip=FALSE,
     gg <- ggplot(data=data, mapping = mapping, ...) +
       scale_y_continuous(limits=limits, expand=c(0,0))
   }
-  gg
+  return(gg)
 }
 
 no_legend <- function() theme(legend.position="none")
@@ -84,17 +84,107 @@ no_legend <- function() theme(legend.position="none")
 scale_y_tree <- function(expand=expand_scale(0, 0.6), ...){
   scale_y_continuous(expand=expand, ...)
 }
+## function to create summary plots for each genset for fig1:
+get_cazy_summary <- function(df) {
+  print("getting summary")
+  types <- c("AA", "GH", "CE", "PL", "GT", "CBM")
+  #print(typeof(df))
+  for (i in 1:length(types)) {
+  colname <- paste(types[i], "_sum", sep="")
+  #print(colname)
+  trues <- grepl(types[i],colnames(df))
+  trues <- length(trues[trues == TRUE])
+  #print(trues) 
+  if (trues == 0) {
+    dd <- rep(0, length(rownames(df)))
+    names(dd) <- rownames(df)
+    dd <- as.data.frame(dd)
+    colnames(dd) <- colname
+    df <- cbind(df,dd)
+    print("will skip")
+    next
+  }
+  if (trues ==1) {
+    dd <- df[,grepl(types[i],colnames(df))]
+    names(dd) <- rownames(df)
+    dd <- as.data.frame(dd)
+    colnames(dd)<-colname
+    df <- cbind(df,dd)
+    next
+  }
+  if (trues > 1) {
+    dd <- rowSums(df[,grepl(types[i],colnames(df))])
+    names(dd) <- rownames(df)
+    dd <- as.data.frame(dd)
+    colnames(dd) <- colname
+    df <- cbind(df,dd)
+    next
+  }
+  }
+  #print(df)
+  summary_df <- df[,grepl("_sum", colnames(df))]
+  colnames(summary_df) <- sub("_.*", "", colnames(summary_df))
+  summary_df <- summary_df[types]
+  return(summary_df)
+}
 
-## recreate tree plot with corrected tip labels:
+# function to rename ancestral state names for fig1 and others:
+rename_anc_labels <- function(df, rows_in_order) {
+  print("Renaming anc labels...")
+  df$name <- factor(df$name, levels=rows_in_order)
+  levels(df$name)[levels(df$name)=="root"] ="root (R)"
+  levels(df$name)[levels(df$name)=="Eurotio_Lecanoro_split"] ="Eurotiomycetes/Lecanoromycetes split (ELS)"
+  levels(df$name)[levels(df$name)=="ancestral_Eurotiomycetes"] ="ancestral Eurotiomycetes (AE)"
+  levels(df$name)[levels(df$name)=="ancestral_Lecanoromycetes_slat"] ="ancestral Lecanoromycetes s.lat. (ALSL)"
+  levels(df$name)[levels(df$name)=="ancestral_Lecanoromycetes_sstr"] ="ancestral Lecanoromycetes s.str. (ALSS)"
+  levels(df$name)[levels(df$name)=="Lecanoro_Ostropo_split"] ="Lecanoromycetidae/Ostropomycetidae split (OLS)"
+  levels(df$name)[levels(df$name)=="ancestral_Lecanoromycetidae"] ="ancestral Lecanoromycetidae (AL)"
+  levels(df$name)[levels(df$name)=="ancestral_Ostropomycetidae"] ="ancestral Ostropomycetidae (AO)"
+  levels(df$name)[levels(df$name)=="ancestral_Xylographa"] ="ancestral Xylographa (AX)"
+  return(df)
+}
+
+create_anc_plot <- function(df){
+  
+  print("Creating anc plot")
+  #print(df)
+  p <- ggplot(df, aes(y=label, x=category)) + geom_tile(aes(fill = value)) + scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449")+ theme_classic()+geom_text(aes(label = ifelse(round(df$value, 1)>0, round(df$value, 1), "")), size=2)
+  p <- p + labs(x = "", y = "") + scale_x_discrete(position="top") +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))
+  # make same changes to the plt margin
+  p <- p + no_y_axis() + no_x_axis() + theme(plot.margin=margin(theme_grey()$plot.margin))
+
+  return(p)
+
+}
+
+create_heatmap <- function(df) {
+  print("create plot")
+  print(head(df))
+  ptree <- get_tree()
+  p <- ggtreeplot(ptree, df, aes(x=category)) + geom_tile(aes(fill=value)) +scale_fill_gradient2(low = "#EAF4F7", high = "#F06449") +theme_classic()+no_y_axis() +no_x_axis()+theme(axis.text.x = element_text(size = base_size *0.8, angle=45, hjust = 0, colour = "grey50")) + no_legend() +scale_x_discrete(position="top")
+  p <- p + scale_y_continuous(expand=c(0,0)) + geom_text(aes(label = ifelse(df$value > 0, df$value, "")), colour="black", size=2)
+  return(p)
+}
+
+## correct tip labels in tree:
 tree$tip.label <- gsub("_", " ", tree$tip.label)
-ptree <- ggtree(tree, size=0.3) + geom_tiplab(align=TRUE, size=2.5) + geom_treescale(x=0.1,y=50, width=0.2, linesize=0.3) + scale_x_continuous(expand=expand_scale(0.2)) + scale_y_tree() +xlim(NA, 1.3)
 rownames(all_cazy) <- gsub("_", " ", rownames(all_cazy))
-tree$tip.label
 
+get_tree <- function() {
+  ptree <- ggtree(tree, size=0.3) + geom_tiplab(align=TRUE, size=2.5) + geom_treescale(x=0.1,y=50, width=0.2, linesize=0.3) + scale_x_continuous(expand=expand_scale(0.2)) + scale_y_tree() +xlim(NA, 1.3)
+
+  #highlight nodes in tree for plotting:
+  bla <- c("R", "ELS", "ALSL", "ALSS", "OLS", "AO", "AX", "AL", "AE")
+  print(bla)
+  print(my_nodes)
+  ptree <- ptree + geom_point2(aes(subset=(node %in% my_nodes)),color="black",size=2) + geom_text2(label=bla, aes(subset=(node %in% my_nodes)), nudge_x=-0.03,nudge_y=0.7, size=2)
+  return(ptree)
+}
 ## Run plotting routine for each interesting gene set:
 
 sets <- c("cellulose", "hemicellulose", "phylosig")
-
+sum_plots <- list()
+anc_sum_plots <- list()
 for (foo in 1:length(sets)) {
   set <- sets[foo]
   if (set == "phylosig") {
@@ -102,7 +192,7 @@ for (foo in 1:length(sets)) {
     cz <- cazies$cazyme
     cellulose_df <- all_cazy[,colnames(all_cazy) %in% cazies$cazyme]
     print("Will analyze phylosig cazy")
-    print(colnames(cellulose_df))
+    #print(colnames(cellulose_df))
   } else if (set == "cellulose") {
     cz <- c("GH3","GH5","GH6","GH7","GH10","GH11", "GH12", "GH28","GH43","GH45","GH61","GH74", "CBM1", "AA9", "CE1", "CE16", "CE5", "CE8", "CE12", "CE15")
     cellulose_df <- all_cazy[,colnames(all_cazy) %in% c("GH3","GH5","GH6","GH7","GH10","GH11", "GH12", "GH28","GH43","GH45","GH61","GH74", "CBM1", "AA9", "CE1", "CE16", "CE5", "CE8", "CE12", "CE15")]
@@ -123,36 +213,58 @@ for (foo in 1:length(sets)) {
   print(rownames(ancestral_states_plot))  
   rows_in_order <- c("root", "Eurotio_Lecanoro_split", "ancestral_Eurotiomycetes","ancestral_Lecanoromycetes_slat", "ancestral_Lecanoromycetes_sstr","Lecanoro_Ostropo_split","ancestral_Lecanoromycetidae", "ancestral_Ostropomycetidae", "ancestral_Xylographa")
   ancestral_states_plot <- ancestral_states_plot[match(rows_in_order, rownames(ancestral_states_plot)),]
-  print(rownames(ancestral_states_plot))
+  #print(rownames(ancestral_states_plot))
   ancestral_states_plot$name <- rownames(ancestral_states_plot)
 
-  plot_df1 <- melt(ancestral_states_plot)
-  plot_df1$name <- factor(plot_df1$name, levels=rows_in_order)
-  levels(plot_df1$name)[levels(plot_df1$name)=="root"] ="root (R)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="Eurotio_Lecanoro_split"] ="Eurotiomycetes/Lecanoromycetes split (ELS)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Eurotiomycetes"] ="ancestral Eurotiomycetes (AE)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Lecanoromycetes_slat"] ="ancestral Lecanoromycetes s.lat. (ALSL)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Lecanoromycetes_sstr"] ="ancestral Lecanoromycetes s.str. (ALSS)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="Lecanoro_Ostropo_split"] ="Lecanoromycetidae/Ostropomycetidae split (OLS)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Lecanoromycetidae"] ="ancestral Lecanoromycetidae (AL)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Ostropomycetidae"] ="ancestral Ostropomycetidae (AO)"
-  levels(plot_df1$name)[levels(plot_df1$name)=="ancestral_Xylographa"] ="ancestral Xylographa (AX)"
+  # this is where the summary plot for ancestral will be created:
+  print("Get anc summary")
+  anc_sum <- get_cazy_summary(ancestral_states_plot)
+  anc_sum$name <- rownames(anc_sum)
+  anc_sum <- rename_anc_labels(anc_sum, rows_in_order)
+  anc_sum <- melt(anc_sum)
+  colnames(anc_sum) <- c("label", "category", "value")
+  anc_sum <- as_tibble(anc_sum)
+  anc_sum$label <- factor(anc_sum$label, levels=c("root (R)", "Eurotiomycetes/Lecanoromycetes split (ELS)", "ancestral Eurotiomycetes (AE)", "ancestral Lecanoromycetes s.lat. (ALSL)", "ancestral Lecanoromycetes s.str. (ALSS)", "Lecanoromycetidae/Ostropomycetidae split (OLS)", "ancestral Lecanoromycetidae (AL)", "ancestral Ostropomycetidae (AO)", "ancestral Xylographa (AX)")) 
+  anc_sum$category <- as.character(anc_sum$category)
+  anc_sum_plots[[foo]] <- create_anc_plot(anc_sum)
+  
+  # this is where the extended anc plot is created
+  print("Create extended anc plot...")
+  plot_df1 <- ancestral_states_plot
+  plot_df1$name <- rownames(ancestral_states_plot)
+  plot_df1 <- rename_anc_labels(plot_df1, rows_in_order)
+  plot_df1 <- melt(plot_df1)
+  colnames(plot_df1) <- c("label", "category", "value")
+  plot_df1 <- as_tibble(plot_df1)
+  plot_df1$label <- factor(plot_df1$label, levels=c("root (R)", "Eurotiomycetes/Lecanoromycetes split (ELS)", "ancestral Eurotiomycetes (AE)", "ancestral Lecanoromycetes s.lat. (ALSL)", "ancestral Lecanoromycetes s.str. (ALSS)", "Lecanoromycetidae/Ostropomycetidae split (OLS)", "ancestral Lecanoromycetidae (AL)", "ancestral Ostropomycetidae (AO)", "ancestral Xylographa (AX)")) 
+  plot_df1$category <- as.character(plot_df1$category)
+  
+  psummary_anc <- create_anc_plot(plot_df1) 
+  
+  # next we create the heatmap of cazy counts summary:
+  print("Create heatmap summary...")
+  sum <- get_cazy_summary(cellulose_df)
+  sum$name <- rownames(sum)
+  sum <- melt(sum)
+  colnames(sum) <- c("label", "category", "value")
+  sum <- as_tibble(sum)
+  sum$label <- as.character(sum$label)
+  sum$category <- as.character(sum$category)
+  print(head(sum))
+  sum_plots[[foo]] <- create_heatmap(sum)
 
-
-  psummary_anc <- ggplot(plot_df1, aes(variable, name)) + geom_tile(aes(fill = value)) + scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449")+ theme_classic()+geom_text(aes(label = ifelse(round(plot_df1$value, 1)>0, round(plot_df1$value, 1), "")), size=2)
-  psummary_anc <- psummary_anc + labs(x = "", y = "") + scale_x_discrete(position="top") +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8,angle=45, hjust = 0, colour = "grey50"))
-  psummary_anc
+  #now the heatmap for the cazies found in the genomes:
+  print("Create complete heatmap...")
   plot_df_sum <- melt(cellulose_df)
 
   colnames(plot_df_sum) <- c("label", "category", "value")
   plot_df_sum <- as_tibble(plot_df_sum)
   plot_df_sum$label <- as.character(plot_df_sum$label)
   plot_df_sum$category <- as.character(plot_df_sum$category)
-
-  psummary <- ggtreeplot(ptree, plot_df_sum, aes(x=category)) + geom_tile(aes(fill=value)) +scale_fill_gradient2(low = "#EAF4F7", high = "#F06449") +theme_classic()+no_y_axis() +no_x_axis()+theme(axis.text.x = element_text(size = base_size *0.8, angle=45, hjust = 0, colour = "grey50")) + no_legend() +scale_x_discrete(position="top")
-  psummary <- psummary + scale_y_continuous(expand=c(0,0)) + geom_text(aes(label = ifelse(plot_df_sum$value >0, plot_df_sum$value, "")), colour="black", size=2)
-
-
+  print(plot_df_sum$category)
+  psummary <- create_heatmap(plot_df_sum)
+  print("done")
+  
   pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_heatmap.pdf",sep=""), width=11.7, height=8.3)
   print(psummary)
   dev.off()
@@ -166,26 +278,10 @@ for (foo in 1:length(sets)) {
   # Make some additional changes to the anc df before combining with the other plots:
   # To create the labels for the anc values while maintaining subplot alignment 
   # I had to create another empty plot with just the labels, but the extend into the plotting area:
-  psummary_legend <- ggplot(plot_df1, aes(variable, name)) + scale_y_discrete(position = "right") + theme(axis.text.y.right = element_text(hjust = 1, size=base_size*0.6))
+  psummary_legend <- ggplot(plot_df1, aes(y=label, x=category)) + scale_y_discrete(position = "right") + theme(axis.text.y.right = element_text(hjust = 1, size=base_size*0.6))
   psummary_legend <- psummary_legend + theme(legend.position = "none", axis.title.y.right=element_blank(), panel.background = element_blank()) +no_y_axis() +no_x_axis()
   psummary_legend <- psummary_legend + theme(axis.text.y.right = element_text(margin = margin(0,0.5,0,-4.5, unit = 'cm'), colour="black"))
-
-  # make same changes to the plt margin
-  psummary_anc <- psummary_anc + no_y_axis() + no_x_axis() + theme(plot.margin=margin(theme_grey()$plot.margin))
-
-  #remove margins around plots
-  #psummary_legend <- psummary_legend + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
-  #psummary <- psummary + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
-  #ptree <- ptree + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
-  #psummary_anc <- psummary_anc + theme(plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
   
-  
-  #highlight nodes in tree for plotting:
-  bla <- c("R", "ELS", "ALSL", "ALSS", "OLS", "AO", "AX", "AL", "AE")
-  print(bla)
-  print(my_nodes)
-  ptree <- ptree + geom_point2(aes(subset=(node %in% my_nodes)),color="black",size=2) + geom_text2(label=bla, aes(subset=(node %in% my_nodes)), nudge_x=-0.03,nudge_y=0.7, size=2)
-
   #plot layout:
   layout <- "
   AAABB
@@ -211,10 +307,37 @@ for (foo in 1:length(sets)) {
   print("combine output")
   pfiller <- ggplot() + geom_blank() + theme_minimal()
   pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_combined.pdf",sep=""), width=11.7, height=8.3)
-  print(ptree + psummary + psummary_legend + psummary_anc + plot_layout(design=layout))
+  print(get_tree() + psummary + psummary_legend + psummary_anc + plot_layout(design=layout))
   dev.off()
 
 }
+
+# now plot the summarized cazymes for fig1:
+layout <- "
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  AAAAAAAAABBCCDD
+  EEEEEEEEEFFGGHH
+  EEEEEEEEEFFGGHH
+"
+
+print("combine summary")
+pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_combined_summary.pdf",sep=""), width=11.7, height=8.3)
+print(get_tree() + sum_plots[[1]] +sum_plots[[2]] + sum_plots[[3]] + psummary_legend + anc_sum_plots[[1]] + anc_sum_plots[[2]] +anc_sum_plots[[3]] + plot_layout(design=layout))
+dev.off()
 
 print("saving environment")
 save.image(file=paste("results/",prefix,"/plots_ancestral_states/ancestral_states.rData", sep=""))
