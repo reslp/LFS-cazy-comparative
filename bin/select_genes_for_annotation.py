@@ -13,10 +13,14 @@ if sys.version_info[0] < 3:
 pars = argparse.ArgumentParser(prog="select_genes_for_annotation.py", description = """This script outputs genes for specific annotations""", epilog = """written by Philipp Resl""")
 pars.add_argument('-gff', dest="gff3_path", required=True, help="Path to GFF3 files which should be scanned")
 pars.add_argument('-fasta', dest="fasta_path", required=True, help="Path to FASTA files containing sequences")
-pars.add_argument('-item', dest="item", required=True, help="Annotation which should be retreived")
+pars.add_argument('-item', dest="item", required=True, help="Annotations to be retreived, seperate by comma: eg. PFAM:PF00083,EggNog:ENOG410PHAJ")
 args=pars.parse_args()
 
-
+# unicode encoding error occurs sometimes:
+args.item = args.item.replace(u'\ufeff','')
+ 
+item = args.item.split(",")
+print(item, file=sys.stderr)
 gff3_files = [file for file in glob.glob(args.gff3_path+"/*") if ".gff3" in file]
 sys.stderr.write("Found %s GFF3 files.\n" % str(len(gff3_files)))
 list_of_ids = []
@@ -30,10 +34,14 @@ for handle in gff3_files:
 		annotation = annotation.replace(",", ";")
 		name = annotation.split(";")[0].split("=")[-1]
 		annotations =  annotation.split(";")[1:]
-		for annot in annotations:
-			if args.item == annot:
-				list_of_ids.append(name)
-				i += 1
+		result = all(el in annotations for el in item)
+		if result:
+			list_of_ids.append(name)
+			i += 1
+		#for annot in annotations:
+		#	if args.item == annot:
+		#		list_of_ids.append(name)
+		#		i += 1
 	sys.stderr.write("%s found %s times.\n" % (args.item, str(i)))
 
 fasta_files = [file for file in glob.glob(args.fasta_path+"/*") if ".fa" in file]
