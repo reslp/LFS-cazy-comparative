@@ -24,16 +24,16 @@ rule all:
 		expand("results/{pre}/checkpoints/similarity_clustering.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/orthology_statistics.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/create_cafe_style_tree.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/create_cafe_commands.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/run_cafe.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/parse_cafe_output.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/visualize_cafe_output.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/create_cafe_style_tree.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/create_cafe_commands.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/run_cafe.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/parse_cafe_output.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/visualize_cafe_output.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/extract_functional_from_cafe.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/extract_functional_from_cafe.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/extract_gh5_genes.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/combine_gh5_genes_and_reference.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
@@ -52,6 +52,14 @@ rule all:
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
+rule all_transporter_tree:
+	input:
+                expand("results/{pre}/checkpoints/extract_transporter_genes.done", pre=config["prefix"]),
+                expand("results/{pre}/checkpoints/combine_transporter_genes_and_reference.done", pre=config["prefix"]),
+                expand("results/{pre}/checkpoints/align_transporter.done", pre=config["prefix"]),
+                expand("results/{pre}/checkpoints/trim_transporter.done", pre=config["prefix"]),
+                expand("results/{pre}/checkpoints/iqtree_transporter.done", pre=config["prefix"])
+
 def remove_donefile(files):
 	new_files = []
 	for file in files:
@@ -66,3 +74,5 @@ include: "rules/statistics.smk"
 include: "rules/ancestral_state_reconstruction.smk"
 include: "rules/saccharis.smk"
 include: "rules/character_correlation.smk"
+include: "rules/cafe.smk"
+include: "rules/transporter_phylogeny.smk"

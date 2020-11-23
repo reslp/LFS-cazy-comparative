@@ -97,16 +97,16 @@ visualize_function_annotations_cafe:
    hint: nomultithread
 get_upstream_inputfiles:
    N: getupstream
-extract_gh5_genes:
-   N: gh5extract
-combine_gh5_genes_and_reference:
-   N: gh5combine
-align_gh5:
-   N: gh5align
-trimm_gh5:
-   N: gh5trimm
-iqtree_gh5:
-   N: gh5iqtree
+extract_transporter_genes:
+   N: tra_extract
+combine_transporter_genes_and_reference:
+   N: tra_combine
+align_transporter:
+   N: tra_align
+trim_transporter:
+   N: tra_trimm
+iqtree_transporter:
+   N: tra_iqtree
    ntasks: 16
    mem: 8G
 plot_genome_overview:
