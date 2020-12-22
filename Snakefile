@@ -8,10 +8,10 @@ rule all:
 	input:
 		expand("results/{pre}/checkpoints/get_upstream_inputfiles.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
+		#expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"]),
+		#expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
+		#expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
+		#expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
@@ -51,6 +51,25 @@ rule all:
 		expand("results/{pre}/checkpoints/pca.done", pre = config["prefix"]),
 		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
+
+rule all_phylogeny:
+	input:
+		expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"])
+	output:
+		expand("results/{pre}/checkpoints/all_phylogeny.done", pre=config["prefix"])
+	shell:
+		"""
+		touch {output}
+		"""
+			
+
 
 rule all_transporter_tree:
 	input:

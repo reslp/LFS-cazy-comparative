@@ -1,134 +1,186 @@
-rule align_aa:
-    input:
-        dir = rules.rename_ortholog_sequences.output.dir,
-        checkpoint = rules.rename_ortholog_sequences.output.checkpoint
-    log:
-        "log/align_aa.log"
-    output:
-        checkpoint = expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
-        dir = directory(expand("results/{pre}/aa_alignments", pre=config["prefix"]))
-    conda:
-        "../envs/phylogenomics.yml"
-    shell:
-        """
-	export TMPDIR="$(pwd)/tmp"
-	if [[ ! -d {output.dir} ]]; then
-		mkdir {output.dir}
-	fi
-        for file in $(find {input.dir}/aa -type f -name "*_renamed");
-        do
-            outname=$(basename $file)
-            echo "Aligning sequences: "$outname
-            mafft --quiet --auto {input.dir}/aa/$outname > {output.dir}/$outname"_aligned"
-        done
-        touch {output.checkpoint}
-        """
+if config["phylogeny"]["precalculated"] == "no":
+    rule align_aa:
+        input:
+            dir = rules.rename_ortholog_sequences.output.dir,
+            checkpoint = rules.rename_ortholog_sequences.output.checkpoint
+        log:
+            "log/align_aa.log"
+        output:
+            checkpoint = expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
+            dir = directory(expand("results/{pre}/aa_alignments", pre=config["prefix"]))
+        conda:
+            "../envs/phylogenomics.yml"
+        shell:
+            """
+    	export TMPDIR="$(pwd)/tmp"
+    	if [[ ! -d {output.dir} ]]; then
+    		mkdir {output.dir}
+    	fi
+            for file in $(find {input.dir}/aa -type f -name "*_renamed");
+            do
+                outname=$(basename $file)
+                echo "Aligning sequences: "$outname
+                mafft --quiet --auto {input.dir}/aa/$outname > {output.dir}/$outname"_aligned"
+            done
+            touch {output.checkpoint}
+            """
+    
+    rule trim:
+        input:
+            dir = rules.align_aa.output.dir,
+            checkpoint = rules.align_aa.output.checkpoint
+        output:
+            checkpoint = expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
+            dir = directory(expand("results/{pre}/aa_trimmed", pre=config["prefix"]))
+        conda:
+            "../envs/phylogenomics.yml"
+        shell:
+            """
+    	export TMPDIR="$(pwd)/tmp"
+            if [[ ! -d {output.dir} ]]; then
+                    mkdir {output.dir}
+            fi
+            
+    	for file in $(find {input.dir}/ -type f -name "*_aligned");
+            do
+                echo "Trimming file: "$file
+                outname=$(basename $file)
+                trimal -gappyout -in $file -out {output.dir}/$outname"_trimmed"
+            done
+            touch {output.checkpoint}
+            """
+    
+    rule iqtree_concat:
+        input:
+            trims = rules.trim.output.dir,
+            checkpoint = rules.trim.output.checkpoint,
+            ids_file = expand("data/{pre}/ids.txt", pre=config["prefix"])
+        output:
+            checkpoint = expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
+            tree = expand("results/{pre}/phylogeny/concatenated/concat.treefile", pre=config["prefix"])
+        params:
+            wd = os.getcwd(),
+            prefix = config["prefix"]
+        singularity:
+            "docker://reslp/iqtree:2.0rc2"
+        threads:
+            config["iqtree"]["threads"]
+        shell:
+            """
+            rm -rf results/{params.prefix}/phylogeny/concatenated/algn
+            cd results/{params.prefix}/phylogeny/concatenated
+            mkdir algn
+            cp {params.wd}/{input.trims}/*trimmed algn
+            iqtree -p algn/ --prefix concat -bb 1000 -nt AUTO -m WAG -redo -T {threads} --no-terrace
+            rm -r algn
+            cd {params.wd}
+            touch {output.checkpoint}
+            """
+    
+    rule iqtree_gene_trees:
+        input:
+            trims = rules.trim.output.dir,
+            checkpoint = rules.trim.output.checkpoint,
+            ids_file = expand("data/{pre}/ids.txt", pre=config["prefix"])
+        output:
+            checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
+            trees = expand("results/{pre}/phylogeny/trees/loci.treefile", pre=config["prefix"])
+        params:
+            wd = os.getcwd(),
+            prefix = config["prefix"]
+        threads:
+            config["iqtree"]["threads"]
+        singularity:
+            "docker://reslp/iqtree:2.0rc2"
+        shell:
+            """
+            rm -rf results/{params.prefix}/phylogeny/trees/algn
+            mkdir results/{params.prefix}/phylogeny/trees/algn
+            cd results/{params.prefix}/phylogeny/trees
+            cp {params.wd}/{input.trims}/*trimmed algn
+            iqtree -S algn --prefix loci -nt AUTO -m WAG -redo -T {threads}
+            cd {params.wd}
+            touch {output.checkpoint}
+            """
 
-rule trim:
-    input:
-        dir = rules.align_aa.output.dir,
-        checkpoint = rules.align_aa.output.checkpoint
-    output:
-        checkpoint = expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
-        dir = directory(expand("results/{pre}/aa_trimmed", pre=config["prefix"]))
-    conda:
-        "../envs/phylogenomics.yml"
-    shell:
-        """
-	export TMPDIR="$(pwd)/tmp"
-        if [[ ! -d {output.dir} ]]; then
-                mkdir {output.dir}
-        fi
-        
-	for file in $(find {input.dir}/ -type f -name "*_aligned");
-        do
-            echo "Trimming file: "$file
-            outname=$(basename $file)
-            trimal -gappyout -in $file -out {output.dir}/$outname"_trimmed"
-        done
-        touch {output.checkpoint}
-        """
+    rule iqtree_gene_concordance:
+        input:
+            loci = rules.iqtree_gene_trees.output.trees,
+            checkpoint1 = rules.iqtree_gene_trees.output.checkpoint,
+            heckpoint2 = rules.iqtree_concat.output.checkpoint,
+            concat = rules.iqtree_concat.output.tree,
+            alignments = rules.trim.output.dir
+        output:
+            checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
+            treefile = expand("results/{pre}/phylogeny/{pre}.cf.tree", pre=config["prefix"])
+        params:
+            wd = os.getcwd(),
+            prefix = config["prefix"]
+        singularity:
+            "docker://reslp/iqtree:2.0rc2"
+        threads:
+            config["iqtree"]["threads"]
+        shell:
+            """
+            cd results/{params.prefix}/phylogeny
+            mkdir -p algn
+            cp {params.wd}/{input.alignments}/*trimmed algn
+            iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
+            rm -r algn
+            cd {params.wd}
+            touch {output.checkpoint}
+            """
+else:
+	rule iqtree_concat:
+		input:
+			config["phylogeny"]["concatenated"]
+		output:
+			tree = expand("results/{pre}/phylogeny/concatenated/concat.treefile", pre=config["prefix"]),
+			checkpoint = expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"])
+		shell:
+			"""
+			cp {input} {output.tree}
+			touch {output.checkpoint}
+			"""
 
-rule iqtree_concat:
-    input:
-        trims = rules.trim.output.dir,
-        checkpoint = rules.trim.output.checkpoint,
-        ids_file = expand("data/{pre}/ids.txt", pre=config["prefix"])
-    output:
-        checkpoint = expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
-        tree = expand("results/{pre}/phylogeny/concatenated/concat.treefile", pre=config["prefix"])
-    params:
-        wd = os.getcwd(),
-        prefix = config["prefix"]
-    singularity:
-        "docker://reslp/iqtree:2.0rc2"
-    threads:
-        config["iqtree"]["threads"]
-    shell:
-        """
-        rm -rf results/{params.prefix}/phylogeny/concatenated/algn
-        cd results/{params.prefix}/phylogeny/concatenated
-        mkdir algn
-        cp {params.wd}/{input.trims}/*trimmed algn
-        iqtree -p algn/ --prefix concat -bb 1000 -nt AUTO -m WAG -redo -T {threads} --no-terrace
-        rm -r algn
-        cd {params.wd}
-        touch {output.checkpoint}
-        """
-
-rule iqtree_gene_trees:
-    input:
-        trims = rules.trim.output.dir,
-        checkpoint = rules.trim.output.checkpoint,
-        ids_file = expand("data/{pre}/ids.txt", pre=config["prefix"])
-    output:
-        checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
-        trees = expand("results/{pre}/phylogeny/trees/loci.treefile", pre=config["prefix"])
-    params:
-        wd = os.getcwd(),
-        prefix = config["prefix"]
-    threads:
-        config["iqtree"]["threads"]
-    singularity:
-        "docker://reslp/iqtree:2.0rc2"
-    shell:
-        """
-        rm -rf results/{params.prefix}/phylogeny/trees/algn
-        mkdir results/{params.prefix}/phylogeny/trees/algn
-        cd results/{params.prefix}/phylogeny/trees
-        cp {params.wd}/{input.trims}/*trimmed algn
-        iqtree -S algn --prefix loci -nt AUTO -m WAG -redo -T {threads}
-        cd {params.wd}
-        touch {output.checkpoint}
-        """
-
-rule iqtree_gene_concordance:
-    input:
-        loci = rules.iqtree_gene_trees.output.trees,
-        checkpoint1 = rules.iqtree_gene_trees.output.checkpoint,
-        heckpoint2 = rules.iqtree_concat.output.checkpoint,
-        concat = rules.iqtree_concat.output.tree,
-        alignments = rules.trim.output.dir
-    output:
-        checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
-        treefile = expand("results/{pre}/phylogeny/{pre}.cf.tree", pre=config["prefix"])
-    params:
-        wd = os.getcwd(),
-        prefix = config["prefix"]
-    singularity:
-        "docker://reslp/iqtree:2.0rc2"
-    threads:
-        config["iqtree"]["threads"]
-    shell:
-        """
-        cd results/{params.prefix}/phylogeny
-        mkdir -p algn
-        cp {params.wd}/{input.alignments}/*trimmed algn
-        iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
-        rm -r algn
-        cd {params.wd}
-        touch {output.checkpoint}
-        """
+	rule iqtree_gene_trees:
+		input:
+			config["phylogeny"]["gene_trees"]
+		output:
+			trees = expand("results/{pre}/phylogeny/trees/loci.treefile", pre=config["prefix"]),
+			checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"])
+		shell:
+			"""
+			cp {input} {output.trees}
+			touch {output.checkpoint}
+			"""
+	rule iqtree_gene_concordance:
+		input:
+			loci = rules.iqtree_gene_trees.output.trees,
+			checkpoint1 = rules.iqtree_gene_trees.output.checkpoint,
+			heckpoint2 = rules.iqtree_concat.output.checkpoint,
+			concat = rules.iqtree_concat.output.tree,
+			alignments = config["phylogeny"]["alignments"]
+		output:
+			checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
+			treefile = expand("results/{pre}/phylogeny/{pre}.cf.tree", pre=config["prefix"])
+		params:
+			wd = os.getcwd(),
+			prefix = config["prefix"]
+		singularity:
+			"docker://reslp/iqtree:2.0rc2"
+		threads:
+			config["iqtree"]["threads"]
+		shell:
+			"""
+			cd results/{params.prefix}/phylogeny
+			mkdir -p algn
+			cp {params.wd}/{input.alignments}/*trimmed algn
+			iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
+			rm -r algn
+			cd {params.wd}
+			touch {output.checkpoint}
+			"""
 
 rule reroot_tree:
     input:
@@ -196,25 +248,37 @@ rule extract_tree:
         python bin/extract_tree_from_r8s.py -r {input.r8s} > {output.ultra_tree}
         touch {output.checkpoint}
         """
-
-rule astral_species_tree:
-        input:
-                trees = rules.iqtree_gene_trees.output.trees,
-                checkpoint = rules.iqtree_gene_trees.output.checkpoint
-        output:
-                species_tree = expand("results/{pre}/astral/species_tree.tre", pre=config["prefix"]),
-                checkpoint = expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"])
-        params:
-                wd = os.getcwd()
-        singularity:
-                "docker://reslp/astral:5.7.1"
-        log:
-                expand("results/{pre}/astral/astral.log", pre=config["prefix"])
-        shell:
-                """
-                java -jar /ASTRAL-5.7.1/Astral/astral.5.7.1.jar -i {input.trees} -o {output.species_tree} 2> {log}
-                touch {output.checkpoint}
-                """
+if config["phylogeny"]["precalculated"] == "no":
+        rule astral_species_tree:
+                input:
+                        trees = rules.iqtree_gene_trees.output.trees,
+                        checkpoint = rules.iqtree_gene_trees.output.checkpoint
+                output:
+                        species_tree = expand("results/{pre}/astral/species_tree.tre", pre=config["prefix"]),
+                        checkpoint = expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"])
+                params:
+                        wd = os.getcwd()
+                singularity:
+                        "docker://reslp/astral:5.7.1"
+                log:
+                        expand("results/{pre}/astral/astral.log", pre=config["prefix"])
+                shell:
+                        """
+                        java -jar /ASTRAL-5.7.1/Astral/astral.5.7.1.jar -i {input.trees} -o {output.species_tree} 2> {log}
+                        touch {output.checkpoint}
+                        """
+else:
+        rule astral_species_tree:
+                input:
+                        config["phylogeny"]["species_tree"]
+                output:
+                        species_tree = expand("results/{pre}/astral/species_tree.tre", pre=config["prefix"]),
+                        checkpoint = expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"])
+                shell:
+                        """
+                        cp {input} {output.species_tree}
+                        touch {output.checkpoint}
+                        """
 
 rule plot_phylogeny:
     input:
