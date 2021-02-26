@@ -139,7 +139,7 @@ else:
 			checkpoint = expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"])
 		shell:
 			"""
-			cp {input} {output.tree}
+			cp $(dirname {input})/* $(dirname {output.tree})
 			touch {output.checkpoint}
 			"""
 
@@ -159,14 +159,14 @@ else:
 			loci = rules.iqtree_gene_trees.output.trees,
 			checkpoint1 = rules.iqtree_gene_trees.output.checkpoint,
 			heckpoint2 = rules.iqtree_concat.output.checkpoint,
-			concat = rules.iqtree_concat.output.tree,
-			alignments = config["phylogeny"]["alignments"]
+			concat = rules.iqtree_concat.output.tree
 		output:
 			checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
 			treefile = expand("results/{pre}/phylogeny/{pre}.cf.tree", pre=config["prefix"])
 		params:
 			wd = os.getcwd(),
-			prefix = config["prefix"]
+			prefix = config["prefix"],
+			alignments = config["phylogeny"]["alignments"]
 		singularity:
 			"docker://reslp/iqtree:2.0rc2"
 		threads:
@@ -175,7 +175,7 @@ else:
 			"""
 			cd results/{params.prefix}/phylogeny
 			mkdir -p algn
-			cp {params.wd}/{input.alignments}/*trimmed algn
+			cp {params.wd}/{params.alignments}*trimmed.fas algn
 			iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
 			rm -r algn
 			cd {params.wd}

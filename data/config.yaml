@@ -1,5 +1,5 @@
-prefix: "82_genomes"
-ngenomes: 82
+prefix: "83_genomes"
+ngenomes: 83
 set:
         cellulose hemicellulose
 orthofiles:
@@ -18,10 +18,10 @@ iqtree:
         threads: 32
 phylogeny: 
         precalculated: "yes"
-        concatenated: "data/phylogeny/concat.contree.tre" 
-        gene_trees: "data/phylogeny/all_gene_tree.tre"
-        species_tree: "data/phylogeny/species_tree.tre"
-        alignments: "data/phylogeny/alignments/"
+        concatenated: "data/83_genomes/phylogeny/concatenated/concat.contree.tre" 
+        gene_trees: "data/83_genomes/phylogeny/all_gene_trees.tre"
+        species_tree: "data/83_genomes/phylogeny/species_tree.tre"
+        alignments: "data/83_genomes/phylogeny/alignments/"
 orthofinder:
         threads: 48 
 scrape_cazy:
