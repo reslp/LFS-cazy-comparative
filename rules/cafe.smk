@@ -1,16 +1,17 @@
 # these rules are currently not used
 rule create_gene_family_table:
     input:
-        orthodir = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
         checkpoint = rules.infer_orthology.output.checkpoint
     output:
         raw_file = expand("results/{pre}/cafe/{pre}_raw_cafe_input_file.tab", pre=config["prefix"]),
         checkpoint = expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"])
     conda:
         "../envs/pyutils.yml"
+    params:
+        prefix = config["prefix"]
     shell:
         """
-        python bin/orthofinder_to_cafe.py -i {input.orthodir}/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv -o {output.raw_file}
+        python bin/orthofinder_to_cafe.py -i results/{params.prefix}/orthofinder/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv -o {output.raw_file}
         touch {output.checkpoint}
         """
 
@@ -154,7 +155,7 @@ rule extract_functional_from_cafe:
 		checkpoint1 = rules.parse_cafe_output.output.checkpoint,
 		mapping_file = rules.visualize_cafe_output.output.mapping_file,
 		checkpoint2 = rules.visualize_cafe_output.output.checkpoint,
-		orthgroups = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
+		#orthgroups = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
 		checkpoint3 = rules.infer_orthology.output.checkpoint,
 		gff = expand("data/{pre}/{pre}_combined.gff", pre=config["prefix"])
 	output:
@@ -179,8 +180,8 @@ rule extract_functional_from_cafe:
 		"../envs/pyutils.yml"
 	shell:
 		"""
-		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho {input.orthgroups}/orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which + -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
-		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho {input.orthgroups}/orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which - -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
+		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho results/{params.prefix}/orthofinder//orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which + -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
+		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho results/{params.prefix}/orthofinder/orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which - -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
 		touch {output.checkpoint}
 		"""
 

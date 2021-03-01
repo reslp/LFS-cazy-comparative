@@ -69,7 +69,8 @@ rule ancestral_states_all_cazy:
 
 rule plot_ancestral_states:
 	input:
-		rdata = rules.ancestral_states_all_cazy.output.rdata
+		rdata = rules.ancestral_states_all_cazy.output.rdata,
+		phylosig = rules.phylosig.output.checkpoint
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states.done", pre=config["prefix"]),
 		rdata = expand("results/{pre}/plots_ancestral_states/ancestral_states.rData", pre=config["prefix"]),
@@ -114,7 +115,7 @@ rule plot_ancestral_states_cazy_all:
 		checkpoint = rules.ancestral_states_all_cazy.output.checkpoint,
 		rdata = rules.ancestral_states_all_cazy.output.rdata
 	output:
-		plot = expand("results/{pre}/plot_ancestral_states_all_cazy/{pre}_all_cazymes.pdf", pre = config["prefix"]),
+		plot = expand("results/{pre}/plots_ancestral_states/{pre}_all_cazymes.pdf", pre = config["prefix"]),
 		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"])
 	params:
 		wd = os.getcwd(),

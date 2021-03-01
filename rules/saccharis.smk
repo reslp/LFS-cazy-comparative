@@ -43,6 +43,7 @@ rule extract_cazy_proteins:
 		"docker://reslp/biopython_plus:1.77"
 	shell:
 		"""
+		#cat {input.combined_proteins}/*.fa >> {output.cazy_proteins}
 		bin/select_cazy_from_gff.py -gff {input.combined_gff} -fasta {input.combined_proteins} -item CAZy >> {output.cazy_proteins}
 		touch {output.checkpoint}
 		"""
@@ -92,13 +93,14 @@ rule saccharis:
 			if ! grep -Fxq "Cazy Pipeline Finished" {params.wd}/results/{params.prefix}/saccharis/$cazy.log;
 			then 
 				echo $cazy >> {params.wd}/results/{params.prefix}/saccharis/interesting_cazy_families.txt
+				Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f $cazy &> {params.wd}/results/{params.prefix}/saccharis/$cazy.log
 				rm -rf {params.wd}/results/{params.prefix}/saccharis/$cazy
 			else
 				continue
 			fi
 		done
 		echo $(cat /data/results/{params.prefix}/saccharis/interesting_cazy_families.txt | tr '\\n' ' ')
-		parallel --joblog {params.wd}/results/{params.prefix}/saccharis/parallel_logfile --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} "&>" {params.wd}/results/{params.prefix}/saccharis/{{}}.log ::: $(cat /data/results/{params.prefix}/saccharis/interesting_cazy_families.txt | tr '\\n' ' ')
+		#parallel --joblog {params.wd}/results/{params.prefix}/saccharis/parallel_logfile --results $TMPDIR  -j {params.parallel_jobs} Saccharis.pl -d /data/results/{params.prefix}/saccharis -g characterized -s /data/{input.seqs} -t {params.saccharis_threads} -f {{}} "&>" {params.wd}/results/{params.prefix}/saccharis/{{}}.log ::: $(cat /data/results/{params.prefix}/saccharis/interesting_cazy_families.txt | tr '\\n' ' ')
 		touch {output.checkpoint}
 		"""
 

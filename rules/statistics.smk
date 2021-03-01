@@ -50,27 +50,35 @@ rule plot_genome_overview:
 		Rscript bin/plot_overview.R {params.wd} {input.cogs_file} {input.cazy_file} {input.secmet_file} {input.stats_file} {input.seccazy_file} {output.genomes_overview}
 		touch {output.checkpoint}
 		"""	
-
-rule orthology_statistics:
-    input:
-        directory = expand("results/{pre}/orthofinder", pre=config["prefix"]),
-        tree = rules.extract_tree.output.ultra_tree,
-        checkpoint1 = rules.infer_orthology.output.checkpoint,
-        checkpoint2 = rules.extract_tree.output.checkpoint
-    output:
-        directory = directory(expand("results/{pre}/orthofinder_statistics/", pre = config["prefix"])),
-        checkpoint = expand("results/{pre}/checkpoints/orthology_statistics.done", pre=config["prefix"])
-    params:
-        prefix = config["prefix"],
-        orthofiles = config["orthofiles"]
-    conda:
-        "../envs/rorthologystatistics.yml"
-    shell:
-        """
-        for i in {params.orthofiles}
-        do
-            echo $i
-            Rscript bin/ortholog_heatmap.R {output.directory}/{params.prefix}_$i.RData {input.tree} {input.directory}/orthofinder/Results_ortho/Comparative_Genomics_Statistics/$i {output.directory}/{params.prefix} $i
-        done
-        touch {output.checkpoint}
-        """
+if config["phylogeny"]["precalculated"] == "no":
+	rule orthology_statistics:
+	    input:
+	        directory = expand("results/{pre}/orthofinder", pre=config["prefix"]),
+	        tree = rules.extract_tree.output.ultra_tree,
+	        checkpoint1 = rules.infer_orthology.output.checkpoint,
+	        checkpoint2 = rules.extract_tree.output.checkpoint
+	    output:
+	        directory = directory(expand("results/{pre}/orthofinder_statistics/", pre = config["prefix"])),
+	        checkpoint = expand("results/{pre}/checkpoints/orthology_statistics.done", pre=config["prefix"])
+	    params:
+	        prefix = config["prefix"],
+	        orthofiles = config["orthofiles"]
+	    conda:
+	        "../envs/rorthologystatistics.yml"
+	    shell:
+	        """
+	        for i in {params.orthofiles}
+	        do
+	            echo $i
+	            Rscript bin/ortholog_heatmap.R {output.directory}/{params.prefix}_$i.RData {input.tree} {input.directory}/orthofinder/Results_ortho/Comparative_Genomics_Statistics/$i {output.directory}/{params.prefix} $i
+	        done
+	        touch {output.checkpoint}
+	        """
+else:
+	rule orthology_statistics:
+		output:
+			checkpoint = expand("results/{pre}/checkpoints/orthology_statistics.done", pre=config["prefix"])
+		shell:
+			"""
+			touch {output.checkpoint}
+			"""
