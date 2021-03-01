@@ -4,7 +4,7 @@ library(phytools)
 library(parallel)
 library(coda)
 args <- commandArgs(trailingOnly=TRUE)
-
+sessionInfo()
 wd <- args[1]
 treefile <- args[2]
 discrete_chars <- args[3]

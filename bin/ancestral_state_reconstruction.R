@@ -49,6 +49,9 @@ all_cazy <- t(all_cazy)
 all_cazy <- all_cazy[match(tip_order, rownames(all_cazy)),]
 all_cazy <- all_cazy [nrow(all_cazy ):1,]
 cellulose_df <- all_cazy
+print("Check data..")
+print(tip_order)
+print(tip_order %in% rownames(all_cazy))
 
 #change working directory for output
 print("Change WD for output...")
