@@ -70,14 +70,16 @@ for (i in 1:npages) {
   plot_df_sum <- melt(cellulose_df[,(start+1):end])
   colnames(plot_df_sum) <- c("label", "category", "value")
   plot_df_sum <- as_tibble(plot_df_sum)
-  plot_df_sum$label <- as.character(plot_df_sum$label)
-  plot_df_sum$category <- as.character(plot_df_sum$category)
+  # there is a problem with omitting fake labels as it is currently written. it sometimes mixes up columns in the dataframe...
+  #plot_df_sum$label <- as.character(plot_df_sum$label)
+  #plot_df_sum$category <- as.character(plot_df_sum$category)
   
   y_lab_text_size <- 7
   plot_df_sum$label <- factor(plot_df_sum$label, levels = rev(label_order)) # to maintain order as it is in the tree
   psummary <- ggplot(plot_df_sum, aes(x=category, y=label)) + geom_tile(aes(fill=value))  +scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449") + geom_text(aes(label = ifelse(plot_df_sum$value >0, plot_df_sum$value, "")), colour="grey50", size=2)
-  psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = omitt_fake_labels(unique(plot_df_sum$category))) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size *0.6,angle=45, hjust = 0, colour = "grey50"))
   psummary
+  #psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = omitt_fake_labels(unique(plot_df_sum$category))) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size *0.6,angle=45, hjust = 0, colour = "grey50"))
+  psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = unique(plot_df_sum$category)) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size *0.6,angle=45, hjust = 0, colour = "grey50"))
   
   #print(all_plots)
   print(psummary)

@@ -1,5 +1,5 @@
-prefix: "82_genomes"
-ngenomes: 82
+prefix: "83_genomes"
+ngenomes: 83
 set:
         cellulose hemicellulose
 orthofiles:
@@ -16,10 +16,17 @@ pfam_descriptions:
         data/pfam_all_description.txt 
 iqtree:
         threads: 32
+phylogeny: 
+        precalculated: "yes"
+        concatenated: "data/83_genomes/phylogeny/concatenated/concat.contree.tre" 
+        gene_trees: "data/83_genomes/phylogeny/all_gene_trees.tre"
+        species_tree: "data/83_genomes/phylogeny/species_tree.tre"
+        alignments: "data/83_genomes/phylogeny/alignments/"
 orthofinder:
         threads: 48 
 scrape_cazy:
-        terms: xylanase β-mannanase cellulase PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
+        #terms: xylanase β-mannanase cellulase PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
+        terms: PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
 saccharis:
         threads: 16
         parallel_jobs: 2
