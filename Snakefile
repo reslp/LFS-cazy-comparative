@@ -55,10 +55,10 @@ configfile: "data/config.yaml"
 
 rule all:
 	input:
-<<<<<<< HEAD
 		expand("results/{pre}/checkpoints/ancestral_states.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"])
+
 rule phylogeny:
 	input:
 		#expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
@@ -67,21 +67,7 @@ rule phylogeny:
 		#expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"]),
-=======
-		expand("results/{pre}/checkpoints/get_upstream_inputfiles.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
-		#expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"]),
->>>>>>> d29a9dc545bf929aa14878d0cce6318d0731ea45
-		expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
+		#expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"])
 	output:
 		expand("results/{pre}/checkpoints/all_phylogeny.done", pre=config["prefix"])
@@ -112,30 +98,8 @@ rule cazy_characterization:
 		touch {output}
 		"""
 
-<<<<<<< HEAD
-rule characterize_transporters:
-=======
-rule all_phylogeny:
-	input:
-		expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"])
-	output:
-		expand("results/{pre}/checkpoints/all_phylogeny.done", pre=config["prefix"])
-	shell:
-		"""
-		touch {output}
-		"""
 			
-
-
 rule all_transporter_tree:
->>>>>>> d29a9dc545bf929aa14878d0cce6318d0731ea45
 	input:
                 #expand("results/{pre}/checkpoints/extract_transporter_genes.done", pre=config["prefix"]),
                 #expand("results/{pre}/checkpoints/combine_transporter_genes_and_reference.done", pre=config["prefix"]),
