@@ -11,9 +11,13 @@ cafe:
 cafe_controlfile:
         data/cafe_commands_template.sh
 r8s_controlfile:
-        data/r8s_template.nex
+        "data/83_genomes/r8s_template.nex"
 pfam_descriptions:
-        data/pfam_all_description.txt 
+        "data/pfam_all_description.txt"
+stats_genomes:
+        "data/83_genomes/stats_genomes.csv"
+other_input:
+        lifestyle: "data/83_genomes/lifestyle"
 iqtree:
         threads: 32
 #these input files come from phylociraptor:
