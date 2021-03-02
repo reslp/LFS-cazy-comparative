@@ -55,10 +55,10 @@ configfile: "data/config.yaml"
 
 rule all:
 	input:
-		expand("results/{pre}/checkpoints/ancestral_states.done", pre=config["prefix"]),
+		"results/{pre}/checkpoints/ancestral_states.done",
 		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"])
+		"results/checkpoints/statistics.done"
 
 rule phylogeny:
 	input:
@@ -80,10 +80,10 @@ rule phylogeny:
 rule ancestral_states:
 	input:
 		rules.phylogeny.output,
-		expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),	
-		expand("results/{pre}/checkpoints/plot_ancestral_states.done", pre=config["prefix"])
+		"results/checkpoints/plot_ancestral_states_cazy_all.done",
+		"results/checkpoints/plot_ancestral_states.done"
 	output:
-		expand("results/{pre}/checkpoints/ancestral_states.done", pre=config["prefix"])
+		"results/checkpoints/ancestral_states.done"
 	shell:
 		"""
 		touch {output}
@@ -100,10 +100,10 @@ rule cazy_characterization:
 		"""
 rule statistics:
 	input:
-		expand("results/{pre}/checkpoints/genome_overview.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/genome_statistics.done", pre=config["prefix"])
+		"results/checkpoints/genome_overview.done",
+		"results/checkpoints/genome_statistics.done"
 	output:
-		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"])
+		"results/checkpoints/statistics.done"
 	shell:
 		"""
 		touch {output}

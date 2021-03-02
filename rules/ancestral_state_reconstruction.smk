@@ -1,6 +1,6 @@
 rule cazy_anc_summary:
     input:
-        cazy_summary = expand("data/{pre}/CAZyme.summary.results.csv", pre=config["prefix"]),
+        cazy_summary = config["funannotate_input"]["cazy_summary"],
         ultra_tree = rules.extract_tree.output.ultra_tree,
         checkpoint = rules.extract_tree.output.checkpoint
     output:
@@ -29,10 +29,10 @@ rule cazy_anc_summary:
 rule phylosig:
 	input:
 		tree = rules.extract_tree.output.ultra_tree,
-		cazy_data = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"])
+		cazy_data = config["funannotate_input"]["cazy"]
 	output:
-		phylosig_families = expand("results/{pre}/phylosig/phylosig_sign_cazymes.txt", pre=config["prefix"]),
-		checkpoint = expand("results/{pre}/checkpoints/phylosig.done", pre=config["prefix"])
+		phylosig_families = "results/ancestral_states_cazy/phylosig/phylosig_sign_cazymes.txt",
+		checkpoint = "results/checkpoints/phylosig.done"
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
@@ -49,16 +49,15 @@ rule phylosig:
 
 rule ancestral_states_all_cazy:
     input:
-        csv = expand("data/{pre}/CAZyme.all.results.csv",pre = config["prefix"]),
+        csv = config["funannotate_input"]["cazy"],
         tree = rules.extract_tree.output.ultra_tree
     output:
-        #dir = directory(expand("results/{pre}/cazy_ancestral_states_all_cazy/", pre = config["prefix"])),
-        checkpoint = expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
-	rdata = expand("results/{pre}/cazy_ancestral_states_all_cazy/{pre}_anc_cazy_all.RData", pre=config["prefix"])
+        checkpoint = "results/checkpoints/ancestral_states_cazy_all.done",
+	rdata = "results/ancestral_states_cazy/anc_cazy_all.RData"
     params:
         wd = os.getcwd(),
         prefix = config["prefix"],
-	outprefix = "cazy_ancestral_states_all_cazy"
+	outprefix = "ancestral_states_cazy"
     conda:
         "../envs/rreroot.yml"
     shell:
@@ -67,23 +66,23 @@ rule ancestral_states_all_cazy:
         touch {output.checkpoint}
         """
 
-rule plot_ancestral_states:
+rule plot_ancestral_states_genesets:
 	input:
 		rdata = rules.ancestral_states_all_cazy.output.rdata,
 		phylosig = rules.phylosig.output.checkpoint
 	output:
-		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states.done", pre=config["prefix"]),
-		rdata = expand("results/{pre}/plots_ancestral_states/ancestral_states.rData", pre=config["prefix"]),
-		rdata2 = expand("results/{pre}/plots_ancestral_states/ancestral_states_all.rData", pre=config["prefix"])
+		checkpoint = "results/checkpoints/plot_ancestral_states.done",
+		rdata = "results/ancestral_states_cazy/plots/ancestral_states.rData",
+		rdata2 = "results/ancestral_states_cazy/plots/ancestral_states_all.rData"
 	params:
 		wd = os.getcwd(),
-		prefix = config["prefix"],
+		prefix = config["prefix"]
 	conda:
 		"../envs/rreroot.yml"
 	shell:
 		"""
 		# plot the heatmaps and tree for different genesets:
-		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/{params.prefix}/plots_ancestral_states/ {input.rdata}
+		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/ancestral_states_cazy/plots/ {input.rdata}
 		# plot heatmap for all cazymes:
 		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
 		touch {output.checkpoint}		
@@ -115,8 +114,8 @@ rule plot_ancestral_states_cazy_all:
 		checkpoint = rules.ancestral_states_all_cazy.output.checkpoint,
 		rdata = rules.ancestral_states_all_cazy.output.rdata
 	output:
-		plot = expand("results/{pre}/plots_ancestral_states/{pre}_all_cazymes.pdf", pre = config["prefix"]),
-		checkpoint = expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"])
+		plot = "results/ancestral_states_cazy/plots/all_cazymes.pdf",
+		checkpoint = "results/checkpoints/plot_ancestral_states_cazy_all.done"
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
@@ -124,7 +123,7 @@ rule plot_ancestral_states_cazy_all:
 		"../envs/rreroot.yml"
 	shell:
 		"""
-		#rdata={params.wd}/results/{params.prefix}/cazy_ancestral_states_all_cazy/{params.prefix}_all_anc_cazy_all.RData
+		#rdata={params.wd}/results/ancestral_states_cazy/plots/{params.prefix}_all_anc_cazy_all.RData
 		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
 		touch {output.checkpoint}
 		""" 

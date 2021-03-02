@@ -55,8 +55,8 @@ print(tip_order %in% rownames(all_cazy))
 
 #change working directory for output
 print("Change WD for output...")
-print(paste(wd,"/results/",prefix,"/",outdir,"/",sep=""))
-setwd(paste(wd,"/results/",prefix,"/",outdir,"/",sep=""))
+print(paste(wd,"/results/",outdir,"/",sep=""))
+setwd(paste(wd,"/results/",outdir,"/",sep=""))
 
 print("plotting tree...")
 tree_out <- paste(prefix, "_tree.pdf", sep="")
@@ -159,4 +159,4 @@ for (i in 1:length(fit_cel)) {
 print(ancestral_states)
 
 print("saving environment")
-save.image(file=paste(prefix,"_anc_cazy_all.RData",sep=""))
+save.image(file="anc_cazy_all.RData")

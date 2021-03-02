@@ -1,19 +1,19 @@
 rule genome_statistics:
 	input:
-		expand("data/{pre}/stats_genomes.csv", pre=config["prefix"])
+		config["stats_genomes"]
 	output:
-		checkpoint = expand("results/{pre}/checkpoints/genome_statistics.done", pre=config["prefix"])
+		checkpoint = "results/checkpoints/genome_statistics.done"
 	params:
 		prefix=config["prefix"],
 		wd = os.getcwd(),
-		dir = expand("results/{pre}/statistics/", pre=config["prefix"])
+		dir = "results/statistics/"
 	conda:
 		"../envs/rplotting.yml"
 	shell:
 		"""
-		if [[ ! -d results/{params.prefix}/statistics ]]
+		if [[ ! -d results/statistics ]]
 		then
-			mkdir results/{params.prefix}/statistics
+			mkdir results/statistics
 		fi
 		Rscript bin/stats.R {input} {params.wd}/{params.dir}
 		touch {output.checkpoint}
@@ -85,10 +85,10 @@ else:
 
 rule gene2gene_distance:
 	input:
-		anno_folder = directory(expand("data/{pre}/annotation_tsv", pre=config["prefix"]))
+		anno_folder = config["funannotate_input"]["annotations_tsv_folder"]
 	output:
-		gene_lengths = expand("results/{pre}/statistics/gene_length_species_medians.txt",pre=config["prefix"]),
-		gene2gene_distance = expand("results/{pre}/statistics/gene2gene_species_medians.txt", pre=config["prefix"])
+		gene_lengths = "results/statistics/gene_length_species_medians.txt",
+		gene2gene_distance = "results/statistics/gene2gene_species_medians.txt"
 	singularity: "docker://reslp/biopython_plus:1.77"
 	shell:
 		"""
@@ -100,19 +100,19 @@ rule gene2gene_distance:
 
 rule genome_overview:
 	input:
-		cogs_file = expand("data/{pre}/COGS.all.results.csv", pre=config["prefix"]),
-		cazy_file = expand("data/{pre}/CAZyme.summary.results.csv", pre=config["prefix"]),
-		secmet_file = expand("data/{pre}/SM.summary.results.csv", pre=config["prefix"]),
-		stats_file = expand("data/{pre}/genome.stats.summary.csv", pre=config["prefix"]),
+		cogs_file = config["funannotate_input"]["cogs"], 
+		cazy_file = config["funannotate_input"]["cazy_summary"],
+		secmet_file = config["funannotate_input"]["secmet"],
+		stats_file = config["funannotate_input"]["genome_stats"],
 		gene_length = rules.gene2gene_distance.output.gene_lengths,
-		lifestyle_file = expand("data/{pre}/lifestyle", pre=config["prefix"]),
+		lifestyle_file = config["other_input"]["lifestyle"],
 		gene2gene_distance = rules.gene2gene_distance.output.gene2gene_distance,
 		tree_file = rules.extract_tree.output.ultra_tree
 	output:
-		checkpoint = expand("results/{pre}/checkpoints/genome_overview.done", pre=config["prefix"]),
-		p1 = expand("results/{pre}/statistics/genomes.pdf", pre=config["prefix"]),
-		p2 = expand("results/{pre}/statistics/Rplots.pdf", pre=config["prefix"]),
-		p3 = expand("results/{pre}/statistics/cazymes_overview_plus_transporters.pdf", pre=config["prefix"])
+		checkpoint = "results/checkpoints/genome_overview.done",
+		p1 = "results/statistics/genomes.pdf",
+		p2 = "results/statistics/Rplots.pdf",
+		p3 = "results/statistics/cazymes_overview_plus_transporters.pdf"
 	singularity: "docker://reslp/rphylogenetics:4.0.3"
 	shadow: "shallow"
 	shell:

@@ -117,6 +117,8 @@ summarize_secreted_and_cazy:
    N: sumseccaz
 plot_ancestral_states_cazy_all:
    N: plancaal
+plot_ancestral_states_genesets:
+   N: plancgs
 character_correlation:
    N: charcorr
    ntasks: 16
