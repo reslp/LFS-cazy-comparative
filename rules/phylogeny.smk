@@ -135,8 +135,8 @@ else:
 		input:
 			config["phylogeny"]["concatenated"]
 		output:
-			tree = expand("results/{pre}/phylogeny/concatenated/concat.treefile", pre=config["prefix"]),
-			checkpoint = expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"])
+			tree = "results/phylogeny/concatenated/concat.treefile",
+			checkpoint = "results/checkpoints/iqtree_concat.done"
 		shell:
 			"""
 			cp $(dirname {input})/* $(dirname {output.tree})
@@ -147,8 +147,8 @@ else:
 		input:
 			config["phylogeny"]["gene_trees"]
 		output:
-			trees = expand("results/{pre}/phylogeny/trees/loci.treefile", pre=config["prefix"]),
-			checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"])
+			trees = "results/phylogeny/trees/loci.treefile",
+			checkpoint = "results/checkpoints/iqtree_gene_trees.done"
 		shell:
 			"""
 			cp {input} {output.trees}
@@ -161,8 +161,7 @@ else:
 			heckpoint2 = rules.iqtree_concat.output.checkpoint,
 			concat = rules.iqtree_concat.output.tree
 		output:
-			checkpoint = expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
-			treefile = expand("results/{pre}/phylogeny/{pre}.cf.tree", pre=config["prefix"])
+			checkpoint = "results/checkpoints/iqtree_gene_concordance.done"
 		params:
 			wd = os.getcwd(),
 			prefix = config["prefix"],
@@ -173,7 +172,7 @@ else:
 			config["iqtree"]["threads"]
 		shell:
 			"""
-			cd results/{params.prefix}/phylogeny
+			cd results/phylogeny
 			mkdir -p algn
 			cp {params.wd}/{params.alignments}*trimmed.fas algn
 			iqtree -t {params.wd}/{input.concat} --no-terrace --gcf {params.wd}/{input.loci} -p algn --scf 100 --prefix {params.prefix} -T {threads} -redo
@@ -187,8 +186,8 @@ rule reroot_tree:
         tree = rules.iqtree_concat.output.tree,
         checkpoint = rules.iqtree_concat.output.checkpoint
     output:
-        treefile = expand("results/{pre}/phylogeny/{pre}_concat_rerooted.tre", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"])
+        treefile = "results/phylogeny/concat_rerooted.tre",
+        checkpoint = "results/checkpoints/reroot_tree.done"
     conda:
         "../envs/rreroot.yml"
     params:
@@ -202,19 +201,19 @@ rule reroot_tree:
 
 rule create_r8s_controlfile:
     input:
-        template = expand("data/{pre}/r8s_template.nex", pre=config["prefix"]),
         tree = rules.reroot_tree.output.treefile,
         checkpoint = rules.reroot_tree.output.checkpoint
     output:
-        r8s_controlfile = expand("results/{pre}/phylogeny/{pre}_r8s_controlfile.nex", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"])
+        r8s_controlfile = "results/phylogeny/r8s_controlfile.nex",
+        checkpoint = "results/checkpoints/create_r8s_controlfile.done"
     params:
-        prefix = config["prefix"]
+        prefix = config["prefix"],
+	template = config["r8s_controlfile"]
     conda:
         "../envs/phylogenomics.yml"
     shell:
         """
-        python bin/create_r8s.py -t {input.template} -tr {input.tree} -l results/{params.prefix}/phylogeny/concatenated/concat.log > {output.r8s_controlfile}
+        python bin/create_r8s.py -t {params.template} -tr {input.tree} -l results/{params.prefix}/phylogeny/concatenated/concat.log > {output.r8s_controlfile}
         touch {output.checkpoint}
         """
 
@@ -223,8 +222,8 @@ rule run_r8s:
         r8s_controlfile = rules.create_r8s_controlfile.output.r8s_controlfile,
         checkpoint = rules.create_r8s_controlfile.output.checkpoint
     output:
-        r8s = expand("results/{pre}/phylogeny/{pre}_r8s_output.txt", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"])
+        r8s = "results/phylogeny/r8s_output.txt",
+        checkpoint = "results/checkpoints/run_r8s.done"
     singularity:
         "docker://reslp/r8s:1.81"
     shell:
@@ -241,8 +240,8 @@ rule extract_tree:
         r8s = rules.run_r8s.output.r8s,
         checkpoint = rules.run_r8s.output.checkpoint
     output:
-        ultra_tree = expand("results/{pre}/phylogeny/{pre}_ultra.tre", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"])
+        ultra_tree = "results/phylogeny/phylogeny_r8s_ultra.tre",
+        checkpoint = "results/checkpoints/extract_tree.done"
     shell:
         """
         python bin/extract_tree_from_r8s.py -r {input.r8s} > {output.ultra_tree}
@@ -272,8 +271,8 @@ else:
                 input:
                         config["phylogeny"]["species_tree"]
                 output:
-                        species_tree = expand("results/{pre}/astral/species_tree.tre", pre=config["prefix"]),
-                        checkpoint = expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"])
+                        species_tree = "results/phylogeny/astral/species_tree.tre",
+                        checkpoint = "results/checkpoints/astral_species_tree.done"
                 shell:
                         """
                         cp {input} {output.species_tree}
@@ -282,19 +281,20 @@ else:
 
 rule plot_phylogeny:
     input:
-        tree = rules.iqtree_gene_concordance.output.treefile,
+        checkpoint_tree = rules.iqtree_gene_concordance.output.checkpoint,
 	astral = rules.astral_species_tree.output.species_tree,
         checkpoint = rules.iqtree_gene_concordance.output.checkpoint
     output:
-        phylogeny = expand("results/{pre}/phylogeny/{pre}_phylogeny.pdf", pre = config["prefix"]),
-	phylogeny2 = expand("results/{pre}/phylogeny/{pre}_phylogeny2.pdf", pre = config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"])
+        phylogeny = "results/phylogeny/phylogeny.pdf",
+	phylogeny2 = "results/phylogeny/phylogeny2.pdf",
+        checkpoint = "results/checkpoints/plot_phylogeny.done"
     params:
-        wd = os.getcwd()
+        wd = os.getcwd(),
+	prefix = config["prefix"]
     conda:
         "../envs/rorthologystatistics.yml"
     shell:
         """
-        Rscript bin/visualize_tree.R {params.wd} {input.tree} {input.astral} {output.phylogeny} {output.phylogeny2}
+        Rscript bin/visualize_tree.R {params.wd} results/phylogeny/{params.prefix}.cf.tree {input.astral} {output.phylogeny} {output.phylogeny2}
         touch {output.checkpoint}
         """

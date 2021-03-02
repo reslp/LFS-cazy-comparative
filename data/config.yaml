@@ -16,12 +16,30 @@ pfam_descriptions:
         data/pfam_all_description.txt 
 iqtree:
         threads: 32
+#these input files come from phylociraptor:
 phylogeny: 
         precalculated: "yes"
         concatenated: "data/83_genomes/phylogeny/concatenated/concat.contree.tre" 
         gene_trees: "data/83_genomes/phylogeny/all_gene_trees.tre"
         species_tree: "data/83_genomes/phylogeny/species_tree.tre"
         alignments: "data/83_genomes/phylogeny/alignments/"
+# these are inputfiles which come from funannotate:
+funannotate_input:
+        cogs: "data/83_genomes/COGS.all.results.csv"
+        cazy: "data/83_genomes/CAZyme.all.results.csv"
+        cazy_summary: "data/83_genomes/CAZyme.summary.results.csv"
+        secmet: "data/83_genomes/SM.summary.results.csv"
+        pfam: "data/83_genomes/pfam.results.csv"
+        interpro: "data/83_genomes/interproscan.results.csv"
+        annotations_tsv_folder: "data/83_genomes/annotation_tsv"
+        annotations_gff_folder: "data/83_genomes/gff_files"
+        gff_combined: "data/83_genomes/83_genomes_combined.gff"
+        proteins_combined: "data/83_genomes/83_genomes_proteins.fas"
+        transcripts_combined: "data/83_genomes/83_genomes_transcripts.fas"
+        protein_folder: "data/83_genomes/protein_files"
+        transcripts_folder: "data/83_genomes/transcript_files"
+        genome_stats: "data/83_genomes/genome.stats.summary.csv"
+
 orthofinder:
         threads: 48 
 scrape_cazy:

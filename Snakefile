@@ -69,9 +69,9 @@ rule phylogeny:
 		#expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"]),
 		#expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"])
+		"results/checkpoints/plot_phylogeny.done"
 	output:
-		expand("results/{pre}/checkpoints/all_phylogeny.done", pre=config["prefix"])
+		"results/checkpoints/all_phylogeny.done"
 	shell:
 		"""
 		touch {output}
