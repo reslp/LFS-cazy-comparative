@@ -55,7 +55,7 @@ configfile: "data/config.yaml"
 
 rule all:
 	input:
-		"results/{pre}/checkpoints/ancestral_states.done",
+		"results/checkpoints/ancestral_states.done",
 		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"]),
 		"results/checkpoints/statistics.done"
