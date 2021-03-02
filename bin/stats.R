@@ -16,7 +16,7 @@ library(ggpubr)
 
 print("creating plots...")
 colors <- wes_palette("FantasticFox1", length(unique(data$class)), type="continuous")
-colors <- c("#66c2a5", "#e78ac3", "#8da0cb", "#fc8d62", "#a6d854", "#ffd92f")
+colors <- c("#66c2a5", "#e78ac3", "#8da0cb", "#fc8d62", "#a6d854", "#ffd92f", "#000000")
 print(colors)
 ggplot(data = data, aes(x = Assembly.Size, y=Percent.GC, color=class)) + geom_point()
 textsize <- 9 

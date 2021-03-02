@@ -57,7 +57,8 @@ rule all:
 	input:
 		expand("results/{pre}/checkpoints/ancestral_states.done", pre=config["prefix"]),
 		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"]),
-		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"])
+		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"])
 
 rule phylogeny:
 	input:
@@ -93,6 +94,16 @@ rule cazy_characterization:
 		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
 	output:
 		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"])
+	shell:
+		"""
+		touch {output}
+		"""
+rule statistics:
+	input:
+		expand("results/{pre}/checkpoints/genome_overview.done", pre=config["prefix"]),
+		expand("results/{pre}/checkpoints/genome_statistics.done", pre=config["prefix"])
+	output:
+		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"])
 	shell:
 		"""
 		touch {output}

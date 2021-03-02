@@ -137,3 +137,11 @@ deeploc:
    N: deeploc
    ntasks: 16
    mem: 8G
+genome_overview:
+   N: gen_ov
+gene2gene_distance:
+   N: g2gd
+genome_statistics:
+   N: genome_stats
+statistics:
+   N: stats
