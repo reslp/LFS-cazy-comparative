@@ -5,6 +5,7 @@ wd <- args[1]
 prefix <- args[2]
 outdir <- args[3]
 rdata <- args[4]
+envfile <- args[5]
 
 print(wd)
 print(prefix)
@@ -265,11 +266,11 @@ for (foo in 1:length(sets)) {
   psummary <- create_heatmap(plot_df_sum)
   print("done")
   
-  pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_heatmap.pdf",sep=""), width=11.7, height=8.3)
+  pdf(file=paste("results/ancestral_states_cazy/plots/", prefix,"_",set,"_heatmap.pdf",sep=""), width=11.7, height=8.3)
   print(psummary)
   dev.off()
 
-  pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_anc_heatmap.pdf",sep=""), width=11.7, height=8.3)
+  pdf(file=paste("results/ancestral_states_cazy/plots/", prefix,"_",set,"_anc_heatmap.pdf",sep=""), width=11.7, height=8.3)
   print(psummary_anc)
   dev.off()
 
@@ -306,7 +307,7 @@ for (foo in 1:length(sets)) {
   
   print("combine output")
   pfiller <- ggplot() + geom_blank() + theme_minimal()
-  pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_combined.pdf",sep=""), width=11.7, height=8.3)
+  pdf(file=paste("results/ancestral_states_cazy/plots/", prefix,"_",set,"_combined.pdf",sep=""), width=11.7, height=8.3)
   print(get_tree() + psummary + psummary_legend + psummary_anc + plot_layout(design=layout))
   dev.off()
 
@@ -335,11 +336,11 @@ layout <- "
 "
 
 print("combine summary")
-pdf(file=paste("results/", prefix, "/plots_ancestral_states/", prefix,"_",set,"_combined_summary.pdf",sep=""), width=11.7, height=8.3)
+pdf(file=paste("results/ancestral_states_cazy/plots/", prefix,"_",set,"_combined_summary.pdf",sep=""), width=11.7, height=8.3)
 print(get_tree() + sum_plots[[1]] +sum_plots[[2]] + sum_plots[[3]] + psummary_legend + anc_sum_plots[[1]] + anc_sum_plots[[2]] +anc_sum_plots[[3]] + plot_layout(design=layout))
 dev.off()
 
 print("saving environment")
-save.image(file=paste("results/",prefix,"/plots_ancestral_states/ancestral_states.rData", sep=""))
+save.image(envfile)
 
 

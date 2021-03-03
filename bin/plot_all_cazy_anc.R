@@ -3,7 +3,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 wd <- args[1]
 rfile <- args[2]
-prefix <- args[3]
+plotfile <- args[3]
+envfile <- args[4]
 
 #wd <- "/Users/sinnafoch/Dropbox/Philipp/xylographa_comparative_genomics"
 #rfile <- "tmp/82_genomes_all_anc_cazy_all.RData"
@@ -62,7 +63,7 @@ omitt_fake_labels <- function(colnms) { # function to get rid of fake column lab
 start <- 0
 end <- 40
 
-filename <- paste("results/",prefix,"/plots_ancestral_states/",prefix,"_all_cazymes.pdf", sep="")
+filename <- plotfile
 
 pdf(filename, width=11.7, height=9.3)
 
@@ -91,4 +92,4 @@ for (i in 1:npages) {
   print(" ")
 }
 dev.off()
-save.image(file=paste("results/",prefix,"/plots_ancestral_states/ancestral_states_all.rData", sep=""))
+save.image(envfile)

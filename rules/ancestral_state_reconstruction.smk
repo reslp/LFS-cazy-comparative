@@ -42,7 +42,7 @@ rule phylosig:
 		"../envs/rreroot.yml"
 	shell:
 		"""
-		Rscript bin/phylosig.R {input.tree} {input.cazy_data} {params.wd}/results/{params.prefix}/phylosig/ &> {log}
+		Rscript bin/phylosig.R {input.tree} {input.cazy_data} {params.wd}/results/ancestral_states_cazy/phylosig/ &> {log}
 		touch {output.checkpoint}
 		"""
 
@@ -66,14 +66,15 @@ rule ancestral_states_all_cazy:
         touch {output.checkpoint}
         """
 
-rule plot_ancestral_states_genesets:
+rule plot_ancestral_states:
 	input:
 		rdata = rules.ancestral_states_all_cazy.output.rdata,
 		phylosig = rules.phylosig.output.checkpoint
 	output:
 		checkpoint = "results/checkpoints/plot_ancestral_states.done",
-		rdata = "results/ancestral_states_cazy/plots/ancestral_states.rData",
-		rdata2 = "results/ancestral_states_cazy/plots/ancestral_states_all.rData"
+		plot_all = "results/ancestral_states_cazy/plots/all_cazymes.pdf",
+		rdata_gs = "results/ancestral_states_cazy/plots/ancestral_states.rData",
+		rdata_all = "results/ancestral_states_cazy/plots/ancestral_states_all.rData"
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
@@ -82,9 +83,9 @@ rule plot_ancestral_states_genesets:
 	shell:
 		"""
 		# plot the heatmaps and tree for different genesets:
-		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/ancestral_states_cazy/plots/ {input.rdata}
+		Rscript bin/plot_ancestral_states.R {params.wd} {params.prefix} results/ancestral_states_cazy/plots/ {input.rdata} {output.rdata_gs}
 		# plot heatmap for all cazymes:
-		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
+		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {output.plot_all} {output.rdata_all}
 		touch {output.checkpoint}		
 		"""
 rule pca:
@@ -124,6 +125,6 @@ rule plot_ancestral_states_cazy_all:
 	shell:
 		"""
 		#rdata={params.wd}/results/ancestral_states_cazy/plots/{params.prefix}_all_anc_cazy_all.RData
-		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {params.prefix}
+		Rscript bin/plot_all_cazy_anc.R {params.wd} {input.rdata} {output.plot} {params.wd}/results/ancestral_states_cazy/all_anc_cazy_all.RData
 		touch {output.checkpoint}
 		""" 

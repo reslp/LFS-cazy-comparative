@@ -80,7 +80,7 @@ rule phylogeny:
 rule ancestral_states:
 	input:
 		rules.phylogeny.output,
-		"results/checkpoints/plot_ancestral_states_cazy_all.done",
+		#"results/checkpoints/plot_ancestral_states_cazy_all.done",
 		"results/checkpoints/plot_ancestral_states.done"
 	output:
 		"results/checkpoints/ancestral_states.done"
@@ -91,9 +91,9 @@ rule ancestral_states:
 
 rule cazy_characterization:
 	input:
-		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"])
+		"results/checkpoints/plot_saccharis_trees.done"
 	output:
-		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"])
+		"results/checkpoints/cazy_characterization.done"
 	shell:
 		"""
 		touch {output}
