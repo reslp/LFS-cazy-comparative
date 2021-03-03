@@ -18,6 +18,8 @@ stats_genomes:
         "data/83_genomes/stats_genomes.csv"
 other_input:
         lifestyle: "data/83_genomes/lifestyle"
+        apriori_cazy_sets: "data/83_genomes/apriori_cazyme_sets.txt"
+        character_information: "data/83_genomes/character_information.csv"
 iqtree:
         threads: 32
 #these input files come from phylociraptor:
