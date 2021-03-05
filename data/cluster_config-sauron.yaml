@@ -1,9 +1,7 @@
 __default__:
-   time: "72:00:00"
    N: default
-   shell: /bin/bash
    h_vmem: 4G
-   queue: mpi
+   q: mpi
    o: $(pwd)/log/sge-%j.out
    e: $(pwd)/log/sge-%j.err
    pe: mpi1node
