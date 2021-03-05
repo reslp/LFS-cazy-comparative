@@ -11,7 +11,7 @@ rule character_correlation:
 		wd = os.getcwd()
 	conda:
 		"../envs/rreroot.yml"
-	threads: 8
+	threads: config["threads"]["character_correlation"]
 	shell:
 		"""
 		if [[ ! -d {output.outdir} ]]

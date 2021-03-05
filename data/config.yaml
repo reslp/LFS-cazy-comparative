@@ -20,8 +20,6 @@ other_input:
         lifestyle: "data/83_genomes/lifestyle"
         apriori_cazy_sets: "data/83_genomes/apriori_cazyme_sets.txt"
         character_information: "data/83_genomes/character_information.csv"
-iqtree:
-        threads: 32
 #these input files come from phylociraptor:
 phylogeny: 
         precalculated: "yes"
@@ -46,11 +44,18 @@ funannotate_input:
         transcripts_folder: "data/83_genomes/transcript_files"
         genome_stats: "data/83_genomes/genome.stats.summary.csv"
 
-orthofinder:
-        threads: 48 
-scrape_cazy:
+cazy_characterization:
         #terms: xylanase β-mannanase cellulase PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
-        terms: PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
-saccharis:
-        threads: 16
-        parallel_jobs: 2
+        terms: GH5 GH43 PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
+        #terms: GH43
+
+# threading information for multithreaded rules:
+threads:
+        saccharis: 16
+        iqtree_transporter: 16
+        iqtree_concat: 16
+        character_correlation: 16
+        saccharis: 16
+        deeploc: 16
+        run_cafe: 16
+        infer_orthology: 32        

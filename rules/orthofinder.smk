@@ -49,7 +49,7 @@ rule infer_orthology:
 	output:
 		checkpoint = expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"])
 	conda: "../envs/orthofinder.yml"
-	threads: config["orthofinder"]["threads"]
+	threads: config["threads"]["infer_orthology"]
 	shell:
 		"""
 		orthofinder -f {input.prot_files} -o {output.dir}/orthofinder -n ortho -S diamond -t {threads}

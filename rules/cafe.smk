@@ -94,6 +94,7 @@ rule run_cafe:
     output:
         cafe_results = expand("results/{pre}/cafe/{pre}_cafe_results.cafe", pre=config["prefix"]),
         checkpoint = expand("results/{pre}/checkpoints/run_cafe.done", pre=config["prefix"])
+    threads: config["threads"]["run_cafe"]
     singularity:
         "docker://reslp/cafe:4.2.1"
     shell:

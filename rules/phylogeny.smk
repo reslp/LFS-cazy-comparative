@@ -64,7 +64,7 @@ if config["phylogeny"]["precalculated"] == "no":
         singularity:
             "docker://reslp/iqtree:2.0rc2"
         threads:
-            config["iqtree"]["threads"]
+            config["threads"]["iqtree_concat"]
         shell:
             """
             rm -rf results/{params.prefix}/phylogeny/concatenated/algn
@@ -169,7 +169,7 @@ else:
 		singularity:
 			"docker://reslp/iqtree:2.0rc2"
 		threads:
-			config["iqtree"]["threads"]
+			config["threads"]["iqtree_concat"]
 		shell:
 			"""
 			cd results/phylogeny

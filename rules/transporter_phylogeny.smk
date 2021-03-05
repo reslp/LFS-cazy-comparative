@@ -68,7 +68,7 @@ rule iqtree_transporter:
 	singularity:
 		"docker://reslp/iqtree:2.0rc2"
 	threads:
-		config["iqtree"]["threads"]
+		config["threads"]["iqtree_transporter"]
 	shell:
 		"""
 		cd results/{params.prefix}/PF00083_tree
