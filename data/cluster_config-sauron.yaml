@@ -2,11 +2,10 @@ __default__:
    time: "72:00:00"
    N: default
    shell: /bin/bash
-   mem: 4G
-   ntasks: 1
+   h_vmem: 4G
    queue: mpi
-   output: $(pwd)/log/slurm-%j.out
-   error: $(pwd)/log/slurm-%j.err
+   o: $(pwd)/log/sge-%j.out
+   e: $(pwd)/log/sge-%j.err
    pe: mpi1node
 align_aa:
    N: align_aa
@@ -47,13 +46,11 @@ filter_cafe_family_table:
 infer_orthology:
    N: infortho
    hint: multithread
-   mem: 8G
-   ntasks: 32
+   h_vmem: 8G
 iqtree_concat:
    N: iqtconcat
    hint: multithread
-   mem: 8G
-   ntasks: 16
+   h_vmem: 8G
 iqtree_gene_concordance:
    N: iqtgencon
    hint: nomultithread
@@ -80,8 +77,7 @@ reroot_tree:
 run_cafe:
    N: runcafe
    hint: multithread
-   mem: 8G
-   ntasks: 16
+   h_vmem: 8G
 run_r8s:
    N: runr8s
    hint: nomultithread
@@ -109,8 +105,7 @@ trim_transporter:
    N: tra_trimm
 iqtree_transporter:
    N: tra_iqtree
-   ntasks: 16
-   mem: 8G
+   h_vmem: 8G
 plot_genome_overview:
    N: genooverview
 summarize_secreted_and_cazy:
@@ -121,24 +116,21 @@ plot_ancestral_states_genesets:
    N: plancgs
 character_correlation:
    N: charcorr
-   ntasks: 16
-   mem: 10G
+   h_vmem: 10G
 prepare_scrape_cazy:
    J: prescrcaz
 prepare_saccharis:
    N: presacch
 saccharis:
    N: saccharis
-   ntasks: 16
-   mem: 10G
+   h_vmem: 10G
 get_saccharis_mapping_data:
    N: gsacchmap
 plot_saccharis_trees:
    N: plsacctree
 deeploc:
    N: deeploc
-   ntasks: 16
-   mem: 8G
+   h_vmem: 8G
 genome_overview:
    N: gen_ov
 gene2gene_distance:

@@ -59,10 +59,10 @@ echo "Additional arguments passed on to snakemake: $SM_ARGS"
 if [ $CLUSTER = "slurm" ]; then
 	export CONDA_PKGS_DIRS="$(pwd)/.conda_pkg_tmp"
 	mkdir -p .conda_pkg_tmp
-	snakemake --use-conda --use-singularity --singularity-args "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B /tmp:/usrtmp -B $(pwd):/data -B $(pwd)/bin:/usr/local/external $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster '$(pwd)/bin/immediate_submit.py {dependencies} slurm' --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
+	snakemake --use-conda --use-singularity --singularity-args "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B /tmp:/usrtmp -B $(pwd):/data -B $(pwd)/bin:/usr/local/external $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster '$(pwd)/bin/immediate-submit/immediate_submit.py {dependencies} slurm' --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
 	unset CONDA_PKGS_DIRS
 elif [ $CLUSTER = "sge" ]; then
-	snakemake --use-conda --use-singularity --singularity-args "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B $(pwd):/data -B $(pwd)/bin:/usr/local/external -B /tmp:/usertmp $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster "$(pwd)/bin/immediate_submit.py '{dependencies}' sge" --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
+	snakemake --use-conda --use-singularity --singularity-args "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B $(pwd):/data -B $(pwd)/bin:/usr/local/external -B /tmp:/usertmp $SI_ARGS" --jobs 1001 --cluster-config $CLUSTER_CONFIG --cluster "$(pwd)/bin/immediate-submit/immediate_submit.py '{dependencies}' sge" --immediate-submit -pr --notemp --latency-wait 600 $SM_ARGS
 elif [ $CLUSTER = "serial" ]; then
 	snakemake --use-conda --use-singularity --singularity-args "-B $(pwd)/external/deeploc-1.0/bin/:/external -B $(pwd)/external/deeploc-1.0/DeepLoc:/usr/lib/python3/dist-packages/DeepLoc -B $(pwd):/data -B $(pwd)/bin:/usr/local/external -B /tmp:/usertmp $SI_ARGS" -pr --notemp --latency-wait 600 $SM_ARGS
 else
