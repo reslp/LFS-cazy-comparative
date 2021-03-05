@@ -43,7 +43,6 @@ filter_cafe_family_table:
    hint: nomultithread
 infer_orthology:
    N: infortho
-   hint: multithread
    h_vmem: 8G
 iqtree_concat:
    N: iqtconcat

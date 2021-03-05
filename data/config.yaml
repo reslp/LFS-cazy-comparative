@@ -58,4 +58,4 @@ threads:
         saccharis: 16
         deeploc: 16
         run_cafe: 16
-        infer_orthology: 32        
+        infer_orthology: 24

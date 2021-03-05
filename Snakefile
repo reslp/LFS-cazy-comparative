@@ -56,9 +56,10 @@ configfile: "data/config.yaml"
 rule all:
 	input:
 		"results/checkpoints/ancestral_states.done",
-		expand("results/{pre}/checkpoints/cazy_characterization.done", pre=config["prefix"]),
+		"results/checkpoints/cazy_characterization.done",
 		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"]),
-		"results/checkpoints/statistics.done"
+		"results/checkpoints/statistics.done",
+		"results/checkpoints/orthology.done"
 
 rule phylogeny:
 	input:
@@ -88,10 +89,12 @@ rule ancestral_states:
 		"""
 		touch {output}
 		"""
-
+terms = config["cazy_characterization"]["terms"].split(" ")
 rule cazy_characterization:
 	input:
-		"results/checkpoints/plot_saccharis_trees.done"
+		expand("results/cazy_characterization/saccharis/saccharis_{term}.done", term=terms),
+		expand("results/cazy_characterization/deeploc/checkpoints/deeploc_{term}.done", term=terms),
+		expand("results/cazy_characterization/saccharis_plotting/checkpoints/plot_saccharis_tree_{term}.done", term=terms)
 	output:
 		"results/checkpoints/cazy_characterization.done"
 	shell:
@@ -108,7 +111,13 @@ rule statistics:
 		"""
 		touch {output}
 		"""
-
+rule orthology:
+	input: "results/orthology/checkpoints/infer_orthology.done"
+	output: "results/checkpoints/orthology.done"
+	shell:
+		"""
+		touch {output}
+		"""
 			
 rule all_transporter_tree:
 	input:
@@ -132,6 +141,8 @@ def remove_donefile(files):
 		else:
 			new_files.append(file)
 	return new_files
+
+include: "rules/functions.smk"
 include: "rules/orthofinder.smk"
 include: "rules/phylogeny.smk"
 include: "rules/statistics.smk"

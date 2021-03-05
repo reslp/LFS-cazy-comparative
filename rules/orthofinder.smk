@@ -44,15 +44,16 @@ rule get_upstream_inputfiles:
 
 rule infer_orthology:
 	input:
-		prot_files = expand("data/{pre}/protein_files", pre=config["prefix"]),
-		check = rules.get_upstream_inputfiles.output.checkpoint 
+		prot_files = get_protein_files
 	output:
-		checkpoint = expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"])
-	conda: "../envs/orthofinder.yml"
+		checkpoint = "results/orthology/checkpoints/infer_orthology.done"
+	params:
+		dir = "results/orthology"
+	singularity: "docker://reslp/orthofinder:2.5.2"
 	threads: config["threads"]["infer_orthology"]
 	shell:
 		"""
-		orthofinder -f {input.prot_files} -o {output.dir}/orthofinder -n ortho -S diamond -t {threads}
+		orthofinder -f {input.prot_files} -o {params.dir} -n ortho -S diamond -t {threads}
 		touch {output.checkpoint}
 		"""
 
