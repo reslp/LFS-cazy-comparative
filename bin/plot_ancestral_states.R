@@ -438,8 +438,10 @@ layout <- "
   CCCCCCCD
 "
 
+treep <- get_tree()
+treep <- treep +xlim(NA,1.2)
 pdf(file=paste("results/ancestral_states_cazy/plots/", prefix,"_",set,"_single_number_summary.pdf",sep=""), width=11.7, height=8.3)
-print(get_tree() + single_number_summary_plot + psummary_legend + single_number_anc_summary_plot + plot_layout(design=layout))
+print(treep + single_number_summary_plot + psummary_legend + single_number_anc_summary_plot + plot_layout(design=layout))
 dev.off()
 
 df <- as.data.frame(single_number_anc_summary)
