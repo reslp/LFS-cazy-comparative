@@ -1,28 +1,28 @@
-# these rules are currently not used
+
 rule create_gene_family_table:
     input:
-        checkpoint = rules.infer_orthology.output.checkpoint
+        checkpoint = rules.infer_orthology.output.checkpoint,
+	cazy_file = "data/83_genomes/CAZyme.all.results.csv" 
     output:
-        raw_file = expand("results/{pre}/cafe/{pre}_raw_cafe_input_file.tab", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"])
-    conda:
-        "../envs/pyutils.yml"
+        raw_file_of = "results/gene_family_evolution/cafe/orthofinder_raw_cafe_input_file.tab",
+	raw_file_cz = "results/gene_family_evolution/cafe/cazy_raw_cafe_input_file.tab"
+    singularity:
+        "docker://reslp/biopython_plus:1.77"
     params:
         prefix = config["prefix"]
     shell:
         """
-        python bin/orthofinder_to_cafe.py -i results/{params.prefix}/orthofinder/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv -o {output.raw_file}
-        touch {output.checkpoint}
-        """
+        python bin/orthofinder_to_cafe.py -i results/orthology/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv -o {output.raw_file_of}
+        python bin/cazy_counts_to_cafe.py -i {input.cazy_file} -o {output.raw_file_cz}
+	"""
+
 
 if config["cafe"]["filter"] == "yes":
 	rule filter_cafe_family_table:
 		input:
-			raw_file = rules.create_gene_family_table.output.raw_file,
-			checkpoint = rules.create_gene_family_table.output.checkpoint
+			raw_file = rules.create_gene_family_table.output.raw_file_of
 		output:
-        		filtered_file = expand("results/{pre}/cafe/{pre}_filtered_cafe_input_file.tab", pre=config["prefix"]),
-        		checkpoint = expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"])
+			orthofinder_filtered_file = "results/gene_family_evolution/cafe/orthofinder_filtered_cafe_input_file.tab"
 		params:
 			wd = os.getcwd(),
 			prefix = config["prefix"]
@@ -30,24 +30,20 @@ if config["cafe"]["filter"] == "yes":
 			"../envs/pyutils.yml"
 		shell:
 			"""
-			cd results/{params.prefix}/cafe/
+			cd results/gene_family_evolution/cafe/
 			name=$(basename "{params.wd}/{input.raw_file}")
-			python {params.wd}/bin/clade_and_size_filter.py -i "$name" -o {params.wd}/{output.filtered_file} -s
+			python {params.wd}/bin/clade_and_size_filter.py -i "$name" -o {params.wd}/{output.orthofinder_filtered_file} -s
 			cd {params.wd}
-			touch {output.checkpoint}
 			"""
 else:
 	rule filter_cafe_family_table:
 		input:
-			raw_file = rules.create_gene_family_table.output.raw_file,
-                	checkpoint = rules.create_gene_family_table.output.checkpoint
+			raw_file = rules.create_gene_family_table.output.raw_file_of
 		output:
-        		filtered_file = expand("results/{pre}/cafe/{pre}_filtered_cafe_input_file.tab", pre=config["prefix"]),
-        		checkpoint = expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"])
+			orthofinder_filtered_file = "results/gene_family_evolution/cafe/orthofinder_filtered_cafe_input_file.tab"
 		shell:
 			"""
 			cp {input.raw_file} {output.filtered_file}
-			touch {output.checkpoint}
 			"""
 
 rule create_cafe_style_tree:
@@ -55,57 +51,67 @@ rule create_cafe_style_tree:
         tree = rules.extract_tree.output.ultra_tree,
         checkpoint = rules.extract_tree.output.checkpoint
     output:
-        tree = expand("results/{pre}/cafe/{pre}_tree.tre", pre=config["prefix"]),
-        cafe_tree = expand("results/{pre}/cafe/{pre}_cafe_tree_single.tre", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/create_cafe_style_tree.done", pre=config["prefix"])
+        tree = "results/gene_family_evolution/cafe/cafe_tree.tre",
+        cafe_tree = "results/gene_family_evolution/cafe/cafe_tree_rates.tre"
     params:
         wd = os.getcwd()
     conda:
         "../envs/rreroot.yml"
     shell:
         """
-        Rscript bin/get_cafe_tree.R {params.wd} {input.tree} {output.tree} {output.cafe_tree}
-        touch {output.checkpoint}
+        Rscript bin/get_cafe_tree.R {params.wd} {input.tree} {output.tree} {output.cafe_tree} Xylographa_vitiligo,Acarospora_spec
         """
 
-rule create_cafe_commands:
-    input:
-        data = rules.filter_cafe_family_table.output.filtered_file,
-        template = expand("data/{pre}/cafe_commands_template.sh",pre = config["prefix"]),
-        tree = rules.create_cafe_style_tree.output.tree,
-        cafe_tree = rules.create_cafe_style_tree.output.cafe_tree
-    output:
-        cafe_commands = expand("results/{pre}/cafe/{pre}_cafe_commands.sh", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/create_cafe_commands.done", pre=config["prefix"])
-    params:
-        prefix = config["prefix"]
-    conda:
-        "../envs/pyutils.yml"
-    shell:
-        """
-        python bin/create_cafe.py -t {input.tree} -ct {input.cafe_tree} -template {input.template} -data {input.data} -pre results/{params.prefix}/cafe/{params.prefix} > {output.cafe_commands}
-        touch {output.checkpoint}
-        """
+#rule create_cafe_commands:
+#    input:
+#        #data = rules.filter_cafe_family_table.output.filtered_file,
+#	data = rules.create_gene_family_table.output.raw_file,
+#        template = expand("data/{pre}/cafe_commands_template.sh",pre = config["prefix"]),
+#        tree = rules.create_cafe_style_tree.output.tree,
+#        cafe_tree = rules.create_cafe_style_tree.output.cafe_tree
+#    output:
+#        cafe_commands = expand("results/{pre}/cafe/{pre}_cafe_commands.sh", pre=config["prefix"]),
+#        checkpoint = expand("results/{pre}/checkpoints/create_cafe_commands.done", pre=config["prefix"])
+#    params:
+#        prefix = config["prefix"]
+#    conda:
+#        "../envs/pyutils.yml"
+#    shell:
+#        """
+#        python bin/create_cafe.py -t {input.tree} -ct {input.cafe_tree} -template {input.template} -data {input.data} -pre results/{params.prefix}/cafe/{params.prefix} > {output.cafe_commands}
+#        touch {output.checkpoint}
+#        """
 
 rule run_cafe:
-    input:
-        cafe_commands = rules.create_cafe_commands.output.cafe_commands,
-        checkpoint = expand("results/{pre}/checkpoints/create_cafe_commands.done", pre=config["prefix"])
-    output:
-        cafe_results = expand("results/{pre}/cafe/{pre}_cafe_results.cafe", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/run_cafe.done", pre=config["prefix"])
-    threads: config["threads"]["run_cafe"]
-    singularity:
-        "docker://reslp/cafe:4.2.1"
-    shell:
-        """
-        cafe {input.cafe_commands}
-        touch {output.checkpoint}
-        """
+	input:
+		data_of = rules.filter_cafe_family_table.output.orthofinder_filtered_file,
+		data_raw_of = rules.create_gene_family_table.output.raw_file_of,
+		data_cz = rules.create_gene_family_table.output.raw_file_cz,
+		tree = rules.create_cafe_style_tree.output.tree,
+		cafe_tree = rules.create_cafe_style_tree.output.cafe_tree
+	output:
+		#cafe_results = "results/gene_family_evolution/cafe/cafe_output/cafe_results.cafe",
+		checkpoint = "results/cafe/checkpoints/run_cafe.done"
+	log:
+		"log/cafe.log"
+	threads: config["threads"]["run_cafe"]
+	singularity: "docker://reslp/cafe:08d27a1"
+	shell:
+		"""
+		echo "Run cafe for CAZy data":
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy | tee {log}
+		
+		echo "Run cafe for filtered orthofinder results:"
+		cafe -t {input.tree} -i {input.data_of} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_filtered | tee {log}
+		
+		echo "Run cafe for unfiltered orthofinder results:"
+		#cafe -i {input.data_raw_of} -t {input.tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_raw | tee {log}
+		touch {output.checkpoint}
+		"""
 
 rule parse_cafe_output:
     input:
-        cafe_results = rules.run_cafe.output.cafe_results,
+#        cafe_results = rules.run_cafe.output.cafe_results,
         checkpoint = rules.run_cafe.output.checkpoint
     output:
         anc = expand("results/{pre}/cafe/{pre}_anc.txt", pre=config["prefix"]),
