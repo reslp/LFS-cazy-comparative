@@ -71,18 +71,18 @@ print(da)
 
 tiplabelsize <- 2
 boxsize <- 0.1
-
-tr_bs <- ggtree(ladderize(tree_rooted), aes(label=label)) + geom_treescale(x=0,y=-5, width=0.2) + xlim(0,0.9) +geom_tiplab(size=tiplabelsize)
+xlim_tree <- 1.4
+tr_bs <- ggtree(ladderize(tree_rooted), aes(label=label)) + geom_treescale(x=0,y=-5, width=0.2) + xlim(0,xlim_tree) +geom_tiplab(size=tiplabelsize)
 tr_bs <- tr_bs + geom_label_repel(data=d, aes(label=bootstrap, fill=bootstrap),size=2,label.padding=boxsize, nudge_x=-0.03) + 
   theme(plot.title=element_text(face="bold"),legend.position=c(0.55,0.05), legend.direction = "horizontal") + scale_fill_viridis_c(begin=0.4) + ggtitle(label="A")
 tr_bs <- tr_bs + labs(subtitle=" ML phylogeny with  bootstrap support")
 
-tr_gc <-  ggtree(ladderize(tree_rooted), aes(label=label)) + geom_treescale(x=0.5,y=-5, width=0.2) + xlim(0,0.9) +geom_tiplab(size=tiplabelsize)
+tr_gc <-  ggtree(ladderize(tree_rooted), aes(label=label)) + geom_treescale(x=0.5,y=-5, width=0.2) + xlim(0,xlim_tree) +geom_tiplab(size=tiplabelsize)
 tr_gc <- tr_gc + geom_label_repel(data=d, aes(label=gene_concordance, fill=gene_concordance),size=2,label.padding=boxsize, nudge_x=-0.03) + 
   theme(plot.title=element_text(face="bold"),legend.position=c(0.55,0.05), legend.direction = "horizontal") + scale_fill_viridis_c(begin=0.4) + ggtitle(label="A")
 tr_gc <- tr_gc +labs(subtitle="  ML phylogeny with gene concordance support")
 
-tr_sc <-  ggtree(ladderize(tree_rooted), aes(label=label)) + geom_treescale(x=0.5,y=-5, width=0.2) + xlim(0,0.9) +geom_tiplab(size=tiplabelsize)
+tr_sc <-  ggtree(ladderize(tree_rooted), aes(label=label)) + geom_treescale(x=0.5,y=-5, width=0.2) + xlim(0,xlim_tree) +geom_tiplab(size=tiplabelsize)
 tr_sc <- tr_sc + geom_label_repel(data=d, aes(label=site_concordance, fill=site_concordance),size=2,label.padding=boxsize, nudge_x=-0.03) + 
   theme(plot.title=element_text(face="bold"),legend.position=c(0.55,0.05), legend.direction = "horizontal") + scale_fill_viridis_c(begin=0.4) + ggtitle(label="B")
 tr_sc <- tr_sc +labs(subtitle="  ML phylogeny with site concordance support")
