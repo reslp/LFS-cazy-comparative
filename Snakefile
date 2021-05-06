@@ -82,6 +82,7 @@ rule ancestral_states:
 	input:
 		rules.phylogeny.output,
 		#"results/checkpoints/plot_ancestral_states_cazy_all.done",
+		"results/checkpoints/pca.done",
 		"results/checkpoints/plot_ancestral_states.done"
 	output:
 		"results/checkpoints/ancestral_states.done"
@@ -132,6 +133,20 @@ rule all_transporter_tree:
 		"""
 		touch {output}
 		"""
+
+rule gene_family_evolution:
+	input:
+		"results/gene_family_evolution/cafe/raw_cafe_input_file.tab",
+		"results/gene_family_evolution/cafe/cafe_tree.tre",
+		"results/gene_family_evolution/checkpoints/run_cafe.done",
+		"results/gene_family_evolution/cafe_significant_families_per_model.txt"
+	output:
+		"results/gene_family_evolution/gene_family_evolution.done"
+	shell:
+		"""
+		touch {output}
+		"""
+
 
 def remove_donefile(files):
 	new_files = []

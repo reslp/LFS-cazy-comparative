@@ -92,12 +92,12 @@ rule pca:
 	input:
 		cazy_data = rules.ancestral_states_all_cazy.output.rdata,
 		check1 = rules.ancestral_states_all_cazy.output.checkpoint,
-		phylosig_cazy = rules.phylosig.output.phylosig_families,
-		apriori_sets = expand("data/{pre}/apriori_cazyme_sets.txt", pre=config["prefix"]),
-		genome_stats = expand("data/{pre}/stats_genomes.csv",pre = config["prefix"])
+		apriori_sets = "data/settings_and_parameters/apriori_cazyme_sets.txt",
+		genome_stats = config["stats_genomes"],
+		colors_file = "data/settings_and_parameters/color_information.csv"
 	output:
-		checkpoint = expand("results/{pre}/checkpoints/pca.done", pre = config["prefix"]),
-		dir = directory(expand("results/{pre}/pca/", pre = config["prefix"]))
+		checkpoint = "results/checkpoints/pca.done",
+		dir = directory("results/ancestral_states_cazy/pca/")
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
@@ -105,7 +105,7 @@ rule pca:
 		"../envs/rreroot.yml"
 	shell:
 		"""
-		Rscript bin/phyl_pca.R {input.cazy_data} {input.phylosig_cazy} {input.apriori_sets} {input.genome_stats} {output.dir} 
+		Rscript bin/phyl_pca.R {input.cazy_data} {input.colors_file} {input.apriori_sets} {input.genome_stats} {output.dir} 
 		touch {output.checkpoint}
 		"""
 
