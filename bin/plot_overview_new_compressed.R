@@ -139,7 +139,7 @@ stats2$name <- factor(stats2$name, levels=unique(stats2$name))
 
 #colors
 stats2$lifestyle
-lifestyle_colors <- c("#4b8ab8", "#922a19", "#c3b4a5", "#6e5854", "#31394a")
+lifestyle_colors <- c("#4b8ab8","#922a19", "#c3b4a5", "#6e5854", "#31394a")
 names(lifestyle_colors) <- unique(stats2$lifestyle)
 stats2
 

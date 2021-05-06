@@ -14,6 +14,7 @@ print(length(args))
 if (length(args) == 5)
 {
   species <- unlist(strsplit(args[5],","))
+  print(species)
 } else {species <- ""}
 
 setwd(wd)
@@ -33,6 +34,8 @@ setwd(wd)
 library(phytools)
 tree <- read.tree(file=treefile)
 tree$node.label <- NULL # we don't need support values or other node labels for this
+tree_names <- tree # save a copy of the tree for later
+tree$edge.length = tree$edge.length / 10
 outstring1 <- write.tree(tree)
 write(outstring1, file=outfile1)
 
@@ -40,15 +43,17 @@ replstr <- function(str) {
   return("")
 }
 
-tree$tip.label <- unlist(lapply(tree$tip.label, replstr))
+#tree$tip.label <- unlist(lapply(tree$tip.label, replstr))
 
-if (species == "")  { # for single rates (no region of interest is specified in the tree)
+if (length(species) == 0)  { # for single rates (no region of interest is specified in the tree)
   print("Single rate analysis")
   for (i in 1:length(tree$edge.length)) {
     tree$edge.length[i] = 1
   }
 } else { # two rates for different parts of the tree
   print("Two rate analysis")
+  print(tree)
+  node <- getMRCA(tree_names, as.vector(species))
   decendent_nodes <- getDescendants(tree, node)
   decendent_nodes <- c(node, decendent_nodes) # add the original node to decendents to get the MRCA edge
   indices <- match(decendent_nodes, tree$edge[,2])

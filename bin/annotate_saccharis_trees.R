@@ -3,6 +3,8 @@ library(ggtree)
 library(tidyverse)
 library(RColorBrewer)
 library(cowplot)
+library(phytools)
+library(patchwork)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -343,14 +345,17 @@ length(ec_colors)
 
 # colors for taxonomy and location will be hardcoded so that they are the same accross multiple plots
 num_cat_tax <- c("Archaea", "Bacteria","Viruses", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
-tax_colors <- c("#d9d9d9", "#969696", "#f0f0f0")
-tax_colors <- c(tax_colors, brewer.pal(length(num_cat_tax)-4, "Spectral"))
+tax_colors <- c("#d9d9d9", "#E6E6E6", "#f0f0f0")
+tax_colors <- c(tax_colors, "#969696","#FF6430", "#1B7189", "#00C48E", "#3EC2D5", "#6B7FD7", "#FFD400")
 tax_colors <- c(tax_colors, "#ffffff")
 names(tax_colors) <- num_cat_tax
+tax_colors
 
 
 num_cat_deeploc <- c("Membrane", "Nucleus", "Cytoplasm", "Extracellular", "Mitochondrion", "Cell_membrane", "Endoplasmic_reticulum", "Plastid", "Golgi_apparatus", "Lysosome/Vacuole", "Peroxisome")
-deeploc_colors <- brewer.pal(length(num_cat_deeploc), "Paired")
+num_cat_deeploc <- c("Nucleus", "Endoplasmic_reticulum", "Mitochondrion", "Plastid", "Golgi_apparatus", "Lysosome/Vacuole", "Peroxisome", "Cytoplasm", "Cell_membrane", "Membrane", "Extracellular")
+#deeploc_colors <- brewer.pal(length(num_cat_deeploc), "Paired")
+deeploc_colors <- colorRampPalette(brewer.pal(6, "RdBu"))(length(num_cat_deeploc))
 names(deeploc_colors)<- num_cat_deeploc
 
 
@@ -362,11 +367,40 @@ names(deeploc_colors)<- num_cat_deeploc
 #}
 
 # plot tree
-ggt <- ggtree(tree, layout="circular", size=0.2)
-ggt <- ggt + xlim(-2, NA)
-#ggt <- ggt + xlim(-2, NA)
-ggt <- open_tree(ggt, 10)
-ggt <- rotate_tree(ggt, 10)
+tree_log <- tree
+tree_log$edge.length <- (log(tree$edge.length)+(min(log(tree$edge.length))*-1))
+
+tree_md <- midpoint.root(tree)
+
+ggt <- ggtree(tree, size=0.2)
+ggt <- ggt + xlim(-10, NA)
+#ggt <- open_tree(ggt, 180)
+#ggt <- rotate_tree(ggt, 90)
+ggt
+
+ggts <- ggt
+j = 1
+for (sf in levels(plot_data$Subf))
+{
+  print(sf)
+  pd <- plot_data[plot_data$Subf==sf,]
+  #print(pd)
+  clade_labels <- rownames(pd[complete.cases(pd),])
+  
+  #drop if there are mislabeled tips
+  clade_labels <- clade_labels[clade_labels %in% tree$tip.label]
+  if (length(clade_labels) == 1 || length(clade_labels) == 0) {print(paste(sf, " has only a single or no tip"))}
+  mrca_node <- getMRCA(tree, clade_labels)
+  print(mrca_node)
+  ggts <- ggts + geom_hilight(node=mrca_node, fill=subf_colors[j], alpha=.6) 
+  ggts <- ggts + geom_cladelabel(node=mrca_node, label=sf, align=T, color="black")
+  j <- j+ 1
+}
+
+ggt <- ggts
+
+
+
 #ggt +ggtitle("bla")+theme(plot.title = element_text(hjust = 0.5, vjust=-55))
 
 if ("Subf" %in% colnames(cazy_data)) {
@@ -379,7 +413,7 @@ if ("Subf" %in% colnames(cazy_data)) {
 	ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors, na.translate = FALSE)
 } else {
 	ecp <- gheatmap(ggt, plot_data[,"EC.",drop=F], offset = 1.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
-        ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors, na.translate = FALSE)
+  ecp  <- ecp  + scale_fill_manual("EC number", values=ec_colors, na.translate = FALSE)
 	}
 
 deeplocp <- ecp + new_scale_fill()
@@ -402,7 +436,7 @@ addSmallLegend <- function(myPlot, pointSize = 1, textSize = 7, spaceLegend = 0.
           legend.key.size = unit(spaceLegend, "lines"))
 }
 dd <- addSmallLegend(domainp)
-
+dd
 
 
 #subfp <- gheatmap(ggt, plot_data[,"Subf",drop=F], offset = 0.1, width=0.1, color=NULL, colnames_position="top", colnames_angle=90, colnames_offset_y=0, hjust=0, font.size=2)
@@ -422,13 +456,104 @@ dd <- addSmallLegend(domainp)
 
 #domainp <- domainp + theme(legend.position="none")
 #p <- plot_grid(domainp, leg_subfp, leg_ecp, leg_domainp2, ncol=4, rel_widths=c(.7, .1, .1, .1))
+dd
 p <- dd + theme(plot.margin = margin(-2, 0, -2, -2, "cm"))
-
-print("Writing plots to file")
-outfile <- paste(out_prefix, "/", family, "_tree.pdf", sep="")
-pdf(file=outfile, width=11.8, height=7.3)
 p
+
+pdf(file=paste(out_prefix,"/",family,"_straight.pdf",sep=""), width=7.3, height=11.8)
+dd
 dev.off()
+
+num_cat_tax <- c("Archaea", "Bacteria","Viruses", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
+tax_colors <- c("#d9d9d9", "#969696", "#f0f0f0")
+tax_colors <- c(tax_colors, "#D53E4F","#FF6430", "#1B7189", "#00C48E", "#3EC2D5", "#6B7FD7", "#FFD400")
+tax_colors <- c(tax_colors, "#ffffff")
+names(tax_colors) <- num_cat_tax
+tax_colors
+
+j = 1
+plot_list <- list()
+for (sf in levels(plot_data$Subf))
+{
+print(sf)
+pd <- plot_data[plot_data$Subf==sf,]
+clade_labels <- rownames(pd[complete.cases(pd),])
+clade_labels <- clade_labels[clade_labels %in% tree$tip.label]
+#print(clade_labels)
+if (length(clade_labels) <= 1) {
+  print(paste(sf, " has only a single or no tip"))
+  next
+}
+mrca_node <- getMRCA(tree, clade_labels)
+nodes <- getDescendants(tree, mrca_node)
+#print("now tips")
+tips <- nodes[nodes < mrca_node]
+tip_labels_for_node <- tree$tip.label[tips]
+#print("get location")
+deeploc_for_node <- deeploc[tip_labels_for_node,]
+deeploc_for_node <- deeploc_for_node[complete.cases(deeploc_for_node),]
+#print("melt df location")
+if (nrow(deeploc_for_node) == 0) {
+  v1 <- c("Cell_membrane","Cytoplasm","Endoplasmic_reticulum", "Extracellular", "Lysosome/Vacuole")
+  v2 <- c(0,0,0,0,0)
+  dl_df <- data.frame(V1=v1, V2=v2)
+}
+else {
+  total <- sum(table(deeploc_for_node$Location))
+  dl_df <- melt(table(deeploc_for_node$Location) /total)
+}
+
+dl_df$category <- "loc"
+colnames(dl_df) <- c("group", "prop", "category")
+
+
+#print("taxonomy")
+taxonomy_plotting$name <- rownames(taxonomy_plotting)
+taxonomy_for_node <- taxonomy_plotting[tip_labels_for_node,]
+taxonomy_for_node <- taxonomy_for_node[complete.cases(taxonomy_for_node),]
+taxonomy_for_node$name <- NULL
+#print("melt df taxonomy")
+total_tax <- sum(table(taxonomy_for_node))
+tax_df <- melt(table(taxonomy_for_node)/total_tax)
+
+tax_df$category <- "tax"
+colnames(tax_df) <- c("group", "prop", "category")
+
+
+#p1 <- ggplot(dl_df, aes(x = 2, y = prop, fill = location))+
+#  geom_bar(stat = "identity")+
+#  coord_polar(theta="y") +theme_void()+xlim(0.5, 2.5) + scale_fill_manual(values = deeploc_colors) + ggtitle(sf)
+#p1
+#print("combine df")
+combined_df <- rbind(tax_df,dl_df)
+#print("create plot")
+p2 <- ggplot(combined_df, aes(x=category, y = prop, fill = group)) +  geom_bar(stat = "identity")
+ps <- p2 + scale_fill_manual(values = c(tax_colors,deeploc_colors)) +theme_void() + ggtitle(sf) + theme(legend.position = "none") 
+plot_list[[j]] <- ps
+j<- j+1
+
+}
+
+# here is code for some special plost. They do not work for all families this is why they are omitted here.
+# the information is also included in the tree plots already.
+
+#pdf(file=paste(out_prefix,"/",family,"_subf_plots.pdf",sep=""), height=18)
+#combined <- wrap_plots(plot_list, ncol=8) & theme(legend.position = "bottom")
+#combined + plot_layout(guides = "collect")
+#dev.off()
+
+
+#pdf("subf5_prop.pdf")
+#ps
+#dev.off()
+#coord_polar(theta="y") +theme_void()+xlim(0.5, 2.5) + scale_fill_manual(values = tax_colors)
+#p
+
+#print("Writing plots to file")
+#outfile <- paste(out_prefix, "/", family, "_tree.pdf", sep="")
+#pdf(file=outfile, width=11.8, height=7.3)
+#p
+#dev.off()
 
 print("Saving R env for potential later use")
 rfile <- paste(out_prefix,"/",family,".rData", sep="")
