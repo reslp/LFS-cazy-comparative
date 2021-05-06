@@ -77,7 +77,7 @@ rule saccharis:
 	input:
 		seqs = rules.prepare_saccharis.output.renamed_sequences,
 		cazy = rules.scrape_cazy.output.checkpoint,
-		family = "results/cazy_characterization/cazy_information/{fam}.found"
+		family = "results/cazy_characterization/cazy_information/{fam}_characterized.txt"
 	output:
 		checkpoint = "results/cazy_characterization/saccharis/saccharis_{fam}.done"
 		
@@ -199,8 +199,9 @@ rule plot_saccharis_trees:
 		prefix = config["prefix"],
 		saccharis_dir = "results/cazy_characterization/saccharis",
 		family = "{fam}"
-	conda:
-		"../envs/rreroot.yml"
+	singularity:
+		"docker://reslp/rphylogenetics:4.0.3"
+		
 	shell:
 		"""
 		if [ ! -f {params.saccharis_dir}/{params.family}/characterized/{params.family}_characterized.tree ] || [ ! -s {params.saccharis_dir}/{params.family}/characterized/{params.family}_characterized.tree ]; then

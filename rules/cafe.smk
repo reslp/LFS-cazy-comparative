@@ -91,127 +91,183 @@ rule run_cafe:
 		cafe_tree = rules.create_cafe_style_tree.output.cafe_tree
 	output:
 		#cafe_results = "results/gene_family_evolution/cafe/cafe_output/cafe_results.cafe",
-		checkpoint = "results/cafe/checkpoints/run_cafe.done"
+		checkpoint = "results/gene_family_evolution/checkpoints/run_cafe.done"
 	log:
 		"log/cafe.log"
 	threads: config["threads"]["run_cafe"]
 	singularity: "docker://reslp/cafe:08d27a1"
 	shell:
 		"""
-		echo "Run cafe for CAZy data":
-		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy | tee {log}
+		echo "Estimate an error model for a single rate":
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate -e
 		
-		echo "Run cafe for filtered orthofinder results:"
-		cafe -t {input.tree} -i {input.data_of} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_filtered | tee {log}
+		echo "Estimate an error model for two rates":
+		cafe -t {input.tree} -i {input.data_cz} -y {input.cafe_tree} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates -e
 		
-		echo "Run cafe for unfiltered orthofinder results:"
+		echo "Run cafe for CAZy data SINGLE RATE:"
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_1 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_2 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_3 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_4 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_5 | tee {log}
+		
+		echo "Run cafe for CAZy data SINGLE RATE + error model:"
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_1_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_2_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_3_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_4_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_5_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
+
+		echo "Run cafe for CAZy data TWO RATES:"
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_1 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_2 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_3 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_4 | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_5 | tee {log}
+
+		echo "Run cafe for CAZy data TWO RATES + error model"
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_1_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt| tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_2_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_3_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_4_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_5_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
+	
+		#echo "Run cafe for filtered orthofinder results:"
+		#cafe -t {input.tree} -i {input.data_of} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_filtered | tee {log}
+		
+		#echo "Run cafe for unfiltered orthofinder results:"
 		#cafe -i {input.data_raw_of} -t {input.tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_raw | tee {log}
+		
 		touch {output.checkpoint}
 		"""
-
 rule parse_cafe_output:
-    input:
+	input:
+		rules.run_cafe.output.checkpoint
+	output:
+		sign_families = "results/gene_family_evolution/cafe_significant_families_per_model.txt"
+	params:
+		wd = os.getcwd()
+	shell:
+		"""
+		cd results/gene_family_evolution/cafe
+		for folder in $(ls -d */); do 
+			families=$(grep -P "\ty" $folder/Base_family_results.txt | awk '{{printf($1":"$2";")}}'); 
+			outf=$(basename $folder); 
+			printf "$outf\t$families\n"; 
+			done > {params.wd}/{output.sign_families}
+		echo $'#nexus\nbegin trees;' > significant_trees.tre
+		for folder in $(ls -d */); do
+			fd=$(basename $folder)
+			export fd
+			grep "*" $folder\Base_asr.tre | perl -pe 's/(TREE )/TREE $ENV{{fd}}_/' >> significant_trees.tre
+			done
+		echo "end;">> significant_trees.tre
+		"""
+
+
+#rule parse_cafe_output:
+#    input:
 #        cafe_results = rules.run_cafe.output.cafe_results,
-        checkpoint = rules.run_cafe.output.checkpoint
-    output:
-        anc = expand("results/{pre}/cafe/{pre}_anc.txt", pre=config["prefix"]),
-        fams = expand("results/{pre}/cafe/{pre}_fams.txt", pre=config["prefix"]),
-        node = expand("results/{pre}/cafe/{pre}_node.txt", pre=config["prefix"]),
-        pub = expand("results/{pre}/cafe/{pre}_pub.txt", pre=config["prefix"]),
-        table = expand("results/{pre}/cafe/{pre}_table.txt", pre=config["prefix"]),
-        tree = expand("results/{pre}/cafe/{pre}_cafe_labeled_tree.tre", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/parse_cafe_output.done", pre=config["prefix"])
-    params:
-        prefix = config["prefix"],
-        wd = os.getcwd()
-    conda:
-        "../envs/pyutils.yml"
-    shell:
-        """
-        cd results/{params.prefix}/cafe
-        python {params.wd}/bin/cafetutorial_report_analysis.py -i {params.wd}/{input.cafe_results} -o {params.prefix}
-        cd {params.wd}
-        touch {output.checkpoint}
-        """
+#        checkpoint = rules.run_cafe.output.checkpoint
+#    output:
+#        anc = expand("results/{pre}/cafe/{pre}_anc.txt", pre=config["prefix"]),
+#        fams = expand("results/{pre}/cafe/{pre}_fams.txt", pre=config["prefix"]),
+#        node = expand("results/{pre}/cafe/{pre}_node.txt", pre=config["prefix"]),
+#        pub = expand("results/{pre}/cafe/{pre}_pub.txt", pre=config["prefix"]),
+#        table = expand("results/{pre}/cafe/{pre}_table.txt", pre=config["prefix"]),
+#        tree = expand("results/{pre}/cafe/{pre}_cafe_labeled_tree.tre", pre=config["prefix"]),
+#        checkpoint = expand("results/{pre}/checkpoints/parse_cafe_output.done", pre=config["prefix"])
+#    params:
+#        prefix = config["prefix"],
+#        wd = os.getcwd()
+#    conda:
+#        "../envs/pyutils.yml"
+#    shell:
+#        """
+#        cd results/{params.prefix}/cafe
+#        python {params.wd}/bin/cafetutorial_report_analysis.py -i {params.wd}/{input.cafe_results} -o {params.prefix}
+#        cd {params.wd}
+#        touch {output.checkpoint}
+#        """
 
-rule visualize_cafe_output:
-    input:
-        table = rules.parse_cafe_output.output.table,
-        tree =  rules.parse_cafe_output.output.tree,
-        plottree = rules.extract_tree.output.ultra_tree,
-        checkpoint1 = rules.extract_tree.output.checkpoint,
-        checkpoint2 = rules.parse_cafe_output.output.checkpoint
-    output:
-        node_table = expand("results/{pre}/cafe/{pre}_node_number_table.csv", pre=config["prefix"]),
-        mapping_file = expand("results/{pre}/cafe/{pre}_cafe_tree_node_mapping.txt", pre=config["prefix"]),
-        checkpoint = expand("results/{pre}/checkpoints/visualize_cafe_output.done", pre=config["prefix"])
-    params:
-        prefix = config["prefix"],
-        wd = os.getcwd()
-    conda:
-        "../envs/rreroot.yml"
-    shell:
-        """
-        Rscript bin/visualize_cafe.R {params.wd}/results/{params.prefix}/cafe {input.tree} {input.table} {input.plottree} {params.prefix}
-        touch {output.checkpoint}
-        """
-
-rule extract_functional_from_cafe:
-	input:
-		fams = rules.parse_cafe_output.output.fams,
-		checkpoint1 = rules.parse_cafe_output.output.checkpoint,
-		mapping_file = rules.visualize_cafe_output.output.mapping_file,
-		checkpoint2 = rules.visualize_cafe_output.output.checkpoint,
-		#orthgroups = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
-		checkpoint3 = rules.infer_orthology.output.checkpoint,
-		gff = expand("data/{pre}/{pre}_combined.gff", pre=config["prefix"])
-	output:
-		exp_cazy = expand("results/{pre}/gene_family_evolution/{pre}_expanded_cazy.txt", pre=config["prefix"]),
-		exp_egg = expand("results/{pre}/gene_family_evolution/{pre}_expanded_egg.txt", pre=config["prefix"]),
-		exp_go = expand("results/{pre}/gene_family_evolution/{pre}_expanded_go.txt", pre=config["prefix"]),
-		exp_interpro = expand("results/{pre}/gene_family_evolution/{pre}_expanded_interpro.txt", pre=config["prefix"]),
-		exp_pfam = expand("results/{pre}/gene_family_evolution/{pre}_expanded_pfam.txt", pre=config["prefix"]),
-		exp_prod = expand("results/{pre}/gene_family_evolution/{pre}_expanded_prod.txt", pre=config["prefix"]),
-		exp_stats = expand("results/{pre}/gene_family_evolution/{pre}_expanded_statistics.txt", pre=config["prefix"]),
-		con_cazy = expand("results/{pre}/gene_family_evolution/{pre}_contracted_cazy.txt", pre=config["prefix"]),
-		con_egg = expand("results/{pre}/gene_family_evolution/{pre}_contracted_egg.txt", pre=config["prefix"]),
-		con_go = expand("results/{pre}/gene_family_evolution/{pre}_contracted_go.txt", pre=config["prefix"]),
-		con_interpro = expand("results/{pre}/gene_family_evolution/{pre}_contracted_interpro.txt", pre=config["prefix"]),
-		con_pfam = expand("results/{pre}/gene_family_evolution/{pre}_contracted_pfam.txt", pre=config["prefix"]),
-		con_prod = expand("results/{pre}/gene_family_evolution/{pre}_contracted_prod.txt", pre=config["prefix"]),
-		con_stats = expand("results/{pre}/gene_family_evolution/{pre}_contracted_statistics.txt", pre=config["prefix"]),
-		checkpoint = expand("results/{pre}/checkpoints/extract_functional_from_cafe.done", pre=config["prefix"])
-	params:
-		prefix = config["prefix"]
-	conda:
-		"../envs/pyutils.yml"
-	shell:
-		"""
-		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho results/{params.prefix}/orthofinder//orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which + -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
-		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho results/{params.prefix}/orthofinder/orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which - -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
-		touch {output.checkpoint}
-		"""
-
-rule visualize_function_annotations_cafe:
-	input:
-		tree = 	rules.extract_tree.output.ultra_tree,
-		checkpoint = rules.extract_tree.output.checkpoint,
-		iprmapping = expand("data/{pre}/entry.list", pre=config["prefix"]),
-		pfammapping = expand("data/{pre}/pfam_all_description.txt", pre=config["prefix"]),
-		files = remove_donefile(expand(rules.extract_functional_from_cafe.output))
-	output:
-		dir = directory(expand("results/{pre}/cafe_functional_plots/", pre = config["prefix"])),
-		checkpoint = expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"])
-	params:
-		wd = os.getcwd(),
-		prefix = config["prefix"]
-	conda:
-		"../envs/rreroot.yml"
-	shell:
-		"""
-		for file in {input.files}
-		do
-		Rscript bin/visualize_cafe_annotation.R {params.wd} {input.tree} $file {params.prefix} {input.iprmapping} {input.pfammapping} {output.dir}
-		done
-		touch {output.checkpoint}
-		"""
+#rule visualize_cafe_output:
+#    input:
+#        table = rules.parse_cafe_output.output.table,
+#        tree =  rules.parse_cafe_output.output.tree,
+#        plottree = rules.extract_tree.output.ultra_tree,
+#        checkpoint1 = rules.extract_tree.output.checkpoint,
+#        checkpoint2 = rules.parse_cafe_output.output.checkpoint
+#    output:
+#        node_table = expand("results/{pre}/cafe/{pre}_node_number_table.csv", pre=config["prefix"]),
+#        mapping_file = expand("results/{pre}/cafe/{pre}_cafe_tree_node_mapping.txt", pre=config["prefix"]),
+#        checkpoint = expand("results/{pre}/checkpoints/visualize_cafe_output.done", pre=config["prefix"])
+#    params:
+#        prefix = config["prefix"],
+#        wd = os.getcwd()
+#    conda:
+#        "../envs/rreroot.yml"
+#    shell:
+#        """
+#        Rscript bin/visualize_cafe.R {params.wd}/results/{params.prefix}/cafe {input.tree} {input.table} {input.plottree} {params.prefix}
+#        touch {output.checkpoint}
+#        """
+#
+#rule extract_functional_from_cafe:
+#	input:
+#		fams = rules.parse_cafe_output.output.fams,
+#		checkpoint1 = rules.parse_cafe_output.output.checkpoint,
+#		mapping_file = rules.visualize_cafe_output.output.mapping_file,
+#		checkpoint2 = rules.visualize_cafe_output.output.checkpoint,
+#		#orthgroups = expand("results/{pre}/orthofinder/", pre=config["prefix"]),
+#		checkpoint3 = rules.infer_orthology.output.checkpoint,
+#		gff = expand("data/{pre}/{pre}_combined.gff", pre=config["prefix"])
+#	output:
+#		exp_cazy = expand("results/{pre}/gene_family_evolution/{pre}_expanded_cazy.txt", pre=config["prefix"]),
+#		exp_egg = expand("results/{pre}/gene_family_evolution/{pre}_expanded_egg.txt", pre=config["prefix"]),
+#		exp_go = expand("results/{pre}/gene_family_evolution/{pre}_expanded_go.txt", pre=config["prefix"]),
+#		exp_interpro = expand("results/{pre}/gene_family_evolution/{pre}_expanded_interpro.txt", pre=config["prefix"]),
+#		exp_pfam = expand("results/{pre}/gene_family_evolution/{pre}_expanded_pfam.txt", pre=config["prefix"]),
+#		exp_prod = expand("results/{pre}/gene_family_evolution/{pre}_expanded_prod.txt", pre=config["prefix"]),
+#		exp_stats = expand("results/{pre}/gene_family_evolution/{pre}_expanded_statistics.txt", pre=config["prefix"]),
+#		con_cazy = expand("results/{pre}/gene_family_evolution/{pre}_contracted_cazy.txt", pre=config["prefix"]),
+#		con_egg = expand("results/{pre}/gene_family_evolution/{pre}_contracted_egg.txt", pre=config["prefix"]),
+#		con_go = expand("results/{pre}/gene_family_evolution/{pre}_contracted_go.txt", pre=config["prefix"]),
+#		con_interpro = expand("results/{pre}/gene_family_evolution/{pre}_contracted_interpro.txt", pre=config["prefix"]),
+#		con_pfam = expand("results/{pre}/gene_family_evolution/{pre}_contracted_pfam.txt", pre=config["prefix"]),
+#		con_prod = expand("results/{pre}/gene_family_evolution/{pre}_contracted_prod.txt", pre=config["prefix"]),
+#		con_stats = expand("results/{pre}/gene_family_evolution/{pre}_contracted_statistics.txt", pre=config["prefix"]),
+#		checkpoint = expand("results/{pre}/checkpoints/extract_functional_from_cafe.done", pre=config["prefix"])
+#	params:
+#		prefix = config["prefix"]
+#	conda:
+#		"../envs/pyutils.yml"
+#	shell:
+#		"""
+#		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho results/{params.prefix}/orthofinder//orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which + -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
+#		python bin/get_functional_for_cafe_families.py -fam {input.fams} -cm {input.mapping_file} -ortho results/{params.prefix}/orthofinder/orthofinder/Results_ortho/Orthogroups/Orthogroups.tsv -gff {input.gff} -node internal -which - -pre results/{params.prefix}/gene_family_evolution/{params.prefix}
+#		touch {output.checkpoint}
+#		"""
+#
+#rule visualize_function_annotations_cafe:
+#	input:
+#		tree = 	rules.extract_tree.output.ultra_tree,
+#		checkpoint = rules.extract_tree.output.checkpoint,
+#		iprmapping = expand("data/{pre}/entry.list", pre=config["prefix"]),
+#		pfammapping = expand("data/{pre}/pfam_all_description.txt", pre=config["prefix"]),
+#		files = remove_donefile(expand(rules.extract_functional_from_cafe.output))
+#	output:
+#		dir = directory(expand("results/{pre}/cafe_functional_plots/", pre = config["prefix"])),
+#		checkpoint = expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"])
+#	params:
+#		wd = os.getcwd(),
+#		prefix = config["prefix"]
+#	conda:
+#		"../envs/rreroot.yml"
+#	shell:
+#		"""
+#		for file in {input.files}
+#		do
+#		Rscript bin/visualize_cafe_annotation.R {params.wd} {input.tree} $file {params.prefix} {input.iprmapping} {input.pfammapping} {output.dir}
+#		done
+#		touch {output.checkpoint}
+#		"""
