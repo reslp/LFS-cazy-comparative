@@ -191,7 +191,8 @@ rule plot_saccharis_trees:
 	input:
 		saccharis_mapping_data = rules.get_saccharis_mapping_data.output.saccharis_mapping_data,
 		checkpoint = rules.scrape_cazy.output.checkpoint,
-		checkpoint2 = rules.deeploc.output.checkpoint
+		checkpoint2 = rules.deeploc.output.checkpoint,
+		colors_file = "data/settings_and_parameters/color_information.csv"
 	output:
 		checkpoint = "results/cazy_characterization/saccharis_plotting/checkpoints/plot_saccharis_tree_{fam}.done"
 	params:
@@ -214,7 +215,7 @@ rule plot_saccharis_trees:
 		fi
 		if [ -f {params.saccharis_dir}/{params.family}/characterized/{params.family}_characterized.tree ] && [ -f results/cazy_characterization/deeploc/{params.family}.extracted.fasta.txt ];
 		then
-			Rscript bin/annotate_saccharis_trees.R {params.wd} {params.saccharis_dir}/{params.family}/characterized/{params.family}_characterized.tree results/cazy_characterization/cazy_information/{params.family}_characterized.txt {input.saccharis_mapping_data} "results/cazy_characterization/saccharis_plotting" {params.family}  results/cazy_characterization/deeploc/{params.family}.extracted.fasta.txt
+			Rscript bin/annotate_saccharis_trees.R {params.wd} {params.saccharis_dir}/{params.family}/characterized/{params.family}_characterized.tree results/cazy_characterization/cazy_information/{params.family}_characterized.txt {input.saccharis_mapping_data} "results/cazy_characterization/saccharis_plotting" {params.family}  results/cazy_characterization/deeploc/{params.family}.extracted.fasta.txt {input.colors_file}
 			touch {output.checkpoint}
 		else
 			echo "One or more input files are missing. Tree will not be plotted"
