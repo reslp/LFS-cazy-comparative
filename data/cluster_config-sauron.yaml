@@ -73,7 +73,6 @@ reroot_tree:
    hint: nomultithread
 run_cafe:
    N: runcafe
-   hint: multithread
    h_vmem: 8G
 run_r8s:
    N: runr8s

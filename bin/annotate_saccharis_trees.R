@@ -15,8 +15,11 @@ additional_data <- args[4]
 out_prefix <- args[5]
 family <- args[6]
 deeploc_file <- args[7]
+colors_file <- args[8]
 
+#probability to consider deeploc predictions to be valid:
 prob <- 0.7
+
 #setwd("/home/reslp/Dropbox/Philipp/xylographa_comparative_genomics/tmp/saccharis_trees")
 #setwd("/Users/sinnafoch/Dropbox/Philipp/xylographa_comparative_genomics/tmp/saccharis_trees")
 
@@ -203,9 +206,23 @@ isFALSE <- function (x) {
 
 ## this is the end of ggnewscale code
 
+#load and parse color info:
+color_data <- read.csv(colors_file,sep=",", header=T, stringsAsFactors=F)
+tax_colors <- color_data$color
+names(tax_colors) <- color_data$taxonomy
+
 #load data
 tree <- read.tree(treefile)
 print("Load cazy data")
+print(fam_data)
+
+# make a check if input file is empty (some cazy families could have no characterized genes)
+print(file.info(fam_data)$size)
+if (file.info(fam_data)$size <= 1) {
+	print(paste("Cazy File is empty, will do nothing: ", fam_data, sep=""))
+	quit()
+}
+
 cazy_data <- read.csv(fam_data, sep="\t", header=T, stringsAsFactors = F)
 print("load additional mapping data")
 additional_mapping <- read.csv(additional_data, header=T, stringsAsFactors = F, sep="\t")
@@ -344,12 +361,12 @@ ec_colors <- colorRampPalette(brewer.pal(11, "Spectral"))(n)
 length(ec_colors)
 
 # colors for taxonomy and location will be hardcoded so that they are the same accross multiple plots
-num_cat_tax <- c("Archaea", "Bacteria","Viruses", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
-tax_colors <- c("#d9d9d9", "#E6E6E6", "#f0f0f0")
-tax_colors <- c(tax_colors, "#969696","#FF6430", "#1B7189", "#00C48E", "#3EC2D5", "#6B7FD7", "#FFD400")
-tax_colors <- c(tax_colors, "#ffffff")
-names(tax_colors) <- num_cat_tax
-tax_colors
+#num_cat_tax <- c("Archaea", "Bacteria","Viruses", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
+#tax_colors <- c("#d9d9d9", "#E6E6E6", "#f0f0f0")
+#tax_colors <- c(tax_colors, "#969696","#FF6430", "#1B7189", "#00C48E", "#3EC2D5", "#6B7FD7", "#FFD400")
+#tax_colors <- c(tax_colors, "#ffffff")
+#names(tax_colors) <- num_cat_tax
+#tax_colors
 
 
 num_cat_deeploc <- c("Membrane", "Nucleus", "Cytoplasm", "Extracellular", "Mitochondrion", "Cell_membrane", "Endoplasmic_reticulum", "Plastid", "Golgi_apparatus", "Lysosome/Vacuole", "Peroxisome")
