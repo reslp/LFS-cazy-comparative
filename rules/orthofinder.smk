@@ -48,12 +48,13 @@ rule infer_orthology:
 	output:
 		checkpoint = "results/orthology/checkpoints/infer_orthology.done"
 	params:
+		proteins = config["funannotate_input"]["protein_folder"],
 		dir = "results/orthology"
 	singularity: "docker://reslp/orthofinder:2.5.2"
 	threads: config["threads"]["infer_orthology"]
 	shell:
 		"""
-		orthofinder -f {input.prot_files} -o {params.dir} -n ortho -S diamond -t {threads}
+		orthofinder -f {params.proteins} -o {params.dir}/orthofinder -n ortho -S diamond -t {threads}
 		touch {output.checkpoint}
 		"""
 
