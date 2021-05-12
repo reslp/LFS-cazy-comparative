@@ -139,7 +139,8 @@ rule gene_family_evolution:
 		"results/gene_family_evolution/cafe/raw_cafe_input_file.tab",
 		"results/gene_family_evolution/cafe/cafe_tree.tre",
 		"results/gene_family_evolution/checkpoints/run_cafe.done",
-		"results/gene_family_evolution/cafe_significant_families_per_model.txt"
+		"results/gene_family_evolution/cafe_significant_families_per_model.txt",
+		"results/gene_family_evolution/cafe_summary_tree.pdf"
 	output:
 		"results/gene_family_evolution/gene_family_evolution.done"
 	shell:

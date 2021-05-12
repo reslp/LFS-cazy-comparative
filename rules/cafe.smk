@@ -99,10 +99,10 @@ rule run_cafe:
 	shell:
 		"""
 		echo "Estimate an error model for a single rate":
-		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate -e
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/error_model_single_rate -e
 		
 		echo "Estimate an error model for two rates":
-		cafe -t {input.tree} -i {input.data_cz} -y {input.cafe_tree} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates -e
+		cafe -t {input.tree} -i {input.data_cz} -y {input.cafe_tree} -p -o results/gene_family_evolution/cafe/error_model_two_rates -e
 		
 		echo "Run cafe for CAZy data SINGLE RATE:"
 		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_1 | tee {log}
@@ -112,11 +112,11 @@ rule run_cafe:
 		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_5 | tee {log}
 		
 		echo "Run cafe for CAZy data SINGLE RATE + error model:"
-		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_1_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_2_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_3_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_4_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_5_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_1_errm -eresults/gene_family_evolution/cafe/error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_2_errm -eresults/gene_family_evolution/cafe/error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_3_errm -eresults/gene_family_evolution/cafe/error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_4_errm -eresults/gene_family_evolution/cafe/error_model_single_rate/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -o results/gene_family_evolution/cafe/cafe_output_cazy_single_rate_5_errm -eresults/gene_family_evolution/cafe/error_model_single_rate/Base_error_model.txt | tee {log}
 
 		echo "Run cafe for CAZy data TWO RATES:"
 		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_1 | tee {log}
@@ -126,11 +126,11 @@ rule run_cafe:
 		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_5 | tee {log}
 
 		echo "Run cafe for CAZy data TWO RATES + error model"
-		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_1_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt| tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_2_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_3_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_4_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
-		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_5_errm -eresults/gene_family_evolution/cafe/cafe_output_cazy_error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_1_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt| tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_2_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_3_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_4_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
+		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_5_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
 	
 		#echo "Run cafe for filtered orthofinder results:"
 		#cafe -t {input.tree} -i {input.data_of} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_filtered | tee {log}
@@ -140,29 +140,46 @@ rule run_cafe:
 		
 		touch {output.checkpoint}
 		"""
+
 rule parse_cafe_output:
 	input:
 		rules.run_cafe.output.checkpoint
 	output:
-		sign_families = "results/gene_family_evolution/cafe_significant_families_per_model.txt"
+		sign_families = "results/gene_family_evolution/cafe_significant_families_per_model.txt",
+		sign_trees = "results/gene_family_evolution/significant_trees.tre"
 	params:
 		wd = os.getcwd()
 	shell:
 		"""
 		cd results/gene_family_evolution/cafe
-		for folder in $(ls -d */); do 
+		for folder in $(ls -d cafe_output*/); do 
 			families=$(grep -P "\ty" $folder/Base_family_results.txt | awk '{{printf($1":"$2";")}}'); 
 			outf=$(basename $folder); 
 			printf "$outf\t$families\n"; 
 			done > {params.wd}/{output.sign_families}
-		echo $'#nexus\nbegin trees;' > significant_trees.tre
-		for folder in $(ls -d */); do
+		echo $'#nexus\nbegin trees;' > {params.wd}/{output.sign_trees}
+		for folder in $(ls -d cafe_output*/); do
 			fd=$(basename $folder)
 			export fd
-			grep "*" $folder\Base_asr.tre | perl -pe 's/(TREE )/TREE $ENV{{fd}}_/' >> significant_trees.tre
+			grep "*" $folder\Base_asr.tre | perl -pe 's/(TREE )/TREE $ENV{{fd}}_/' >> {params.wd}/{output.sign_trees}
 			done
-		echo "end;">> significant_trees.tre
+		echo "end;">> {params.wd}/{output.sign_trees}
 		"""
+
+rule plot_cafe_summary_tree:
+	input:
+		sign_trees = rules.parse_cafe_output.output.sign_trees
+	output:
+		cafe_summary_tree = "results/gene_family_evolution/cafe_summary_tree.pdf"
+	params:
+		wd = os.getcwd()
+	singularity:
+		"docker://reslp/rphylogenetics:4.0.3"
+	shell:
+		"""
+		Rscript bin/parse_cafe_trees.R {params.wd} {input.sign_trees} {output.cafe_summary_tree}
+		"""
+
 
 
 #rule parse_cafe_output:

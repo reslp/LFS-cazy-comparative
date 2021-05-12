@@ -60,6 +60,8 @@ orthology_statistics:
 parse_cafe_output:
    N: parcafout
    hint: nomultithread
+plot_cafe_summary_tree:
+   N: plotcafsum
 phylosig:
    N: phylosig
 plot_phylogeny:
