@@ -5,6 +5,7 @@
 import argparse
 import glob
 import sys
+import os
 from Bio import SeqIO
 
 if sys.version_info[0] < 3:
@@ -21,8 +22,15 @@ args.item = args.item.replace(u'\ufeff','')
  
 item = args.item.split(",")
 print(item, file=sys.stderr)
-gff3_files = [file for file in glob.glob(args.gff3_path+"/*") if ".gff3" in file]
-sys.stderr.write("Found %s GFF3 files.\n" % str(len(gff3_files)))
+if os.path.isdir(args.gff3_path):
+	gff3_files = [file for file in glob.glob(args.gff3_path+"/*") if ".gff3" in file]
+elif os.path.isfile(args.gff3_path):
+	gff3_files = [args.gff3_path]
+else:
+	print("Something is wrong with -gff argument", file=sys.stderr)
+	sys.exit(1)
+
+print("Found %s GFF3 files." % str(len(gff3_files)), file=sys.stderr)
 list_of_ids = []
 for handle in gff3_files:
 	sys.stderr.write("Reading file: %s\n" % handle)
@@ -33,7 +41,8 @@ for handle in gff3_files:
 		annotation=line.split("\t")[-1]
 		annotation = annotation.replace(",", ";")
 		name = annotation.split(";")[0].split("=")[-1]
-		annotations =  annotation.split(";")[1:]
+		annotations = annotation.split(";")[1:]
+		annotations = [ann.split("=")[-1] for ann in annotations]
 		result = all(el in annotations for el in item)
 		if result:
 			list_of_ids.append(name)
@@ -44,8 +53,15 @@ for handle in gff3_files:
 		#		i += 1
 	sys.stderr.write("%s found %s times.\n" % (args.item, str(i)))
 
-fasta_files = [file for file in glob.glob(args.fasta_path+"/*") if ".fa" in file]
-sys.stderr.write("Found %s FASTA files.\n" % str(len(fasta_files)))
+if os.path.isdir(args.fasta_path):
+	fasta_files = [file for file in glob.glob(args.fasta_path+"/*") if ".fa" in file]
+elif os.path.isfile(args.fasta_path):
+	fasta_files = [args.fasta_path]
+else:
+	print("Something wrong with -fasta argument", file=sys.stderr)
+	sys.exit(1)
+
+print("Found %s FASTA files." % str(len(fasta_files)), file=sys.stderr)
 
 for handle in fasta_files:
 	sys.stderr.write("Reading file: %s\n" % handle)
