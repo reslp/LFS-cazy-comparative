@@ -7,7 +7,7 @@ orthofiles:
 root:
         Erysiphe_necator,Epichloe_typhina,Sordaria_macrospora,Aureobasidium_pullulans,Phyllosticta_citricarpa,Arthonia_radiata
 cafe:
-        filter: no
+        filter: "yes"
 cafe_controlfile:
         data/cafe_commands_template.sh
 r8s_controlfile:
@@ -20,6 +20,10 @@ other_input:
         lifestyle: "data/83_genomes/lifestyle"
         apriori_cazy_sets: "data/83_genomes/apriori_cazyme_sets.txt"
         character_information: "data/83_genomes/character_information.csv"
+        color_information: "data/settings_and_parameters/color_information.csv" 
+        taxonomy_information: "data/settings_and_parameters/taxonomy_information.csv" 
+        putative_cellulases: "data/settings_and_parameters/cloned_putative_cellulases.txt"
+        characterized_transporters: "data/sugar_transporters_characterized_reference_seqs.fa"
 #these input files come from phylociraptor:
 phylogeny: 
         precalculated: "yes"
@@ -46,8 +50,8 @@ funannotate_input:
 
 cazy_characterization:
         #terms: xylanase β-mannanase cellulase PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
-        terms: GH5 GH43 PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
-        #terms: GH43
+        #terms: GH5 GH43 PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
+        terms: GH5 GH43 GH18 CE10 AA3 AA7 AA9 GH79
 
 # threading information for multithreaded rules:
 threads:
@@ -58,4 +62,4 @@ threads:
         saccharis: 16
         deeploc: 16
         run_cafe: 16
-        infer_orthology: 24
+        infer_orthology: 10

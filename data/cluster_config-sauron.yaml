@@ -20,6 +20,8 @@ astral_species_tree:
 cazy_anc_summary:
    N: cazyancsum
    hint: nomultithread
+characterize_transporters:
+   N: all
 create_cafe_commands:
    N: createcafe
    hint: nomultithread
@@ -35,6 +37,8 @@ create_r8s_controlfile:
 extract_functional_from_cafe:
    N: extrfuncaf
    hint: nomultithread
+extract_transporter_genes:
+   N: extragen
 extract_tree:
    N: extrtree
    hint: nomultithread
@@ -54,6 +58,9 @@ iqtree_gene_concordance:
 iqtree_gene_trees:
    N: iqtgenetr
    hint: nomultithread
+orthofinder_transporter:
+   N: oftra
+   h_vmem: 8G
 orthology_statistics:
    N: orthstats
    hint: nomultithread

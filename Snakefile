@@ -105,7 +105,8 @@ rule cazy_characterization:
 rule statistics:
 	input:
 		"results/checkpoints/genome_overview.done",
-		"results/checkpoints/genome_statistics.done"
+		"results/checkpoints/genome_statistics.done",
+		"results/statistics/cellulase_orthologs/cellulase_orthologs.tsv"
 	output:
 		"results/checkpoints/statistics.done"
 	shell:
@@ -120,19 +121,23 @@ rule orthology:
 		touch {output}
 		"""
 			
-rule all_transporter_tree:
+#rule all_transporter_tree:
+#	input:
+#                #expand("results/{pre}/checkpoints/extract_transporter_genes.done", pre=config["prefix"]),
+#                #expand("results/{pre}/checkpoints/combine_transporter_genes_and_reference.done", pre=config["prefix"]),
+#                #expand("results/{pre}/checkpoints/align_transporter.done", pre=config["prefix"]),
+#                #expand("results/{pre}/checkpoints/trim_transporter.done", pre=config["prefix"]),
+#                expand("results/{pre}/checkpoints/iqtree_transporter.done", pre=config["prefix"])
+#	output:
+#		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"])
+#	shell:
+#		"""
+#		touch {output}
+#		"""
+
+rule characterize_transporters:
 	input:
-                #expand("results/{pre}/checkpoints/extract_transporter_genes.done", pre=config["prefix"]),
-                #expand("results/{pre}/checkpoints/combine_transporter_genes_and_reference.done", pre=config["prefix"]),
-                #expand("results/{pre}/checkpoints/align_transporter.done", pre=config["prefix"]),
-                #expand("results/{pre}/checkpoints/trim_transporter.done", pre=config["prefix"]),
-                expand("results/{pre}/checkpoints/iqtree_transporter.done", pre=config["prefix"])
-	output:
-		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"])
-	shell:
-		"""
-		touch {output}
-		"""
+		"results/transporter_characterization/orthofinder.done"
 
 rule gene_family_evolution:
 	input:
