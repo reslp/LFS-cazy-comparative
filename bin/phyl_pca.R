@@ -28,11 +28,15 @@ apriori_cazymes  <- read.table(apriori_cazymes, header=T, sep=",", stringsAsFact
 rownames(apriori_cazymes) <- apriori_cazymes$cazyme
 #load taxonomic information for species:
 #add_info <- read.csv("stats_genomes.csv", sep=";", header=T) 
-add_info <- read.csv(genome_stats, sep=";", header=T) 
+add_info <- read.csv(genome_stats, sep=",", header=T) 
 print("done")
 print("Formatting data")
 #all cazyme data needs to be ordered so that the taxonomy matches (add_info is ordered alphabetically)
 all_cazy <- all_cazy[ order(row.names(all_cazy)), ]
+print("This check has to be true:")
+rownames(all_cazy) == add_info$name
+print(rownames(all_cazy))
+print(add_info$name)
 #data
 cazy_with_info <- cbind(all_cazy, add_info["class"])
 
