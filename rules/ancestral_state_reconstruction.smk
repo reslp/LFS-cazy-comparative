@@ -93,7 +93,7 @@ rule pca:
 		cazy_data = rules.ancestral_states_all_cazy.output.rdata,
 		check1 = rules.ancestral_states_all_cazy.output.checkpoint,
 		apriori_sets = "data/settings_and_parameters/apriori_cazyme_sets.txt",
-		genome_stats = config["stats_genomes"],
+		genome_stats = config["other_input"]["taxonomy_information"],
 		colors_file = "data/settings_and_parameters/color_information.csv"
 	output:
 		checkpoint = "results/checkpoints/pca.done",
