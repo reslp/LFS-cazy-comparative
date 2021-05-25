@@ -97,6 +97,23 @@ rule gene2gene_distance:
 		mv gene_length_species_medians.txt {output.gene_lengths}
 		mv gene2gene_species_medians.txt {output.gene2gene_distance}
 		"""
+rule get_cellulase_orthologs:
+	input:
+		cellulase_names = config["other_input"]["putative_cellulases"],
+		ids = "data/ids.txt"
+	output:
+		cellulase_orthologs = "results/statistics/cellulase_orthologs/cellulase_orthologs.tsv",
+		cellulase_orthologs_renamed = "results/statistics/cellulase_orthologs/cellulase_orthologs_renamed.tsv"
+	shell:
+		"""
+		searchstring=$(cat data/settings_and_parameters/cloned_putative_cellulases.txt | tr "\\n" "-" | sed 's/.$//' | sed -e 's#-#i\\\|#')
+		echo $searchstring
+		filename=$(grep -l "$searchstring" results/orthology/orthofinder/Results_ortho/Orthogroup_Sequences/*.fa)
+	 	echo $filename
+		cat $filename | grep ">" | cut -d"_" -f 1 | cut -d ">" -f 2 | sort | uniq -c | sed 's/pred//' | awk '{{print $2 "\t" $1}}' > {output.cellulase_orthologs}
+		awk 'NR==FNR{{a[$1]=$2; next}}{{$1=a[$1]; print}}' {input.ids} {output.cellulase_orthologs} > {output.cellulase_orthologs_renamed}
+		cp $filename results/statistics/cellulase_orthologs/
+		""" 
 
 rule genome_overview:
 	input:
@@ -105,22 +122,25 @@ rule genome_overview:
 		secmet_file = config["funannotate_input"]["secmet"],
 		stats_file = config["funannotate_input"]["genome_stats"],
 		gene_length = rules.gene2gene_distance.output.gene_lengths,
-		lifestyle_file = config["other_input"]["lifestyle"],
+		color_file = config["other_input"]["color_information"],
 		gene2gene_distance = rules.gene2gene_distance.output.gene2gene_distance,
-		tree_file = rules.extract_tree.output.ultra_tree
+		tree_file = rules.extract_tree.output.ultra_tree,
+		taxonomy_file = config["other_input"]["taxonomy_information"]
 	output:
 		checkpoint = "results/checkpoints/genome_overview.done",
-		p1 = "results/statistics/genomes.pdf",
+		p1 = "results/statistics/genomes_overview.pdf",
 		p2 = "results/statistics/Rplots.pdf",
-		p3 = "results/statistics/cazymes_overview_plus_transporters.pdf"
-	singularity: "docker://reslp/rphylogenetics:4.0.3"
+		p3 = "results/statistics/cazymes_overview_plus_transporters.pdf",
+		stats_file = "results/statistics/median_values.txt"
+	singularity: "docker://reslp/rphylogenetics:4.0.3_test"
 	shadow: "shallow"
 	shell:
 		"""
 		WD=$(pwd)
-		Rscript bin/plot_overview_new_compressed.R $WD {input.cogs_file} {input.cazy_file} {input.secmet_file} {input.stats_file} {input.gene2gene_distance} {input.gene_length} {input.tree_file} {input.lifestyle_file}
-		cp genomes.pdf {output.p1}
+		Rscript bin/plot_overview_new_compressed.R $WD {input.cogs_file} {input.cazy_file} {input.secmet_file} {input.stats_file} {input.gene2gene_distance} {input.gene_length} {input.tree_file} {input.color_file} {input.taxonomy_file}
+		cp genomes_overview.pdf {output.p1}
 		cp Rplots.pdf {output.p2}
 		cp cazymes_overview_plus_transporters.pdf {output.p3}
+		cp median_values_taxonomy.csv {output.stats_file}	
 		touch {output.checkpoint}
 		"""
