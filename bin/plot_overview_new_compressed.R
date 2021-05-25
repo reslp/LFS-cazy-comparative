@@ -19,7 +19,9 @@ stats_file <- args[5]
 gene2gene_file <- args[6]
 genelength_file <- args[7]
 tree_file <- args[8]
-lifestyle_file <- args[9]
+colors_file <- args[9]
+taxonomy_file <- args[10]
+#lifestyle_file <- args[9]
 
 #setwd("/Users/sinnafoch/Dropbox/Philipp/xylographa_comparative_genomics/tmp/new_overview")
 setwd(wd)
@@ -64,8 +66,13 @@ genelength$name <- NULL
 #secmet <- melt(secmet)
 #stats <- read.table("genome.stats.summary.csv", sep=",", header=T)
 stats <- read.table(stats_file, sep=",", header=T)
-lifestyles <- read.table(lifestyle_file, sep=",", header=T)
-rownames(lifestyles) <- lifestyles$name
+
+
+
+
+#if coloring for different lifestyles is used. currently it is not.
+#lifestyles <- read.table(lifestyle_file, sep=",", header=T)
+#rownames(lifestyles) <- lifestyles$name
 tree <- read.tree(tree_file)
 
 
@@ -79,6 +86,37 @@ stats2 <- as.data.frame(stats2)
 stats2$isolate <- NULL
 rownames(stats2) <- str_replace(rownames(stats2),"\\.","_")
 
+color_data <- read.csv(colors_file, sep=",", header=T, stringsAsFactors=F)
+tax_colors <- color_data$color
+names(tax_colors) <- color_data$taxonomy
+colors <- tax_colors
+
+taxonomy <- read.table(taxonomy_file, sep=",", header=T, stringsAsFactors=F)
+rownames(taxonomy) <- taxonomy$name
+
+taxnames <- taxonomy$class
+names(taxnames) <- taxonomy$name
+
+#asstign taxon colors
+
+#get_color <- function(taxon, colors) {
+#	return(unname(colors[taxon]))
+#}
+
+#for (taxon in names(taxnames)) {
+#	taxnames[taxon] <- get_color(taxnames[taxon], tax_colors)
+#}
+print(taxnames)
+# reorder by tree tip order
+taxnames <- taxnames[match(rownames(stats2), names(taxnames))]
+
+# add to stats2
+stats2$taxonomy <- taxnames
+
+print(stats2)
+
+#quit()
+
 #reformat to numeric for plotting
 stats2$Assembly_Size <- str_replace_all(str_replace(stats2$Assembly_Size," bp",""),",","")
 stats2$Assembly_Size <- trunc(as.numeric(stats2$Assembly_Size)/1000000)
@@ -90,8 +128,8 @@ stats2$Num_tRNA <- as.numeric(stats2$Num_tRNA)
 # order by other dataframe, maybe later by tree tip order
 stats2 <- stats2[match(tree$tip.label, rownames(stats2)),]
 #stats2
-lifestyles <- lifestyles[match(tree$tip.label, rownames(lifestyles)),]
-lifestyles
+#lifestyles <- lifestyles[match(tree$tip.label, rownames(lifestyles)),]
+#lifestyles
 cazy <- cazy[match(tree$tip.label, rownames(cazy)),]
 #cazy
 cazy_individual <- cazy_individual[match(tree$tip.label, rownames(cazy_individual)),]
@@ -112,7 +150,7 @@ cazy$name <- cazy_names
 #stats2$PF00083 <- pf00083
 #stats2
 #add lifestyles
-stats2$lifestyle <- lifestyles$lifestyle2
+#stats2$lifestyle <- lifestyles$lifestyle2
 stats2$Cazy <- cazy$Total
 stats2$gene2gene <- gene2gene
 stats2$genelength <- genelength
@@ -138,15 +176,16 @@ stats2$name <- rownames(stats2)
 stats2$name <- factor(stats2$name, levels=unique(stats2$name))
 
 #colors
-stats2$lifestyle
-lifestyle_colors <- c("#4b8ab8","#922a19", "#c3b4a5", "#6e5854", "#31394a")
-names(lifestyle_colors) <- unique(stats2$lifestyle)
-stats2
+#stats2$lifestyle
+#lifestyle_colors <- c("#4b8ab8","#922a19", "#c3b4a5", "#6e5854", "#31394a")
+#names(lifestyle_colors) <- unique(stats2$lifestyle)
+
+#stats2
 
 create_barplot <- function(df, y_data, fungal_names, title) {
-  ggplot(df, aes(x=name, y=y_data, fill=lifestyle)) +
+  ggplot(df, aes(x=name, y=y_data, fill=taxonomy)) +
     geom_bar(stat="identity", alpha = 0.8) +
-    scale_fill_manual(values = lifestyle_colors) +
+    scale_fill_manual(values = colors) +
     scale_y_continuous(position= "right") +
     ylab(title)+
     geom_hline(yintercept=median(y_data), linetype="dotted", color = "grey40")+
@@ -157,9 +196,9 @@ create_barplot <- function(df, y_data, fungal_names, title) {
 }
 
 create_dotplot <- function(df, y_data, fungal_names, title) {
-  ggplot(df, aes(x=name, y=y_data, color=lifestyle), label=y_data) +
+  ggplot(df, aes(x=name, y=y_data, color=taxonomy), label=y_data) +
     geom_point(stat="identity", alpha = 0.8, size=2) +
-    scale_color_manual(values = lifestyle_colors) +
+    scale_color_manual(values = colors) +
     scale_y_continuous(position= "right") +
     ylab(title)+
     geom_hline(yintercept=median(y_data), linetype="dotted", color = "grey40")+
@@ -182,7 +221,7 @@ layout <-
   ABCDEFG
   ABCDEFG
 "
-pdf(file="genomes.pdf", width=11, height=11.7)
+pdf(file="genomes_overview.pdf", width=11, height=11.7)
 print(p_genome_size + p_GC + p_genes + p_genelength + p_gene2gene + p_trna + p_cazy + plot_layout(design=layout))
 dev.off() 
 
@@ -210,7 +249,7 @@ pdf(file="cazymes_overview_plus_transporters.pdf", width=11, height=11.7)
 print(p_AA + p_CBM + p_CE + p_GH + p_GT + p_PL + plot_layout(design=layout2))
 dev.off()
 
-write.csv(file="median_values_lifestyles.csv", aggregate(.~lifestyle, data=stats2, median), row.names = F, quote=F)
+write.csv(file="median_values_taxonomy.csv", aggregate(.~taxonomy, data=stats2, median), row.names = F, quote=F)
 
 # now plot different transporter groups the same way:
 #colnames(transporters)
