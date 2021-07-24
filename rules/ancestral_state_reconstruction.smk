@@ -94,18 +94,21 @@ rule pca:
 		check1 = rules.ancestral_states_all_cazy.output.checkpoint,
 		apriori_sets = "data/settings_and_parameters/apriori_cazyme_sets.txt",
 		genome_stats = config["other_input"]["taxonomy_information"],
-		colors_file = "data/settings_and_parameters/color_information.csv"
+		colors_file = "data/settings_and_parameters/color_information.csv",
+		peroxi_gene_counts = rules.parse_orthofinder_peroxi.output.gene_counts
 	output:
 		checkpoint = "results/checkpoints/pca.done",
-		dir = directory("results/ancestral_states_cazy/pca/")
+		dir = directory("results/geneset_similarity/")
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
-	conda:
-		"../envs/rreroot.yml"
+	#conda:
+	#	"../envs/rreroot.yml"
+	singularity:
+		"docker://reslp/rphylogenetics:4.0.3"
 	shell:
 		"""
-		Rscript bin/phyl_pca.R {input.cazy_data} {input.colors_file} {input.apriori_sets} {input.genome_stats} {output.dir} 
+		Rscript bin/phyl_pca.R {input.cazy_data} {input.colors_file} {input.apriori_sets} {input.genome_stats} {input.peroxi_gene_counts} {output.dir} 
 		touch {output.checkpoint}
 		"""
 
