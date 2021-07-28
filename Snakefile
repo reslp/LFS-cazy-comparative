@@ -82,7 +82,6 @@ rule ancestral_states:
 	input:
 		rules.phylogeny.output,
 		#"results/checkpoints/plot_ancestral_states_cazy_all.done",
-		"results/checkpoints/pca.done",
 		"results/checkpoints/plot_ancestral_states.done"
 	output:
 		"results/checkpoints/ancestral_states.done"
@@ -90,6 +89,12 @@ rule ancestral_states:
 		"""
 		touch {output}
 		"""
+
+rule geneset_similarity:
+	input:
+		"results/geneset_similarity/pca.done",
+		"results/geneset_similarity/overview_cazyme_counts.csv"
+
 terms = config["cazy_characterization"]["terms"].split(" ")
 rule cazy_characterization:
 	input:
@@ -169,6 +174,7 @@ include: "rules/phylogeny.smk"
 include: "rules/statistics.smk"
 include: "rules/peroxidase_characterization.smk"
 include: "rules/ancestral_state_reconstruction.smk"
+include: "rules/geneset_similarity.smk"
 include: "rules/saccharis.smk"
 include: "rules/character_correlation.smk"
 include: "rules/cafe.smk"

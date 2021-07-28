@@ -24,6 +24,7 @@ other_input:
         taxonomy_information: "data/settings_and_parameters/taxonomy_information.csv" 
         putative_cellulases: "data/settings_and_parameters/cloned_putative_cellulases.txt"
         characterized_transporters: "data/sugar_transporters_characterized_reference_seqs.fa"
+        peroxidase_sequences: "data/all_ascomycota_peroxidases_redoxibase.fas"
 #these input files come from phylociraptor:
 phylogeny: 
         precalculated: "yes"
@@ -51,7 +52,7 @@ funannotate_input:
 cazy_characterization:
         #terms: xylanase β-mannanase cellulase PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
         #terms: GH5 GH43 PL2 PL2 PL3 PL4 PL7 PL8 PL9 PL11 PL14 PL20 PL22 PL26 PL27 PL23
-        terms: GH5 GH43 GH18 CE10 AA3 AA7 AA9 GH79
+        terms: AA3 AA9 CBM1 CBM13 CBM35 CBM6 CBM66 GH10 GH1 GH11 GH12 GH141 GH16 GH2 GH26 GH27 GH29 GH30 GH3 GH31 GH35 GH36 GH39 GH43 GH45 GH5 GH51 GH55 GH6 GH67 GH7 GH72 GH74 GH95 AA1 AA2 AA5 CE8 GH105 GH28 GH49 GH53 GH79 GH88 PL1 PL3 PL4 PL9 
 
 # threading information for multithreaded rules:
 threads:
@@ -62,4 +63,4 @@ threads:
         saccharis: 16
         deeploc: 16
         run_cafe: 16
-        infer_orthology: 10
+        infer_orthology: 20
