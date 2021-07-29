@@ -62,11 +62,11 @@ pvalues <- c()
 for (cat in colnames(cazy_sum_data)) {
   cats <- c(cats, cat)
   lecanoro_counts <- cazy_sum_data[rownames(cazy_sum_data) %in% lecanoromycetes_names,][,cat]
-  sum_lecanoro_counts <- c(sum_lecanoro_counts,sum(lecanoro_counts))
+  sum_lecanoro_counts <- c(sum_lecanoro_counts,mean(lecanoro_counts))
   other_asco_counts <- cazy_sum_data[rownames(cazy_sum_data) %in% non_lecanoromycetes_names,][,cat]
-  sum_other_asco_counts <- c(sum_other_asco_counts, sum(other_asco_counts))
+  sum_other_asco_counts <- c(sum_other_asco_counts, mean(other_asco_counts))
   
-  percent_dif <- c(percent_dif,100-(100/sum(other_asco_counts)*sum(lecanoro_counts)))
+  percent_dif <- c(percent_dif,100-(100/mean(other_asco_counts)*mean(lecanoro_counts)))
   test <- wilcox.test(lecanoro_counts, other_asco_counts)
   pvalues <- c(pvalues, test$p.value)
   #print(paste(cat, sum(lecanoro_counts), sum(other_asco_counts), percent_dif, test$p.value, sep=" "))
