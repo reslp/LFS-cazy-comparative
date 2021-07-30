@@ -65,6 +65,10 @@ end <- 40
 
 filename <- plotfile
 
+print(colnames(cellulose_df))
+cellulose_df <- cellulose_df[,order(colnames(cellulose_df))]
+print(colnames(cellulose_df))
+
 pdf(filename, width=11.7, height=9.3)
 
 for (i in 1:npages) {
