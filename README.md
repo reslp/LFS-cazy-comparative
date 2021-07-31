@@ -1,4 +1,4 @@
-# CAZymes in LFS
+# CAZymes in Lichen fungal symbionts
 
 This repository contains the analysis pipeline used to generate the comparative genomic results of the Manuscript: Large differences in carbohydrate degradation and transport potential in the genomes of lichen fungal symbionts. BioRxiv XXX
 
