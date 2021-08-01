@@ -2,6 +2,8 @@
 
 This repository contains the analysis pipeline used to generate the comparative genomic results of the Manuscript: Large differences in carbohydrate degradation and transport potential in the genomes of lichen fungal symbionts. BioRxiv XXX
 
+Note: The code here is not final, so work on the pipeline will continue to make sure everything runs smoothly when the manuscript gets published.
+
 ## Prerequisites
 The pipline was designed in such a way that it can run desktop computers (although this is discouraged), solitary linux servers or large HPC clusters. As a result, needed requirements depend.
 
