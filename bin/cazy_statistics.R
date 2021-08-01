@@ -38,6 +38,11 @@ calc_diff <- function(V1, V2) {
 	return(diff)
 }
 
+# formula to calculate increase/decrease:
+calc_inc <- function(V1, V2) {
+	inc <- ((V1 - V2) / V2) * 100
+	return(inc)
+}
 
 cats <- c()
 sum_lecanoromycetes_counts <- c()
@@ -45,12 +50,21 @@ sum_lecanoro_counts <- c()
 sum_ostropo_all_counts <- c()
 sum_ostropo_counts <- c()
 sum_ostropales_counts <- c()
+
 percent_dif_ostropo <- c()
 percent_dif_ostropo_all <- c()
 percent_dif_ostropo_lecanoro <- c()
 percent_dif_ostropales <- c()
 percent_dif_lecanoro <- c()
 percent_dif_lecanoromycetes <- c()
+
+percent_inc_ostropo <- c()
+percent_inc_ostropo_all <- c()
+percent_inc_ostropo_lecanoro <- c()
+percent_inc_ostropales <- c()
+percent_inc_lecanoro <- c()
+percent_inc_lecanoromycetes <- c()
+
 sum_other_asco_counts <- c()
 pvalues_ostropo <- c()
 pvalues_ostropo_all <- c()
@@ -98,6 +112,20 @@ for (cat in colnames(cazy_sum_data)) {
   percent_dif_lecanoro <- c(percent_dif_lecanoro,calc_diff(mean(lecanoro_counts),mean(other_asco_counts)))
   # Lecanoromycetes vs. other fungi
   percent_dif_lecanoromycetes <- c(percent_dif_lecanoromycetes,calc_diff(mean(lecanoromycetes_counts),mean(other_asco_counts)))
+  
+  # caculate the % increase between mean values found in different tax groups:
+  # Ostropomycetidae without OG vs other fungi
+  percent_inc_ostropo <- c(percent_inc_ostropo, calc_inc(mean(ostropo_counts), mean(other_asco_counts)))
+  # Ostropomycetidae vs other fungi
+  percent_inc_ostropo_all <- c(percent_inc_ostropo_all, calc_inc(mean(ostropo_all_counts), mean(other_asco_counts)))
+  # Ostropomycetidae vs. other fungi
+  percent_inc_ostropo_lecanoro <- c(percent_inc_ostropo_lecanoro, calc_inc(mean(ostropo_all_counts), mean(lecanoro_counts)))
+  # OG clade vs. other fungi
+  percent_inc_ostropales <- c(percent_inc_ostropales,calc_inc(mean(ostropales_counts),mean(other_asco_counts)))
+  # Lecanoromycetidae vs. other fungi
+  percent_inc_lecanoro <- c(percent_inc_lecanoro,calc_inc(mean(lecanoro_counts),mean(other_asco_counts)))
+  # Lecanoromycetes vs. other fungi
+  percent_inc_lecanoromycetes <- c(percent_inc_lecanoromycetes,calc_inc(mean(lecanoromycetes_counts),mean(other_asco_counts)))
   
   #compare Lecanoromycetes with other fungi
   test0 <- wilcox.test(lecanoromycetes_counts, other_asco_counts)
@@ -151,6 +179,12 @@ df <- data.frame(
 	Percent_Difference_Ostropomycetidae_noOG= percent_dif_ostropo,
 	Percent_Difference_Ostropales= percent_dif_ostropales,
 	Percent_Difference_OstroLecano= percent_dif_ostropo_lecanoro,
+	Percent_Increase_Lecanoromycetes=percent_inc_lecanoromycetes,
+	Percent_Increase_Lecanoromycetidae = percent_inc_lecanoro,
+	Percent_Increase_Ostropomycetidae= percent_inc_ostropo_all,
+	Percent_Increase_Ostropomycetidae_noOG= percent_inc_ostropo,
+	Percent_Increase_Ostropales= percent_inc_ostropales,
+	Percent_Increase_OstroLecano= percent_inc_ostropo_lecanoro,
 	Pvalue_lecanoromycetes = pvalues_lecanoromycetes,
 	Pvalue_lecanoro = pvalues_lecanoro,
 	Pvalue_ostropo = pvalues_ostropo_all,
