@@ -5,7 +5,7 @@ This repository contains the analysis pipeline used to generate the comparative 
 Note: The code here is not final, so work on the pipeline will continue to make sure everything runs smoothly when the manuscript gets published.
 
 ## Prerequisites
-The pipline was designed in such a way that it can run desktop computers (although this is discouraged), solitary linux servers or large HPC clusters. As a result, needed requirements depend.
+The pipline was designed in such a way that it can run desktop computers (although this is discouraged), solitary linux servers or large HPC clusters. As a result, needed requirements depend. We strongly encourage to run this on an HPC system, to be able to benefit from parallelization of different tasks. We support the commonly used job sheduling systems SGE and SLURM.
 
 Local computer or solitary server:
 
