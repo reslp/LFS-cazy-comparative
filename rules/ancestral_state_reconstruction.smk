@@ -100,8 +100,10 @@ rule plot_ancestral_states_cazy_all:
 	params:
 		wd = os.getcwd(),
 		prefix = config["prefix"]
-	conda:
-		"../envs/rreroot.yml"
+	#conda:
+	#	"../envs/rreroot.yml"
+	singularity:
+		"docker://reslp/rphylogenetics:4.0.3"
 	shell:
 		"""
 		#rdata={params.wd}/results/ancestral_states_cazy/plots/{params.prefix}_all_anc_cazy_all.RData
