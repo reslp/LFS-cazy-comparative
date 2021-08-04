@@ -83,3 +83,19 @@ rule parse_orthofinder_peroxi:
 		cat {input.peroxi_seqs} | grep ">" | sed 's/>//' | awk -F"|" '{{printf$1"_"$2"\\t"$5"\\n"}}' > {output.pod_mapping}
 		bin/rename_orthofinder_counts.py --orthogroups-file results/peroxidase_characterization/orthofinder/Results_ortho/Orthogroups/Orthogroups.txt --mapping-file {output.pod_mapping} --counts-file results/peroxidase_characterization/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv > {output.gene_counts}
 		"""
+
+
+rule plot_peroxidases:
+	input:
+		countsfile = rules.parse_orthofinder_peroxi.output.gene_counts,
+		treefile = rules.extract_tree.output.ultra_tree		
+	output:
+		"results/peroxidase_characterization/pod_heatmap.pdf"
+	singularity:
+		"docker://reslp/rphylogenetics:4.0.3"
+	params:
+		wd = os.getcwd()
+	shell:
+		"""
+		Rscript bin/POD_heatmap.R {params.wd}/results/peroxidase_characterization {input.treefile} {input.countsfile}	
+		"""

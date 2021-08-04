@@ -158,6 +158,10 @@ rule gene_family_evolution:
 		touch {output}
 		"""
 
+rule characterize_peroxidases:
+	input:
+		"results/peroxidase_characterization/pod_heatmap.pdf"
+
 
 def remove_donefile(files):
 	new_files = []
