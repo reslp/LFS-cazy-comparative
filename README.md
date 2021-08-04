@@ -1,6 +1,6 @@
 # CAZymes in Lichen fungal symbionts
 
-This repository contains the analysis pipeline used to generate the comparative genomic results of the Manuscript: Large differences in carbohydrate degradation and transport potential in the genomes of lichen fungal symbionts. BioRxiv XXX
+This repository contains the analysis pipeline used to generate the comparative genomic results of the Manuscript: Large differences in carbohydrate degradation and transport potential in the genomes of lichen fungal symbionts. This study is currently available as preprint on BioRxiv: https://www.biorxiv.org/content/10.1101/2021.08.01.454614v1. *If you use parts of this repository please cite us.*
 
 Note: The code here is not final, so work on the pipeline will continue to make sure everything runs smoothly when the manuscript gets published.
 
@@ -69,7 +69,7 @@ The commands here assume the pipeline is run an SGE cluster (in this case Sauron
 
 7. To run peroxidase orthology analysis:
 ```
-./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r peroxidase_characterization"
+./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r characterize_peroxidases"
 ```
 
 8. To run gene family expansion analysis with CAFE:
