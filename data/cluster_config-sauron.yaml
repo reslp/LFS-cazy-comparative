@@ -153,3 +153,11 @@ peroxidase_diamond:
    N: perdia
 filter_peroxidase_sequences:
    N: filperseq
+plot_transporters:
+   N: pltrans
+plot_peroxidases:
+   N: plperoxi
+parse_orthofinder_transporter:
+   N: paoftrans
+parse_orthofinder_peroxi:
+   N: paofpero
