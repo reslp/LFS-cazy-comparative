@@ -31,16 +31,16 @@ For the pipeline to run you will have to change a few things:
 Different steps of the pipeline can be run individually to generate results:
 The commands here assume the pipeline is run an SGE cluster (in this case Sauron, the HPC cluster of the University of Graz). The commands below have to be executed in the base directory of the repository.
 
-1. To calculate gene and site concordance factors and plot phylogenetic trees:
+1. To calculate gene and site concordance factors and plot phylogenetic trees. The phylogeny itself was calculated using phylociraptor (https://github.com/reslp/phylociraptor):
 	
 ```
-./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r plot_phylogeny"
+./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r phylogeny"
 ```
 
 2. To calculate ancestral CAZyme family size and create plots:
 
 ```
-./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r ancestral_states"
+./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r reconstruct_ancestral_states"
 ```
 
 3. To calculate PCA and phylogenetically corrected PCA for CAZyme sets, as well as % differences between different taxonomic groups:
@@ -52,7 +52,7 @@ The commands here assume the pipeline is run an SGE cluster (in this case Sauron
 4. To perform subcellular location prediction, data mining of cazy.org and phylogenetic characterization of CAZyme families run: 
 
 ```
-./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r cazy_characterization"
+./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r characterize_cazymes"
 ```
 
 5. To calculate genome overview statistics run:
@@ -64,7 +64,7 @@ The commands here assume the pipeline is run an SGE cluster (in this case Sauron
 6. To run sugar transporter orthology analysis:
 
 ```
-./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r transporter_characterization"
+./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r characterize_transporters"
 ```
 
 7. To run peroxidase orthology analysis:
@@ -75,7 +75,7 @@ The commands here assume the pipeline is run an SGE cluster (in this case Sauron
 8. To run gene family expansion analysis with CAFE:
 
 ```
-./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r gene_family_evolution"
+./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r infer_gene_family_evolution"
 ```
 
 

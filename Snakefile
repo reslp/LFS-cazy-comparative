@@ -1,57 +1,6 @@
 singularity: "docker://continuumio/miniconda3:4.7.10"
-#singularity: "docker://conda/miniconda3-centos7"
 configfile: "data/config.yaml"
 
-#print(config)
-
-#rule all:
-#	input:
-#		#expand("results/{pre}/checkpoints/get_upstream_inputfiles.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/statistics.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/infer_orthology.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/rename_ortholog_sequences.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/align_aa.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/trim.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/iqtree_concat.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/iqtree_gene_trees.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/iqtree_gene_concordance.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/reroot_tree.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/create_r8s_controlfile.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/run_r8s.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/extract_tree.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/cazy_anc_summary.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/ancestral_states_cazy.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/similarity_clustering.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/orthology_statistics.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/plot_phylogeny.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/create_gene_family_table.done", pre=config["prefix"]),
-#		# next lines are CAFE related parts
-#		#expand("results/{pre}/checkpoints/filter_cafe_family_table.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/create_cafe_style_tree.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/create_cafe_commands.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/run_cafe.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/parse_cafe_output.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/visualize_cafe_output.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/extract_functional_from_cafe.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/visualize_function_annotations_cafe.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/astral_species_tree.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/extract_gh5_genes.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/combine_gh5_genes_and_reference.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/align_gh5.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/trim_gh5.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/iqtree_gh5.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/ancestral_states_cazy_all.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/plot_genome_overview.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/summarize_secreted_and_cazy.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/plot_ancestral_states_cazy_all.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/character_correlation.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/extract_cazy_proteins.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/saccharis.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/plot_saccharis_trees.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/phylosig.done", pre=config["prefix"]),
-#		expand("results/{pre}/checkpoints/pca.done", pre = config["prefix"]),
-#		#expand("results/{pre}/checkpoints/create_codon_alignments.done", pre=config["prefix"]),
-#		#expand("results/{pre}/checkpoints/run_codeml.done", pre=config["prefix"])
 
 rule all:
 	input:
@@ -78,7 +27,7 @@ rule phylogeny:
 		touch {output}
 		"""
 
-rule ancestral_states:
+rule reconstruct_ancestral_states:
 	input:
 		rules.phylogeny.output,
 		#"results/checkpoints/plot_ancestral_states_cazy_all.done",
@@ -96,7 +45,7 @@ rule geneset_similarity:
 		"results/geneset_similarity/overview_cazyme_counts.csv"
 
 terms = config["cazy_characterization"]["terms"].split(" ")
-rule cazy_characterization:
+rule characterize_cazymes:
 	input:
 		expand("results/cazy_characterization/saccharis/saccharis_{term}.done", term=terms),
 		expand("results/cazy_characterization/deeploc/checkpoints/deeploc_{term}.done", term=terms),
@@ -125,26 +74,12 @@ rule orthology:
 		"""
 		touch {output}
 		"""
-			
-#rule all_transporter_tree:
-#	input:
-#                #expand("results/{pre}/checkpoints/extract_transporter_genes.done", pre=config["prefix"]),
-#                #expand("results/{pre}/checkpoints/combine_transporter_genes_and_reference.done", pre=config["prefix"]),
-#                #expand("results/{pre}/checkpoints/align_transporter.done", pre=config["prefix"]),
-#                #expand("results/{pre}/checkpoints/trim_transporter.done", pre=config["prefix"]),
-#                expand("results/{pre}/checkpoints/iqtree_transporter.done", pre=config["prefix"])
-#	output:
-#		expand("results/{pre}/checkpoints/characterize_transporters.done", pre=config["prefix"])
-#	shell:
-#		"""
-#		touch {output}
-#		"""
 
 rule characterize_transporters:
 	input:
 		"results/transporter_characterization/orthofinder.done"
 
-rule gene_family_evolution:
+rule infer_gene_family_evolution:
 	input:
 		"results/gene_family_evolution/cafe/raw_cafe_input_file.tab",
 		"results/gene_family_evolution/cafe/cafe_tree.tre",
