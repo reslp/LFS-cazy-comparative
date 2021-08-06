@@ -26,14 +26,46 @@ rule orthofinder_transporter:
 	threads: config["threads"]["infer_orthology"]
 	shell:
 		"""
-		cp {input.characterized_genes} results/transporter_characterization/proteins/Characterized_transporters.fa
-		ulimit -n 3000	
+		#cp {input.characterized_genes} results/transporter_characterization/proteins/Characterized_transporters.fa
+		cat {input.characterized_genes} |  awk -F"_" '{{if ($1 ~ />/ ) {{print $1"_"$2"_"$3"_"$4}} else {{print}}}}' > results/transporter_characterization/proteins/Characterized_transporters.fa
+		# this is only necessary in case there is a limit for how many files can be opened at the same time
+		# this was a problem with Sauron and it has been fixed now.
+		#ulimit -n 3000	
+		echo "Ulimit hard: "$(ulimit -Hn)
+		echo "Ulimit soft: "$(ulimit -Sn)	
 		orthofinder -f results/transporter_characterization/proteins -o results/transporter_characterization/orthofinder -n ortho -S diamond -t {threads}
 		touch {output}
 		"""
-		
-		
-		
+				
+rule parse_orthofinder_transporter:
+	input:
+		rules.orthofinder_transporter.output,
+		transporter_seqs = config["other_input"]["characterized_transporters"]
+	output:
+		trans_mapping = "results/transporter_characterization/TRANSPORTER_name_mapping.txt",
+		gene_counts = "results/transporter_characterization/Orthogroups.GeneCount.renamed.tsv"
+	singularity:
+		"docker://reslp/biopython_plus:1.77"
+	shell:
+		"""
+		cat {input.transporter_seqs} | grep ">" | sed 's/>//' | awk -F"_" '{{printf $1"_"$2"_"$3"_"$4"\\t"$1"\\n"}}' | sed 's/ /_/g' > {output.trans_mapping}
+		bin/rename_orthofinder_counts.py --orthogroups-file results/transporter_characterization/orthofinder/Results_ortho/Orthogroups/Orthogroups.txt --mapping-file {output.trans_mapping} --counts-file results/transporter_characterization/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv > {output.gene_counts}
+		"""
+
+rule plot_transporters:
+	input:
+		countsfile = rules.parse_orthofinder_transporter.output.gene_counts,
+		treefile = rules.extract_tree.output.ultra_tree		
+	output:
+		"results/transporter_characterization/transporter_heatmap.pdf"
+	singularity:
+		"docker://reslp/rphylogenetics:4.0.3"
+	params:
+		wd = os.getcwd()
+	shell:
+		"""
+		Rscript bin/transporter_heatmap.R {params.wd}/results/transporter_characterization {input.treefile} {input.countsfile}	
+		"""
 
 #rule extract_transporter_genes:
 #	input:
