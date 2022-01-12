@@ -92,18 +92,18 @@ for (i in 1:npages) {
   offset3 <- 0.45
   psummary <- psummary + 
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 70-offset, ymax = 93+offset3), fill = "transparent", color = "#81D93A", size = 0.2) + 
-	geom_text(aes(41.3,82), label ="Ostropomycetidae", angle=-90, size = 3, color="#81D93A") + 
+	annotate("text", x=41.3, y=82, label ="Ostropomycetidae", angle=-90, size = 3, color="#81D93A") + 
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 53-offset, ymax = 69+offset3), fill = "transparent", color = "#33a02c", size = 0.2) + 
-	geom_text(aes(41.3,61), label ="Lecanoromycetidae", angle=-90, size = 3, color="#33a02c") + 
+	annotate("text", x=41.3,y=61, label ="Lecanoromycetidae", angle=-90, size = 3, color="#33a02c") + 
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 78-offset, ymax = 82+offset3), fill = "transparent", color = "black", size = 0.2) + 
-	geom_text(aes(40.8,79.8), label ="OG clade", angle=-90, size = 2) +
+	annotate("text",x=40.8,y=79.8, label ="OG clade", angle=-90, size = 2) +
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 48-offset, ymax = 52+offset3), fill = "transparent", color = "grey", size = 0.2) + 
-	geom_text(aes(40.8,49.5), label ="*", size = 4, color="grey") +
+	annotate("text", x=40.8,y=49.5, label ="*", size = 4, color="grey") +
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 11-offset, ymax = 11+offset3), fill = "transparent", color = "grey", size = 0.2) + 
-	geom_text(aes(40.8,10.7), label ="*", size = 4, color="grey") +
+	annotate("text", x=40.8,y=10.7, label ="*", size = 4, color="grey") +
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 33-offset, ymax = 33+offset3), fill = "transparent", color = "grey", size = 0.2) + 
-	geom_text(aes(40.8,32.7), label ="*", size = 4, color="grey") +
-	geom_text(aes(35,-0.2), label ="*) lichen fungi outside Lecanoromycetes", size = 3, color="grey") +
+	annotate("text", x=40.8,y=32.7, label ="*", size = 4, color="grey") +
+	annotate("text", x=35,y=-0.2, label ="*) lichen fungi outside Lecanoromycetes", size = 3, color="grey") +
 	coord_cartesian(ylim = c(0.5, 93), xlim = c(0.5, 40), clip="off") #+ theme(plot.margin=unit(c(1,3,1,1), "lines" ))
   #psummary
   psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = unique(plot_df_sum$category)) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size,angle=45, hjust = 0, colour = "grey50"))
