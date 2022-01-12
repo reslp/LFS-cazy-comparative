@@ -97,7 +97,7 @@ for (i in 1:npages) {
 	geom_text(aes(41.3,61), label ="Lecanoromycetidae", angle=-90, size = 3, color="#33a02c") + 
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 78-offset, ymax = 82+offset3), fill = "transparent", color = "black", size = 0.2) + 
 	geom_text(aes(40.8,79.8), label ="OG clade", angle=-90, size = 2) +
-	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 53-offset, ymax = 47+offset3), fill = "transparent", color = "grey", size = 0.2) + 
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 48-offset, ymax = 52+offset3), fill = "transparent", color = "grey", size = 0.2) + 
 	geom_text(aes(40.8,49.5), label ="*", size = 4, color="grey") +
 	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 11-offset, ymax = 11+offset3), fill = "transparent", color = "grey", size = 0.2) + 
 	geom_text(aes(40.8,10.7), label ="*", size = 4, color="grey") +
