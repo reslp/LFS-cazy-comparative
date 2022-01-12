@@ -69,6 +69,7 @@ print(colnames(cellulose_df))
 cellulose_df <- cellulose_df[,order(colnames(cellulose_df))]
 print(colnames(cellulose_df))
 
+label_order <- gsub("_", " ", label_order)
 pdf(filename, width=11.7, height=9.3)
 
 for (i in 1:npages) {
@@ -80,11 +81,32 @@ for (i in 1:npages) {
   #plot_df_sum$category <- as.character(plot_df_sum$category)
   
   y_lab_text_size <- 7
+  plot_df_sum$label <- gsub("_", " ", plot_df_sum$label)
   plot_df_sum$label <- factor(plot_df_sum$label, levels = rev(label_order)) # to maintain order as it is in the tree
-  psummary <- ggplot(plot_df_sum, aes(x=category, y=label)) + geom_tile(aes(fill=value))  +scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449") + geom_text(aes(label = ifelse(plot_df_sum$value >0, plot_df_sum$value, "")), colour="grey50", size=2)
-  psummary
-  #psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = omitt_fake_labels(unique(plot_df_sum$category))) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size *0.6,angle=45, hjust = 0, colour = "grey50"))
-  psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = unique(plot_df_sum$category)) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size *0.6,angle=45, hjust = 0, colour = "grey50"))
+  print(paste0("Number of labels: ", length(unique(plot_df_sum$label))))
+  print(paste0("Number of categories: ", length(unique(plot_df_sum$category))))
+  psummary <- ggplot(plot_df_sum, aes(x=category, y=label)) + geom_tile(aes(fill=value))  + geom_text(aes(label = ifelse(plot_df_sum$value >= 1, plot_df_sum$value, "")), colour="grey51", size=2) + scale_fill_gradient2(low = "#EAF4F7",   high = "#F06449") 
+  # added as by reviewers suggestion to make it easier to delimit different groups:
+  offset <- 0.5
+  offset2 <- 0.48
+  offset3 <- 0.45
+  psummary <- psummary + 
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 70-offset, ymax = 93+offset3), fill = "transparent", color = "#81D93A", size = 0.2) + 
+	geom_text(aes(41.3,82), label ="Ostropomycetidae", angle=-90, size = 3, color="#81D93A") + 
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 53-offset, ymax = 69+offset3), fill = "transparent", color = "#33a02c", size = 0.2) + 
+	geom_text(aes(41.3,61), label ="Lecanoromycetidae", angle=-90, size = 3, color="#33a02c") + 
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 78-offset, ymax = 82+offset3), fill = "transparent", color = "black", size = 0.2) + 
+	geom_text(aes(40.8,79.8), label ="OG clade", angle=-90, size = 2) +
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 53-offset, ymax = 47+offset3), fill = "transparent", color = "grey", size = 0.2) + 
+	geom_text(aes(40.8,49.5), label ="*", size = 4, color="grey") +
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 11-offset, ymax = 11+offset3), fill = "transparent", color = "grey", size = 0.2) + 
+	geom_text(aes(40.8,10.7), label ="*", size = 4, color="grey") +
+	geom_rect(aes(xmin = 1-offset2, xmax = 40+offset2, ymin = 33-offset, ymax = 33+offset3), fill = "transparent", color = "grey", size = 0.2) + 
+	geom_text(aes(40.8,32.7), label ="*", size = 4, color="grey") +
+	geom_text(aes(35,-0.2), label ="*) lichen fungi outside Lecanoromycetes", size = 3, color="grey") +
+	coord_cartesian(ylim = c(0.5, 93), xlim = c(0.5, 40), clip="off") #+ theme(plot.margin=unit(c(1,3,1,1), "lines" ))
+  #psummary
+  psummary <- psummary + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0),position="top",labels = unique(plot_df_sum$category)) +scale_y_discrete(expand = c(0, 0)) + theme(plot.margin = margin(0, 1, 1, 0, "cm"),legend.position = "none",axis.ticks = element_blank(), axis.text.y=element_text(size=y_lab_text_size), axis.text.x = element_text(size = base_size,angle=45, hjust = 0, colour = "grey50"))
   
   #print(all_plots)
   print(psummary)
