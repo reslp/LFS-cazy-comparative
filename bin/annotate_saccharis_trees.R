@@ -478,7 +478,7 @@ p <- dd + theme(plot.margin = margin(-2, 0, -2, -2, "cm"))
 p
 
 pdf(file=paste(out_prefix,"/",family,"_straight.pdf",sep=""), width=7.3, height=11.8)
-dd
+dd + coord_cartesian(clip="off")
 dev.off()
 
 num_cat_tax <- c("Archaea", "Bacteria","Viruses", "Eukaryota", "Lecanoromycetes", "Leotiomycetes", "Sordariomycetes", "Arthoniomycetes", "Dothideomycetes", "Eurotiomycetes", "unclassified")
