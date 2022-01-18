@@ -62,23 +62,41 @@ add_info$name
 #remove gene families which have all zero values:
 data_peroxi <- data_peroxi[,colSums(data_peroxi)> 0]
 
-classII_cols <- c()
-print("Searching for Class_II peroxidases")
+#classII_cols <- c()
+#print("Searching for Class_II peroxidases")
+#for (i in 1:length(colnames(data_peroxi))) {
+#	if (grepl("Class_II",colnames(data_peroxi)[i], fixed=TRUE)) {
+#		classII_cols <- c(classII_cols, i)
+#	}
+#}
+haloperoxi_cols <- c()
+print("Searching for Haloperoxidases")
 for (i in 1:length(colnames(data_peroxi))) {
-	if (grepl("Class_II",colnames(data_peroxi)[i], fixed=TRUE)) {
-		classII_cols <- c(classII_cols, i)
+	if (grepl("Haloperoxidase",colnames(data_peroxi)[i], fixed=TRUE)) {
+		haloperoxi_cols <- c(haloperoxi_cols, i)
 	}
 }
-print("Respective columns are:")
-classII_cols
+dypperoxi_cols <- c()
+print("Searching for DyP-peroxidases")
+for (i in 1:length(colnames(data_peroxi))) {
+	if (grepl("DyP",colnames(data_peroxi)[i], fixed=TRUE)) {
+		dypperoxi_cols <- c(dypperoxi_cols, i)
+	}
+}
+print("Respective Halo columns are:")
+haloperoxi_cols
+print("Respective DyP columns are:")
+dypperoxi_cols
+
+haeme_dyp_cols <- c(haloperoxi_cols, dypperoxi_cols)
 # make sure returned structure is a dataframe (with a single column it is a vector)
 # then calculate rowsums in case there are multiple columns and tranform named vector to dataframe again so in can be joined with rest of data
-classII_data <- as.data.frame(rowSums(as.data.frame(data_peroxi[,classII_cols])))
-colnames(classII_data) <- "classIIpods"
+haeme_dyp_data <- as.data.frame(rowSums(as.data.frame(data_peroxi[,haeme_dyp_cols])))
+colnames(haeme_dyp_data) <- "haeme_dyp"
 
 # combine all dataframes into one.
-cazy_with_info <- cbind(all_cazy, classII_data, add_info["class"])
-all_cazy <- cbind(all_cazy, classII_data)
+cazy_with_info <- cbind(all_cazy, haeme_dyp_data, add_info["class"])
+all_cazy <- cbind(all_cazy, haeme_dyp_data)
 
 print("Combined dataset has columns:")
 colnames(cazy_with_info)
@@ -161,15 +179,15 @@ for (i in 1:length(setnames)) {
 	print("Starting with normal PCA")
 	# now create a plot with a normal PCA but with the reconstructed ancestral states on different nodes:
 	ancestral_states$name <- NULL
-	# have to remove classII pods from normal PCA first because we have no ancestral states for them
-	set <- set[set != "classIIpods"]
+	# have to remove haeme_dyp pods from normal PCA first because we have no ancestral states for them
+	set <- set[set != "haeme_dyp"]
 	if (set == "phylosig") {
 		ancestral_states_sub <- ancestral_states[,colnames(ancestral_states) %in% sign_cazymes$cazyme]
 	} else {
 		ancestral_states_sub <- ancestral_states[,colnames(ancestral_states) %in% apriori_cazymes$cazyme[apriori_cazymes[,set] == 1]]
 	}
-	# again have to remove classII from normal PCA because we have no ancestral states data for them
-	cazy_subset$classIIpods <- NULL
+	# again have to remove haeme_dyp from normal PCA because we have no ancestral states data for them
+	cazy_subset$haeme_dyp <- NULL
 	cazy_subset2 <- rbind(cazy_subset, ancestral_states_sub)
 	
 	#rownames(cazy_subset2)
