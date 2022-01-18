@@ -150,8 +150,18 @@ data <- data[match(labels, rownames(data)), ]
 #exclude columns with 0 orthologs
 data <- data[,colSums(data)> 0]
 
+
+
 colnames(data) <- gsub("__", "\n", colnames(data))
 
+#summarize haeme and DyP peroxidases:
+dyp_haeme_names <- c("DyP.type_peroxidase_D", "DyP.type_peroxidase_B", "DyP.type_peroxidase_B.1", "Haloperoxidase_.haem..2", "Haloperoxidase_.haem.", "Haloperoxidase_.haem..1")
+
+print(rowSums(data[,dyp_haeme_names]))
+data <- cbind(data, DyP_haeme_total =rowSums(data[,dyp_haeme_names])) 
+print(head(data))
+
+#prepare for plotting
 data2 <- melt(data)
 colnames(data2) <- c("label", "category", "value")
 data2 <- as_tibble(data2)
