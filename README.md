@@ -4,7 +4,7 @@ This repository contains the analysis pipeline used to generate the comparative 
 
 ## Important information
 
-Currently this repository is being worked to include all files and streamlined instructions to run all analyses. This will be finished before the manuscript is accepted for publication in a scientific journal.
+Currently this repository is being worked on to include all files, scripts and streamlined instructions to run all analyses. This will be finished before the manuscript is accepted for publication.
 
 ## Prerequisites
 The workflows used to analyse the data are designed in such a way that they can run on desktop computers (although this is strongly discouraged), solitary linux servers or large HPC clusters. We strongly encourage to run this on an HPC system, to be able to benefit from parallelization of different tasks. We support the commonly used job sheduling systems SGE and SLURM.
