@@ -20,3 +20,5 @@ tmp/
 saccharis_backup/
 TODO.md
 data/82_genomes_v2/
+phylogeny/phylociraptor
+genome-annotation/smsi-funannotate
