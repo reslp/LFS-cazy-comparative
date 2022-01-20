@@ -10,9 +10,9 @@ This repository contains the analysis pipeline used to generate the comparative 
 
 [Installation](#Installation)
 
-[Part 1: Phylogenomics](#Part-1--Recreate-phylogenomic-analysis)
+[Part 1: Phylogenomics](#Part-1---Recreate-phylogenomic-analysis)
 
-[Part 2: Genome annotation](#Part-2:-Genome-annotation)
+[Part 2: Genome annotation](#Part-2---Genome-annotation)
 
 [Part 3: Comparative genomics](#Part-3:-Comparative-genomics)
 
@@ -90,7 +90,7 @@ $ ./setup.sh
 
 ## Running the workflows to recreate results
 
-### Part 1: Recreate phylogenomic analysis
+### Part 1 - Recreate phylogenomic analysis
 
 We used our [phylociraptor](https://github.com/reslp/phylociraptor) pipeline to calculate phylogenomic trees. This part of the analysis can be found in `./phylogeny/phylociraptor`. 
 Make sure that you run the `setup.sh` script before.
@@ -139,7 +139,7 @@ To recreate phylogenomic results you should run these commands in this order. Mi
 
 After you finsihed running step 7 we have recreated the phylogenomic results presented in the LFS-cazy paper.
 
-### Part 2: Genome annotation
+### Part 2 - Genome annotation
 
 For genome annotation we used [funannotate](https://github.com/nextgenusfs/funannotate) using our in-house pipeline [smsi-funannotate](https://github.com/reslp/smsi-funannotate). Running this part of the analysis is independent of Part 1, however you need to make sure to run `setup.sh` and that you have snakemake and singularity installed correctly.
 
