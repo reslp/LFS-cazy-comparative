@@ -10,7 +10,7 @@ This repository contains the analysis pipeline used to generate the comparative 
 
 [Installation](#Installation)
 
-[Part 1: Phylogenomics](#Part-1:-Recreate-phylogenomic-analysis)
+[Part 1: Phylogenomics](#Part-1--Recreate-phylogenomic-analysis)
 
 [Part 2: Genome annotation](#Part-2:-Genome-annotation)
 
@@ -77,7 +77,9 @@ The used version in the paper is Signal-P 4.1.
 ADD
 
 
-3. Run the `setup.sh` script to download remaining workflows for phylogenomics and genome annotation as well as the input data from NCBI.
+3. Now run the `setup.sh` script to download remaining workflows for phylogenomics and genome annotation as well as the input data from NCBI.
+
+This script will take some time to run depending on your internet connection and computer hardware. Please make sure that you have completed the previous steps first!
 
 ```
 $ ./setup.sh
