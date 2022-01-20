@@ -46,7 +46,7 @@ then
 	git checkout 1ed30e3
 	cd ../..
 	echo "Will download additional required software to input-data/genome-annotation/data/external"
-	echo "Downloading Interproscan 5.48-83.0, this can take some time... please be patient."
+	echo "Downloading Interproscan 5.48-83.0, this can take some time... please be patient the."
 	wget -P input-data/genome-annotation/data/external http://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.48-83.0/interproscan-5.48-83.0-64-bit.tar.gz
 	echo "Interproscan successfully downloaded. Unpacking..."
 	tar -xvfz input-data/genome-annotation/data/external/interproscan-5.48-83.0-64-bit.tar.gz
@@ -93,7 +93,26 @@ then
 	sed -i 's$MAX_ALLOWED_ENTRIES=20000$MAX_ALLOWED_ENTRIES=100000$' genome-annotation/smsi-funannotate/data/external/signalp-4.1/signalp
 	echo "Signal-P setup complete"
 	echo
-
+	echo "Now checkiong for RepeatMasker libraries in input-files/Repeatmasker_Libraries.tar.gz"
+	echo "If this file is not present, the annotation pipeline will be configured to used TanTan for repeatmasking instead!"
+	echo "Please refer to the README file if you would like to know more about this..."
+	if [[ -f input-files/Repeatmasker_Libraries.tar.gz ]]
+	then
+		echo "Repeatmasker Library found, will unpack now..."
+		tar -xf input-files/Repeatmasker_Libraries.tar.gz -C genome-annotation/smsi-funannotate/data/
+		echo "Repeatmasker Library was unpacked to genome-annotation/smsi-funannotate/data/."
+		echo "IMPORTANT: Make sure that the folder of the library is called RepeatMaskerLibraries!"		
+	else
+		echo "Repeatmasker Library not found, will change Repeatmasking to tantan instead."
+		sed -i 's/repeatmasker/tantan/' genome-annotation/smsi-funannotate/data/config.yaml
+	fi
+	
+	echo "------------------------------------------------------------"
+	echo "Will setup Part3 (comparative genomics)..."
+	echo "done"
+	echo
+	echo "Setup is finished. Please refer to the README files for further instructions on how to perform analyses."
+	exit 0
 else
 	echo "OK, will abort setup."
  	exit 0
