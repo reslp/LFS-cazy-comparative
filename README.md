@@ -84,7 +84,7 @@ In case you don't have this library, the setup script will prepare genome annota
 3. Now run the `setup.sh` script to download remaining workflows for phylogenomics and genome annotation as well as the input data from NCBI.
 
 This script will take some time to run depending on your internet connection and computer hardware. Please make sure that you have completed the previous steps first!
-](https://gitlab.com/mcfrith/tantan)
+
 ```
 $ ./setup.sh
 ```

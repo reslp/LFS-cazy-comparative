@@ -26,16 +26,33 @@ then
 	echo "Will clone phylociraptor into the ./phylogeny directory"
 	git clone --recursive https://github.com/reslp/phylociraptor.git phylogeny/phylociraptor
 	cd phylogeny/phylociraptor
-	echo "Will checkout version used in the paper..."
-	git checkout a93b4c8
-	# add genome download here once we have NCBI accession numbers
+	echo "Phylociraptor has changed and improved quite a bit since it was used to analyse the data for this paper."
+	echo "There is no harm to use the most current version of it. However it is also possible to use the same version as in the paper:"
+	read -p "Would you like to use the exact version of phylociraptor as was used in the paper? (y/n)" phyv
+	if [[ $phyv == "y" || $phyv == "Y" ]]
+	then
+		echo "Will checkout version (git commit a93b4c8) used in the paper now..."
+		git checkout a93b4c8
+	else
+		echo "Will keep updated version of phylociraptor"
+	fi
 	cd ../..
 	echo "Will copy over config files for phylociraptor from input-data/phylociraptor."
 	echo "These files contain settings and taxon selection used in the study."
-	echo "HINT: Currently these files do not contain the final NCBI accession number as we are still waiting for them..."
+	echo "Copy config file"
 	cp input-data/phylciraptor/config.yaml phylogeny/phylociraptor/data
+	echo "Copy samples file"
 	cp input-data/phylociraptor/LFS-phylogenomics-taxon-selection.csv phylogeny/phylociraptor/data	
-	echo "Files copied successfully. You may now look at the README file to see how to recreate phylogenomic results."
+	echo "Copy genome_download script"
+	cp input-data/phylociraptor/download_assemblies.sh phylogeny/phylociraptor/data
+	echo "Copy Dibaes and Graphis assemblies"
+	cp input-data/phylociraptor/assemblies/* phylogeny/phylociraptor/data/assemblies/
+	echo "Now I will download the remaining assemblies from NCBI"
+	cd phylogeny/phylociraptor/data/
+	bash download_assemblies.sh
+	cd ../../../
+	echo "$(pwd)"
+	echo " Setup for part 1 (phylogenomics) is complete. You may now look at the README file to see how to recreate phylogenomic results."
 	
 	echo "------------------------------------------------------------"
 	echo "Will setup Part2 (genome annotation)..."
@@ -109,12 +126,30 @@ then
 	
 	echo "------------------------------------------------------------"
 	echo "Will setup Part3 (comparative genomics)..."
-	echo "done"
-	echo
+	echo "Downloading data from Dryad (https://datadryad.org/stash/dataset/doi:10.5061/dryad.3xsj3txjb)"
+	cd comparative-analysis/data
+	#wget https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3xsj3txjb/download -O dryad_dataset.zip
+	echo "Download finished. Unpacking data."
+	unzip dryad_dataset.zip
+	mv README ../README-Dryad
+	unzip LFS-Cazy-comparative-phylogeny-annotations-settings.zip
+	mv for_dryad/genome_annotations/* 83_genomes/
+	mv for_dryad/other/all_ascomycota_peroxidases_redoxibase.fas all_ascomycota_peroxidases_redoxibase.fas
+	mv for_dryad/other/sugar_transporters_characterized_reference_seqs.fa sugar_transporters_characterized_reference_seqs.fa
+	mv for_dryad/other/stats_genomes.csv 83_genomes/
+	mv for_dryad/other/lifestyle 83_genomes/
+	mv for_dryad/other/r8s_template.nex 83_genomes/
+	mv for_dryad/other/character_information.csv 83_genomes/
+#	mkdir settings_and_parameters
+#	mv for_dryad/other/apriori_cazyme_sets.txt settings_and_parameters/
+	mv for_dryad/other/cloned_putative_cellulases.txt settings_and_parameters/
+	mv for_dryad/other/color_information.csv settings_and_parameters/
+	mv for_dryad/other/taxonomy_information.csv settings_and_parameters/
+	mv for_dryad/phylogeny 83_genomes/
 	echo "Setup is finished. Please refer to the README files for further instructions on how to perform analyses."
-	exit 0
+	
 else
 	echo "OK, will abort setup."
  	exit 0
-fi
+fi	
 
