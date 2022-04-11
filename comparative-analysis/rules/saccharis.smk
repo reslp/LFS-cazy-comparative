@@ -77,7 +77,7 @@ rule saccharis:
 	input:
 		seqs = rules.prepare_saccharis.output.renamed_sequences,
 		cazy = rules.scrape_cazy.output.checkpoint,
-		family = "results/cazy_characterization/cazy_information/{fam}_characterized.txt"
+#		family = "results/cazy_characterization/cazy_information/{fam}_characterized.txt"
 	output:
 		checkpoint = "results/cazy_characterization/saccharis/saccharis_{fam}.done"
 		
