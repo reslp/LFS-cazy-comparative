@@ -2,49 +2,47 @@
 rule create_gene_family_table:
     input:
         checkpoint = rules.infer_orthology.output.checkpoint,
-	cazy_file = "data/83_genomes/CAZyme.all.results.csv" 
+        cazy_file = "data/83_genomes/CAZyme.all.results.csv" 
     output:
-        raw_file_of = "results/gene_family_evolution/cafe/orthofinder_raw_cafe_input_file.tab",
-	raw_file_cz = "results/gene_family_evolution/cafe/cazy_raw_cafe_input_file.tab"
+        raw_file_cz = "results/gene_family_evolution/cafe/cazy_raw_cafe_input_file.tab"
     singularity:
         "docker://reslp/biopython_plus:1.77"
     params:
         prefix = config["prefix"]
     shell:
         """
-        python bin/orthofinder_to_cafe.py -i results/orthology/orthofinder/Results_ortho/Orthogroups/Orthogroups.GeneCount.tsv -o {output.raw_file_of}
         python bin/cazy_counts_to_cafe.py -i {input.cazy_file} -o {output.raw_file_cz}
 	"""
 
 
-if config["cafe"]["filter"] == "yes":
-	rule filter_cafe_family_table:
-		input:
-			raw_file = rules.create_gene_family_table.output.raw_file_of
-		output:
-			orthofinder_filtered_file = "results/gene_family_evolution/cafe/orthofinder_filtered_cafe_input_file.tab"
-		params:
-			wd = os.getcwd(),
-			prefix = config["prefix"]
-		conda:
-			"../envs/pyutils.yml"
-		shell:
-			"""
-			cd results/gene_family_evolution/cafe/
-			name=$(basename "{params.wd}/{input.raw_file}")
-			python {params.wd}/bin/clade_and_size_filter.py -i "$name" -o {params.wd}/{output.orthofinder_filtered_file} -s
-			cd {params.wd}
-			"""
-else:
-	rule filter_cafe_family_table:
-		input:
-			raw_file = rules.create_gene_family_table.output.raw_file_of
-		output:
-			orthofinder_filtered_file = "results/gene_family_evolution/cafe/orthofinder_filtered_cafe_input_file.tab"
-		shell:
-			"""
-			cp {input.raw_file} {output.filtered_file}
-			"""
+#if config["cafe"]["filter"] == "yes":
+#	rule filter_cafe_family_table:
+#		input:
+#			raw_file = rules.create_gene_family_table.output.raw_file_of
+#		output:
+#			orthofinder_filtered_file = "results/gene_family_evolution/cafe/orthofinder_filtered_cafe_input_file.tab"
+#		params:
+#			wd = os.getcwd(),
+#			prefix = config["prefix"]
+#		conda:
+#			"../envs/pyutils.yml"
+#		shell:
+#			"""
+#			cd results/gene_family_evolution/cafe/
+#			name=$(basename "{params.wd}/{input.raw_file}")
+#			python {params.wd}/bin/clade_and_size_filter.py -i "$name" -o {params.wd}/{output.orthofinder_filtered_file} -s
+#			cd {params.wd}
+#			"""
+#else:
+#	rule filter_cafe_family_table:
+#		input:
+#			raw_file = rules.create_gene_family_table.output.raw_file_of
+#		output:
+#			orthofinder_filtered_file = "results/gene_family_evolution/cafe/orthofinder_filtered_cafe_input_file.tab"
+#		shell:
+#			"""
+#			cp {input.raw_file} {output.filtered_file}
+#			"""
 
 rule create_cafe_style_tree:
     input:
@@ -84,8 +82,6 @@ rule create_cafe_style_tree:
 
 rule run_cafe:
 	input:
-		data_of = rules.filter_cafe_family_table.output.orthofinder_filtered_file,
-		data_raw_of = rules.create_gene_family_table.output.raw_file_of,
 		data_cz = rules.create_gene_family_table.output.raw_file_cz,
 		tree = rules.create_cafe_style_tree.output.tree,
 		cafe_tree = rules.create_cafe_style_tree.output.cafe_tree
@@ -131,12 +127,6 @@ rule run_cafe:
 		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_3_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
 		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_4_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
 		cafe -t {input.tree} -i {input.data_cz} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_cazy_two_rates_5_errm -eresults/gene_family_evolution/cafe/error_model_two_rates/Base_error_model.txt | tee {log}
-	
-		#echo "Run cafe for filtered orthofinder results:"
-		#cafe -t {input.tree} -i {input.data_of} -p -y {input.cafe_tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_filtered | tee {log}
-		
-		#echo "Run cafe for unfiltered orthofinder results:"
-		#cafe -i {input.data_raw_of} -t {input.tree} -o results/gene_family_evolution/cafe/cafe_output_orthofinder_raw | tee {log}
 		
 		touch {output.checkpoint}
 		"""
