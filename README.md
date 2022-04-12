@@ -74,6 +74,9 @@ The used version in the paper is Signal-P 4.1.
 
 *RepeatMasker Libraries*
 
+
+By default, repeatmasking is turned off during genome annotation, simply because assemblies downloaded from NCBI are already pre-masked. Therfore, you can skip this step and continue with point 3 below. You only have to perform the following steps if you would like do do repeatmasking yourself again:
+
 The RepBase repeat library has become proprietary. By default the containers used in the pipeline will use the built in library shipped with RepeatMasker. It is however possible to use old versions of the RepBase library. This is handled by mounting the respective directory (Libraries directory in the RepeatMasker directory) into the container like so:
 
 If you have a copy of the RepBase library available tar and gzip the folder, rename it to `Repeatmasker_Libraries.tar.gz` and place this file in `input-data`.
@@ -239,7 +242,7 @@ The commands here assume the pipeline is run an SGE cluster (in this case Sauron
 ./submit.sh -t sge -c data/cluster_config-sauron.yaml -s "-r infer_gene_family_evolution"
 ```
 
-
+After running all these steps you have recreated the comparative genomic results.
 
 
  
