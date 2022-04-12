@@ -1,6 +1,11 @@
 # CAZymes in Lichen fungal symbionts
 
-This repository contains the analysis pipeline used to generate the comparative genomic results of the Manuscript: Large differences in carbohydrate degradation and transport potential in the genomes of lichen fungal symbionts. This study is currently available as preprint on BioRxiv: https://www.biorxiv.org/content/10.1101/2021.08.01.454614v1. *If you use parts of this repository please cite us.*
+This repository contains the analysis pipeline used to generate the comparative genomic results of the manuscript: Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. 
+
+*If you use parts of this repository please cite us.*
+
+Additionally, there exists a preprint on BioRxiv: https://www.biorxiv.org/content/10.1101/2021.08.01.454614v1. 
+
 
 ## Contents
 
@@ -16,12 +21,8 @@ This repository contains the analysis pipeline used to generate the comparative 
 
 [Part 3: Comparative genomics](#Part-3---Comparative-genomics)
 
-## Important information
-
-Currently this repository is being worked on to include all files, scripts and streamlined instructions to run all analyses. This will be finished before the manuscript is accepted for publication.
-
 ## Hardware and Software requirements
-The workflows used to analyse the data are designed in such a way that they can run on desktop computers (although this is strongly discouraged), solitary linux servers or large HPC clusters. We strongly encourage to run this on an HPC system, to be able to benefit from parallelization of different tasks. We support the commonly used job sheduling systems SGE and SLURM.
+The workflows used to analyse the data are designed in such a way that they can run on desktop computers (although this is strongly discouraged), solitary linux servers or large HPC clusters. We strongly encourage you to run this on an HPC system, to be able to benefit from parallelization of different tasks. We support the commonly used job sheduling systems SGE and SLURM.
 
 Local computer or solitary server:
 
@@ -51,7 +52,7 @@ git clone --recursive https://github.com/reslp/LFS-cazy-comparative.git
 
 2. Download external dependecies
 
-Before the setup can proceed, several external dependencies need to be downloaded manually. This cannot be done automatically, since these software packages require you to acquire a personalized license.
+Before setup can proceed, several external dependencies need to be downloaded manually. This cannot be done automatically, since these software packages require you to acquire a personalized license.
 Place all downloaded files in `input-data` and make sure that they are correctly named (see below). Otherwise the setup script will complain. 
 
 *GeneMark ES*
@@ -60,7 +61,7 @@ GeneMark-ES can be downloaded here: [topaz.gatech.edu/GeneMark/license_download.
 
 You will get two files: `gmes_linux_64.tar.gz` and `gm_key_64.gz`. Place them into the folder `input-files` so that the setup script is able to find them.
 
-The used version in the paper is 4.62.
+The used version of GeneMark in the paper is 4.62.
 
 
 *Signal-P*
@@ -73,11 +74,11 @@ The used version in the paper is Signal-P 4.1.
 
 *RepeatMasker Libraries*
 
-The RepBase repeat library has become proprietory. By default the containers used in the pipeline will use the built in library shipped with RepeatMasker. It is however possible to use old versions of the RepBase library. This is handled by mounting the respective directory (Libraries directory in the RepeatMasker directory) into the container like so:
+The RepBase repeat library has become proprietary. By default the containers used in the pipeline will use the built in library shipped with RepeatMasker. It is however possible to use old versions of the RepBase library. This is handled by mounting the respective directory (Libraries directory in the RepeatMasker directory) into the container like so:
 
 If you have a copy of the RepBase library available tar and gzip the folder, rename it to `Repeatmasker_Libraries.tar.gz` and place this file in `input-data`.
 
-**IMPORTANT Depending on the used version of this Library Repeatmasking may be slightly different compared to what is published in this paper. The used Version of the RepBase library used here is from August 2018, shortly before RepBase became proprietory.**
+**IMPORTANT Depending on the used version of this Library repeatmasking may be slightly different compared to what is published in this paper. The used Version of the RepBase library used here is from August 2018, shortly before RepBase became proprietary.**
 
 In case you don't have this library, the setup script will prepare genome annotation so that [tantan](https://gitlab.com/mcfrith/tantan) is used instead.
 
@@ -89,19 +90,16 @@ This script will take some time to run depending on your internet connection and
 $ ./setup.sh
 ```
 
-**Currently the setup script is under development and we have to wait for NCBI accession number to finalize it. The script currently downloads all software but not the input data. Downloading input files will be added before the paper gets published**
-
-
 ## Running the workflows to recreate results
 
 ### Part 1 - Recreate phylogenomic analysis
 
 We used our [phylociraptor](https://github.com/reslp/phylociraptor) pipeline to calculate phylogenomic trees. This part of the analysis can be found in `./phylogeny/phylociraptor`. 
-Make sure that you run the `setup.sh` script before.
-This script will download the phylociraptor GitHub repository to `./phylogeny` and revert it to the version (based on git commits) that was used in the paper.
+**Make sure that you run the `setup.sh` script before.**
+This script will download the phylociraptor GitHub repository to `./phylogeny` and revert it to the version (based on git commits) that was used in the paper and it will download all assemblies used in the analysis.
 Additionally, it will copy the input files necessary to run phylociraptor from `./input-files/phylociraptor` so that the analysis is ready to go. 
 
-To recreate phylogenomic results you should run these commands in this order. Mind you that this can take significant amount of time depending on you computation resources. It is highly recommended to run this on HPC clusters only. The example commands here assume a SLURM submission system.
+To recreate phylogenomic results you should run phylociraptor commands in the following order. Mind you that this can take significant amount of time depending on you computational resources. It is highly recommended to run this on HPC clusters only. The example commands here assume a SLURM submission system.
 
 **IMORTANT: All commands need to be run from within the `phylogeny/phylociraptor` directory. Snakemake and Singularity (see above) need to available** 
 
@@ -139,15 +137,15 @@ To recreate phylogenomic results you should run these commands in this order. Mi
 ./phylociraptor -m tree -t slurm -c data/cluster-config-SLURM.yaml.template
 ```
 
-**IMPORTANT: If you compare these commands to how phylociraptor is currently run you may notice a few differences. This is because phylociraptor has been greatly enhanced since it was used for the LFS-cazy study. You may also want to try using a more recent version**
+**IMPORTANT: If you compare these commands to how phylociraptor is currently run you may notice a few differences. This is because phylociraptor has been greatly enhanced since it was used for the LFS-cazy study. You may also want to try using a more recent version. The results should be the same.**
 
 After you finsihed running step 7 we have recreated the phylogenomic results presented in the LFS-cazy paper.
 
 ### Part 2 - Genome annotation
 
-For genome annotation we used [funannotate](https://github.com/nextgenusfs/funannotate) using our in-house pipeline [smsi-funannotate](https://github.com/reslp/smsi-funannotate). Running this part of the analysis is independent of Part 1, however you need to make sure to run `setup.sh` and that you have snakemake and singularity installed correctly.
+For genome annotation we used [funannotate](https://github.com/nextgenusfs/funannotate) as part of our in-house pipeline [smsi-funannotate](https://github.com/reslp/smsi-funannotate). Creating de-novo genome annotations is independent of Part 1, however you need to make sure to run `setup.sh` and that you have snakemake and singularity installed correctly.
 
-Due to many dependencies and different databases used this part requires additional setup steps. What is described here is largely according to the README files and instructions also given in the [smsi-funannotate](https://github.com/reslp/smsi-funannotate) README file.
+Due to many dependencies and different databases which are used this part requires additional setup steps. What is described here is largely according to the README files and instructions also given in the [smsi-funannotate](https://github.com/reslp/smsi-funannotate) README file.
 
 **IMPORTANT: All commands need to be run in the `genome-annotation/smsi-funannotate` folder and snakemake and singularity need to be available**
 
