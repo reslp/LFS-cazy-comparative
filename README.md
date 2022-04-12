@@ -1,6 +1,6 @@
 # CAZymes in Lichen fungal symbionts
 
-This repository contains the analysis pipeline used to recreate results of the manuscript: Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. 
+This repository contains the analysis pipeline used in the manuscript: Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. 
 
 *If you use parts of this repository please cite us.*
 
@@ -75,7 +75,7 @@ The used version in the paper is Signal-P 4.1.
 *RepeatMasker Libraries*
 
 
-By default, repeatmasking is turned off during genome annotation, simply because assemblies downloaded from NCBI are already pre-masked. Therefore, you can skip this step and continue with point 3 (running the setup script) below. You only have to perform the following steps if you would like do do repeatmasking yourself again:
+By default, repeatmasking is turned off during genome annotation, simply because assemblies downloaded from NCBI are already pre-masked. Therefore, you can skip this step and continue with point 3 (running the setup script) below. You only have to perform the following steps if you would like to do repeatmasking yourself again:
 
 The RepBase repeat library has become proprietary. By default the containers used in the pipeline will use the built in library shipped with RepeatMasker. It is however possible to use old versions of the RepBase library. This is handled by mounting the respective directory (Libraries directory in the RepeatMasker directory) into the container like so:
 
