@@ -40,7 +40,7 @@ then
 	echo "Will copy over config files for phylociraptor from input-data/phylociraptor."
 	echo "These files contain settings and taxon selection used in the study."
 	echo "Copy config file"
-	cp input-data/phylciraptor/config.yaml phylogeny/phylociraptor/data
+	cp input-data/phylociraptor/config.yaml phylogeny/phylociraptor/data/
 	echo "Copy samples file"
 	cp input-data/phylociraptor/LFS-phylogenomics-taxon-selection.csv phylogeny/phylociraptor/data	
 	echo "Copy genome_download script"
@@ -123,12 +123,18 @@ then
 		echo "Repeatmasker Library not found, will change Repeatmasking to tantan instead."
 		sed -i 's/repeatmasker/tantan/' genome-annotation/smsi-funannotate/data/config.yaml
 	fi
-	
+        echo "Copy smsi-funannotate config files to the correct directory:"
+        cp input-data/genome-annotation/config.yaml genome-annotation/smsi-funannotate/data/
+        cp input-data/genome-annotation/data.csv genome-annotation/smsi-funannotate/data/
+        echo "Copy assemblies to correct directory:"
+        cp phylogeny/phylociraptor/data/assemblies/*.f* genome-annotation/smsi-funannotate/data/assemblies/
+        echo "Setup part 2 is done"	
+
 	echo "------------------------------------------------------------"
 	echo "Will setup Part3 (comparative genomics)..."
 	echo "Downloading data from Dryad (https://datadryad.org/stash/dataset/doi:10.5061/dryad.3xsj3txjb)"
 	cd comparative-analysis/data
-	#wget https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3xsj3txjb/download -O dryad_dataset.zip
+	wget https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3xsj3txjb/download -O dryad_dataset.zip
 	echo "Download finished. Unpacking data."
 	unzip dryad_dataset.zip
 	mv README ../README-Dryad
