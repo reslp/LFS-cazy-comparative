@@ -1,6 +1,6 @@
 # CAZymes in Lichen fungal symbionts
 
-This repository contains the analysis pipeline used to generate the comparative genomic results of the manuscript: Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. 
+This repository contains the analysis pipeline used to recreate results of the manuscript: Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. 
 
 *If you use parts of this repository please cite us.*
 
@@ -59,7 +59,7 @@ Place all downloaded files in `input-data` and make sure that they are correctly
 
 GeneMark-ES can be downloaded here: [topaz.gatech.edu/GeneMark/license_download.cgi](http://topaz.gatech.edu/GeneMark/license_download.cgi)
 
-You will get two files: `gmes_linux_64.tar.gz` and `gm_key_64.gz`. Place them into the folder `input-files` so that the setup script is able to find them.
+You will get two files: `gmes_linux_64.tar.gz` and `gm_key_64.gz`. Place them in the folder `input-files` so that the setup script is able to find them.
 
 The used version of GeneMark in the paper is 4.62.
 
@@ -75,15 +75,13 @@ The used version in the paper is Signal-P 4.1.
 *RepeatMasker Libraries*
 
 
-By default, repeatmasking is turned off during genome annotation, simply because assemblies downloaded from NCBI are already pre-masked. Therfore, you can skip this step and continue with point 3 below. You only have to perform the following steps if you would like do do repeatmasking yourself again:
+By default, repeatmasking is turned off during genome annotation, simply because assemblies downloaded from NCBI are already pre-masked. Therefore, you can skip this step and continue with point 3 (running the setup script) below. You only have to perform the following steps if you would like do do repeatmasking yourself again:
 
 The RepBase repeat library has become proprietary. By default the containers used in the pipeline will use the built in library shipped with RepeatMasker. It is however possible to use old versions of the RepBase library. This is handled by mounting the respective directory (Libraries directory in the RepeatMasker directory) into the container like so:
 
 If you have a copy of the RepBase library available tar and gzip the folder, rename it to `Repeatmasker_Libraries.tar.gz` and place this file in `input-data`.
 
 **IMPORTANT Depending on the used version of this Library repeatmasking may be slightly different compared to what is published in this paper. The used Version of the RepBase library used here is from August 2018, shortly before RepBase became proprietary.**
-
-In case you don't have this library, the setup script will prepare genome annotation so that [tantan](https://gitlab.com/mcfrith/tantan) is used instead.
 
 3. Now run the `setup.sh` script to download remaining workflows for phylogenomics and genome annotation as well as the input data from NCBI.
 
@@ -102,9 +100,9 @@ We used our [phylociraptor](https://github.com/reslp/phylociraptor) pipeline to 
 This script will download the phylociraptor GitHub repository to `./phylogeny` and revert it to the version (based on git commits) that was used in the paper and it will download all assemblies used in the analysis.
 Additionally, it will copy the input files necessary to run phylociraptor from `./input-files/phylociraptor` so that the analysis is ready to go. 
 
-To recreate phylogenomic results you should run phylociraptor commands in the following order. Mind you that this can take significant amount of time depending on you computational resources. It is highly recommended to run this on HPC clusters only. The example commands here assume a SLURM submission system.
+To recreate phylogenomic results you should run phylociraptor commands in the following order. Mind that this can take a significant amount of time depending on your computational resources. It is highly recommended to run this on HPC clusters only. The example commands here assume a SLURM submission system.
 
-**IMORTANT: All commands need to be run from within the `phylogeny/phylociraptor` directory. Snakemake and Singularity (see above) need to available** 
+**IMORTANT: All commands need to be run from within the `phylogeny/phylociraptor` directory. Snakemake and Singularity (see above) need to be available** 
 
 1. Setup the phylogenomic analysis:
 
@@ -142,7 +140,7 @@ To recreate phylogenomic results you should run phylociraptor commands in the fo
 
 **IMPORTANT: If you compare these commands to how phylociraptor is currently run you may notice a few differences. This is because phylociraptor has been greatly enhanced since it was used for the LFS-cazy study. You may also want to try using a more recent version. The results should be the same.**
 
-After you finsihed running step 7 we have recreated the phylogenomic results presented in the LFS-cazy paper.
+After you finished running step 7 you have recreated the phylogenomic results presented in the LFS-cazy paper.
 
 ### Part 2 - Genome annotation
 
@@ -175,18 +173,19 @@ You should now see a list of all installed funannotate databases. For this study
   gene2product      text        1.65         2020-10-05         33749   0f2d46d3f7d1f08a87c1d4fec1eb05bb
 ```
 
-**IMPORTANT: These databases are constantly updated, so it may happen that you will see different version numbers, Md5checksum or Dates in your own databases. These differences may lead to slight differences during gene-calling and annotation compared to what is reported in the published version of the paper**
+**IMPORTANT: These databases are constantly updated, so it may happen that you will see different version numbers, Md5checksum or dates in your own databases. These differences may lead to slight differences during gene-calling and annotation compared to what is reported in the published version of the paper**
 
-2. Setup additional dependencies of funannotate which require a license
+2. Setup additional dependencies of funannotate which require a personalized license
 
-Funannotate uses several additional programs such as eggnog-mapper, Signal-P and GeneMark ES, which require you to get a license. For eggnog-mapper we created a Docker container (which can be used with Singularity as well).
+Funannotate uses several additional programs such as eggnog-mapper, Signal-P and GeneMark ES, which require you to get a license. For eggnog-mapper we created a Docker container (which can be used with Singularity as well). If you follow the instructions above, the setup script will have prepared this for you.
 
 ### Part 3 - Comparative genomics 
+
+**IMPORTANT: Make sure you run the setup script first**
 
 For the pipeline to run you will have to change a few things so that parameters fit your own computer infrastructure:
 
 1. Adjust the `comparative-analysis/data/cluster-config.yaml` file to fit your own cluster enviroment (if you work on a HPC cluster).
-3. Place input files in the correct folder. The pipeline needs several input files corresponding to the individual genomes such as GFF3 files, predicted proteins and transcripts, and annotation files produced by funannotate. Currently these files are not included in the repository. When the manuscript and the associated data gets published, download of this data will be automated and included here. 
 
 #### Run the pipeline:
 
