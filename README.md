@@ -1,10 +1,11 @@
 # CAZymes in Lichen fungal symbionts
 
-This repository contains the analysis pipeline used in the manuscript: Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. 
+This repository contains the analysis pipeline used in the publication: **Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts** published in [Nature Communications](https://www.nature.com/articles/s41467-022-30218-6)
 
-*If you use parts of this repository please cite us.*
+**If you use parts of this repository please cite us:**
 
-Additionally, there exists a preprint on BioRxiv: https://www.biorxiv.org/content/10.1101/2021.08.01.454614v1. 
+
+Resl, Philipp; Bujold, Adina R.; Tagirdzhanova, Gulnara; Meidl, Peter; Freire Rallo, Sandra; Kono, Mieko; Fernández-Brime, Samantha; Guðmundsson, Hörður; Andrésson, Ólafur Sigmar; Muggia, Lucia; Mayrhofer, Helmut; McCutcheon, John P.; Wedin, Mats; Werth, Silke; Willis, Lisa M.; Spribille, Toby (**2022**) Large differences in carbohydrate degradation and transport potential among lichen fungal symbionts. *Nature Communications* **13**: 2634. https://doi.org/10.1038/s41467-022-30218-6
 
 
 ## Contents
