@@ -1,0 +1,20 @@
+#NEXUS
+
+Begin trees;
+tree tree_1 = %%tree%%
+End;
+
+begin r8s;
+blformat lengths=persite nsites=%%nsites%% ultrametric=no;
+
+
+set smoothing=500;
+
+fixage taxon=root age=1000;
+
+divtime method=PL algorithm=TN;
+describe plot=chrono_description;
+describe plot=cladogram;
+quit;
+
+end;
